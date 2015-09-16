@@ -46,7 +46,7 @@ patterns.
 ### Connections 
 
 Helper functions are provided for both building the GraphQL types
-for connections and for implementing the `resolve` method for fields
+for connections and for implementing the `resolver` method for fields
 returning those types.
 
  - `connectionArgs` returns the arguments that fields should provide when
@@ -55,7 +55,7 @@ they return a connection type.
 `edgeType`, given a name and a node type.
  - `connectionFromArray` is a helper method that takes an array and the
 arguments from `connectionArgs`, does pagination and filtering, and returns
-an object in the shape expected by a `connectionType`'s `resolve` function.
+an object in the shape expected by a `connectionType`'s `resolver` function.
  - `connectionFromPromisedArray` is similar to `connectionFromArray`, but
 it takes a promise that resolves to an array, and returns a promise that
 resolves to the expected shape by `connectionType`.
@@ -93,7 +93,7 @@ factionType = GraphQLObjectType(
 This shows adding a `ships` field to the `Faction` object that is a connection.
 It uses `connectionDefinitions({name: 'Ship', nodeType: shipType})` to create
 the connection type, adds `connectionArgs` as arguments on this function, and
-then implements the resolve function by passing the array of ships and the
+then implements the resolver function by passing the array of ships and the
 arguments to `connectionFromArray`.
 
 ### Object Identification
