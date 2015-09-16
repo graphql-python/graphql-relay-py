@@ -33,16 +33,16 @@ photoData = {
   '2': Photo(photoId=2, width=400),
 }
 
-def getNode(globalId):
+def getNode(globalId, *args):
   resolvedGlobalId = fromGlobalId(globalId)
   _type, _id = resolvedGlobalId.type, resolvedGlobalId.id
-  if type == 'User':
-    return userData[id]
+  if _type == 'User':
+    return userData[_id]
   else:
-    return photoData[id]
+    return photoData[_id]
 
 def getNodeType(obj):
-  if hasattr(obj, 'id'):
+  if isinstance(obj, User):
     return userType
   else:
     return photoType
@@ -104,7 +104,38 @@ def test_gives_different_ids():
           'id': 'UGhvdG86Mg=='
         },
       ]
-    };
+    }
+    result = graphql(schema, query)
+    assert result.errors == None
+    assert result.data == expected
+
+def test_refetches_the_ids():
+    query = '''
+    {
+      user: node(id: "VXNlcjox") {
+        id
+        ... on User {
+          name
+        }
+      },
+      photo: node(id: "UGhvdG86MQ==") {
+        id
+        ... on Photo {
+          width
+        }
+      }
+    }
+    '''
+    expected = {
+      'user': {
+        'id': 'VXNlcjox',
+        'name': 'John Doe'
+      },
+      'photo': {
+        'id': 'UGhvdG86MQ==',
+        'width': 300
+      }
+    }
     result = graphql(schema, query)
     assert result.errors == None
     assert result.data == expected
