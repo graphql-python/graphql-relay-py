@@ -7,8 +7,21 @@ from .connection.arrayconnection import (
 	connectionFromPromisedArray,
 	cursorForObjectInConnection
 )
+from .node.node import (
+	nodeDefinitions,
+	fromGlobalId,
+	toGlobalId,
+	globalIdField,
+)
+
 
 __all__ = [
-	'connectionArgs', 'connectionDefinitions', 'connectionFromArray',
-	'connectionFromPromisedArray', 'cursorForObjectInConnection'
+	# Helpers for creating connection types in the schema
+	'connectionArgs', 'connectionDefinitions',
+	# Helpers for creating connections from arrays
+	'connectionFromArray', 'connectionFromPromisedArray', 'cursorForObjectInConnection',
+	# Helper for creating node definitions
+	'nodeDefinitions',
+	# Utilities for creating global IDs in systems that don't have them
+	'fromGlobalId', 'toGlobalId', 'globalIdField',
 ]
