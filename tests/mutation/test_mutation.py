@@ -237,5 +237,4 @@ def test_contains_correct_field():
     }
     result = graphql(schema, query)
     assert result.errors == None
-    print result.data
     assert result.data == expected
