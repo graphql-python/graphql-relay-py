@@ -236,8 +236,6 @@ After cloning this repo, ensure dependencies are installed by running:
 python setup.py install
 ```
 
-This library is written in Python.
-
 After developing, the full test suite can be evaluated by running:
 
 ```sh
