@@ -251,7 +251,7 @@ def mutateAndGetPayload(data, *_):
     return IntroduceShipMutation(
         shipId=newShip.id,
         factionId=factionId,
-    );
+    )
 
 shipMutation = mutationWithClientMutationId(
     'IntroduceShip',

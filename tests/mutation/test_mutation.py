@@ -9,33 +9,33 @@ from graphql.core.type import (
 )
 
 from graphql_relay.mutation.mutation import (
-  mutationWithClientMutationId,
+    mutationWithClientMutationId,
 )
 
 class Result(object):
-  def __init__(self, result, clientMutationId=None):
-    self.clientMutationId = clientMutationId
-    self.result = result
+    def __init__(self, result, clientMutationId=None):
+        self.clientMutationId = clientMutationId
+        self.result = result
 
 simpleMutation = mutationWithClientMutationId(
-  'SimpleMutation',
-  inputFields= {},
-  outputFields= {
-    'result': GraphQLField(GraphQLInt)
-  },
-  mutateAndGetPayload= lambda *_: Result(result=1)
+    'SimpleMutation',
+    inputFields= {},
+    outputFields= {
+        'result': GraphQLField(GraphQLInt)
+    },
+    mutateAndGetPayload= lambda *_: Result(result=1)
 )
 
 mutation = GraphQLObjectType(
-  'Mutation',
-  fields= {
-    'simpleMutation': simpleMutation
-  }
+    'Mutation',
+    fields= {
+        'simpleMutation': simpleMutation
+    }
 )
 
 schema = GraphQLSchema(
-  query= mutation,
-  mutation= mutation
+    query= mutation,
+    mutation= mutation
 )
 
 def test_requires_an_argument():

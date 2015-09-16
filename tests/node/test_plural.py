@@ -17,29 +17,29 @@ from graphql.core.type import (
 from graphql_relay.node.plural import pluralIdentifyingRootField
 
 userType = GraphQLObjectType(
-  'User',
-  fields= lambda: {
-    'username': GraphQLField(GraphQLString),
-    'url': GraphQLField(GraphQLString),
-  }
+    'User',
+    fields= lambda: {
+        'username': GraphQLField(GraphQLString),
+        'url': GraphQLField(GraphQLString),
+    }
 )
 User = namedtuple('User', ['username', 'url'])
 
 
 queryType = GraphQLObjectType(
-  'Query',
-  fields= lambda: {
-    'usernames': pluralIdentifyingRootField(
-        'usernames',
-        description='Map from a username to the user',
-        inputType= GraphQLString,
-        outputType=userType,
-        resolveSingleInput=lambda username: User(
-          username=username,
-          url='www.facebook.com/' + username
+    'Query',
+    fields= lambda: {
+        'usernames': pluralIdentifyingRootField(
+              'usernames',
+              description='Map from a username to the user',
+              inputType= GraphQLString,
+              outputType=userType,
+              resolveSingleInput=lambda username: User(
+                  username=username,
+                  url='www.facebook.com/' + username
+              )
         )
-      )
-  }
+    }
 )
 
 schema = GraphQLSchema(query=queryType)

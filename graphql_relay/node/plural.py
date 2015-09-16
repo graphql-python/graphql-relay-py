@@ -1,5 +1,5 @@
 from graphql.core.type import (
-	GraphQLArgument,
+    GraphQLArgument,
     GraphQLList,
     GraphQLNonNull,
     GraphQLField,
@@ -8,21 +8,21 @@ from graphql.core.type import (
 # GraphQLInputObjectType
 
 def pluralIdentifyingRootField(argName, inputType, outputType, resolveSingleInput, description=None):
-	inputArgs = {}
-	inputArgs[argName] = GraphQLArgument(
-		GraphQLNonNull(
-			GraphQLList(
-				GraphQLNonNull(inputType)
-			)
-		)
-	)
-	def resolver(obj, args, *_):
-		inputs = args[argName]
-		return map(resolveSingleInput, inputs)
+    inputArgs = {}
+    inputArgs[argName] = GraphQLArgument(
+        GraphQLNonNull(
+            GraphQLList(
+                GraphQLNonNull(inputType)
+            )
+        )
+    )
+    def resolver(obj, args, *_):
+        inputs = args[argName]
+        return map(resolveSingleInput, inputs)
 
-	return GraphQLField(
-		GraphQLList(outputType),
-		description=description,
-		args=inputArgs,
-		resolver=resolver 
-	)
+    return GraphQLField(
+        GraphQLList(outputType),
+        description=description,
+        args=inputArgs,
+        resolver=resolver 
+    )

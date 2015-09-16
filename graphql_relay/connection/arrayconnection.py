@@ -81,14 +81,14 @@ def emptyConnection():
     )
 
 
-PREFIX = 'arrayconnection:';
+PREFIX = 'arrayconnection:'
 
 
 def offsetToCursor(offset):
     '''
     Creates the cursor string from an offset.
     '''
-    return base64(PREFIX + str(offset));
+    return base64(PREFIX + str(offset))
 
 
 def cursorToOffset(cursor):
