@@ -9,7 +9,6 @@ def connectionFromArray(data, args={}, **kwargs):
     a connection object for use in GraphQL. It uses array offsets as pagination,
     so pagination will only work if the array is static.
     '''
-    edges = [Edge(value, cursor=offsetToCursor(index)) for index, value in enumerate(data)]
     full_args = dict(args, **kwargs)
 
     before = full_args.get('before')
@@ -17,29 +16,35 @@ def connectionFromArray(data, args={}, **kwargs):
     first = full_args.get('first')
     last = full_args.get('last')
 
+    count = len(data)
     # Slice with cursors
-    begin = max(getOffset(after, -1), -1) + 1;
-    end = min(getOffset(before, len(edges) + 1), len(edges) + 1);
-    edges = edges[begin:end]
-    if len(edges) == 0:
+    begin = max(getOffset(after, -1), -1) + 1
+    end = min(getOffset(before, count + 1), count)
+    if begin >= count or begin>=end:
         return emptyConnection()
 
     # Save the pre-slice cursors
-    firstPresliceCursor = edges[0].cursor
-    lastPresliceCursor = edges[len(edges) - 1].cursor
+    firstPresliceCursor = offsetToCursor(begin)
+    lastPresliceCursor = offsetToCursor(min(end, count)-1)
 
     # Slice with limits
     if first != None:
-        edges = edges[0:first]
+        end = min(begin+first, end)
     if last != None:
-        edges = edges[-last:]
-    
-    if len(edges) == 0:
+        begin = max(end-last, begin)
+
+    if begin >= count or begin>=end:
         return emptyConnection()
 
+    sliced_data = data[begin:end]
+    edges = [
+        Edge(node, cursor=offsetToCursor(i+begin))
+        for i, node in enumerate(sliced_data)
+    ]
+
     # Construct the connection
-    firstEdge = edges[0];
-    lastEdge = edges[len(edges) - 1];
+    firstEdge = edges[0]
+    lastEdge = edges[len(edges) - 1]
     return Connection(
         edges,
         PageInfo(
