@@ -223,7 +223,7 @@ This code creates a mutation named `IntroduceShip`, which takes a faction
 ID and a ship name as input. It outputs the `Faction` and the `Ship` in
 question. `mutateAndGetPayload` then gets an object with a property for
 each input field, performs the mutation by constructing the new ship, then
-returns an object that will be resolved by the output fields.
+returns an object that will be resolved by the output fields. 
 
 Our mutation type then creates the `introduceShip` field using the return
 value of `mutationWithClientMutationId`.
