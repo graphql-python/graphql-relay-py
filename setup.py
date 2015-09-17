@@ -23,7 +23,7 @@ class PyTest(TestCommand):
         sys.exit(errno)
 
 setup(
-    name='graphql-relay-py',
+    name='graphql-relay',
     version='0.1',
 
     description='Relay implementation for Python',

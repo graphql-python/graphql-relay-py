@@ -36,7 +36,7 @@ Install Relay Library for GraphQL-py
 
 ```sh
 pip install git+https://github.com/dittos/graphql-py.git # Last version of graphql-py
-pip install graphql-relay-py
+pip install graphql-relay
 ```
 
 When building a schema for [GraphQL-py](https://github.com/dittos/graphql-py),
