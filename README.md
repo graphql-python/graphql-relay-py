@@ -4,7 +4,7 @@ This is a library to allow the easy creation of Relay-compliant servers using
 the [GraphQL-py](https://github.com/dittos/graphql-py) reference implementation
 of a GraphQL server.
 
-*Note: The code is a **exact** port of the original [graphql-relay js implementation](https://github.com/graphql/graphql-relay-js)
+*Note: The code is a __exact__ port of the original [graphql-relay js implementation](https://github.com/graphql/graphql-relay-js)
 from Facebook*
 
 [![Build Status](https://travis-ci.org/syrusakbary/graphql-relay-py.svg?branch=master)](https://travis-ci.org/syrusakbary/graphql-relay-py)
