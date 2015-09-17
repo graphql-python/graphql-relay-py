@@ -8,6 +8,6 @@ install:
 - pip install git+https://github.com/dittos/graphql-py.git # Last version of graphql-py
 script:
 - py.test --cov=graphql_relay
-- flake8
+# - flake8
 after_success:
 - coveralls
