@@ -47,14 +47,10 @@ setup(
     packages=find_packages(exclude=['tests']),
 
     install_requires=[
-        'graphql-py'
+        'graphqllib'
     ],
     tests_require=['pytest>=2.7.2'],
     extras_require={
-        'django': [
-            'Django>=1.8.0,<1.9',
-            'singledispatch>=3.4.0.3',
-        ],
     },
 
     cmdclass={'test': PyTest},

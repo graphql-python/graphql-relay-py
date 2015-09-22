@@ -1,7 +1,7 @@
 # Relay Library for GraphQL Python
 
 This is a library to allow the easy creation of Relay-compliant servers using
-the [GraphQL-py](https://github.com/dittos/graphql-py) reference implementation
+the [GraphQL Python](https://github.com/dittos/graphqllib) reference implementation
 of a GraphQL server.
 
 *Note: The code is a __exact__ port of the original [graphql-relay js implementation](https://github.com/graphql/graphql-relay-js)
@@ -12,15 +12,15 @@ from Facebook*
 
 ## Getting Started
 
-A basic understanding of GraphQL and of the GraphQL-py implementation is needed
+A basic understanding of GraphQL and of the GraphQL Python implementation is needed
 to provide context for this library.
 
 An overview of GraphQL in general is available in the
-[README](https://github.com/dittos/graphql-py/blob/master/README.md) for the
-[Specification for GraphQL](https://github.com/dittos/graphql-py).
+[README](https://github.com/dittos/graphqllib/blob/master/README.md) for the
+[Specification for GraphQL](https://github.com/dittos/graphqllib).
 
 This library is designed to work with the 
-the [GraphQL-py](https://github.com/dittos/graphql-py) reference implementation
+the [GraphQL Python](https://github.com/dittos/graphqllib) reference implementation
 of a GraphQL server.
 
 An overview of the functionality that a Relay-compliant GraphQL server should
@@ -30,16 +30,16 @@ describes a simple set of examples that exist as [tests](tests) in this
 repository. A good way to get started with this repository is to walk through
 that documentation and the corresponding tests in this library together.
 
-## Using Relay Library for GraphQL-py
+## Using Relay Library for GraphQL Python (graphqllib)
 
-Install Relay Library for GraphQL-py
+Install Relay Library for GraphQL Python
 
 ```sh
-pip install git+https://github.com/dittos/graphql-py.git # Last version of graphql-py
+pip install git+https://github.com/dittos/graphqllib.git # Last version of graphqllib
 pip install graphql-relay
 ```
 
-When building a schema for [GraphQL-py](https://github.com/dittos/graphql-py),
+When building a schema for [GraphQL](https://github.com/dittos/graphqllib),
 the provided library functions can be used to simplify the creation of Relay
 patterns.
 
