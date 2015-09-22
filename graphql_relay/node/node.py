@@ -47,7 +47,7 @@ def nodeDefinitions(idFetcher, typeResolver=None):
                 description='The ID of an object'
             )
         },
-        resolver= lambda obj, args, info: idFetcher(args.get('id'))
+        resolver= lambda obj, args, info: idFetcher(args.get('id'), info)
     )
     return GraphQLNode(nodeInterface, nodeField)
 

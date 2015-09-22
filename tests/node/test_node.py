@@ -29,8 +29,8 @@ photoData = {
     '4': Photo(id=4, width=400),
 }
 
-def getNode(id):
-    # assert schema == schema
+def getNode(id, info):
+    assert info.schema == schema
     if id in userData:
         return userData[id]
     else:
