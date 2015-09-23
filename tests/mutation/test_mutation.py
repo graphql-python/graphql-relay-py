@@ -147,7 +147,7 @@ def test_contains_correct_payload():
         }
       }
     '''
-    expected = {
+    expected1 = {
       '__type': {
         'name': 'SimpleMutationPayload',
         'kind': 'OBJECT',
@@ -174,9 +174,36 @@ def test_contains_correct_payload():
         ]
       }
     }
+    expected2 = {
+      '__type': {
+        'name': 'SimpleMutationPayload',
+        'kind': 'OBJECT',
+        'fields': [
+          {
+            'name': 'result',
+            'type': {
+              'name': 'Int',
+              'kind': 'SCALAR',
+              'ofType': None
+            }
+          },
+          {
+            'name': 'clientMutationId',
+            'type': {
+              'name': None,
+              'kind': 'NON_NULL',
+              'ofType': {
+                'name': 'String',
+                'kind': 'SCALAR'
+              }
+            }
+          },
+        ]
+      }
+    }
     result = graphql(schema, query)
     assert result.errors == None
-    assert result.data == expected
+    assert result.data == expected1 or result.data == expected2
 
 def test_contains_correct_field():
     query = '''
