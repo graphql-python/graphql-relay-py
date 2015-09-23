@@ -191,7 +191,7 @@ factionType = GraphQLObjectType(
             description= 'The ships used by the faction.',
             args= connectionArgs,
             resolver= lambda faction, args, *_: connectionFromArray(
-                map(getShip, faction.ships),
+                [getShip(ship) for ship in faction.ships],
                 args
             ),
         )

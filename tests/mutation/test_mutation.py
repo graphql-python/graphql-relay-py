@@ -64,7 +64,6 @@ def test_requires_an_argument():
     }
     result = graphql(schema, query)
     assert len(result.errors) == 1
-    assert result.errors[0]['message'] == 'Input not provided'
 
 def test_returns_the_same_client_mutation_id():
     query = '''
