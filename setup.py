@@ -27,6 +27,7 @@ setup(
     version='0.1.1',
 
     description='Relay implementation for Python',
+    long_description=open('README.rst').read(),
 
     url='https://github.com/syrusakbary/graphql-relay-py',
 
