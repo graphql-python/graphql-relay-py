@@ -1,5 +1,6 @@
 from graphql.core.type import (
     GraphQLArgument,
+    GraphQLInputObjectField,
     GraphQLInputObjectType,
     GraphQLNonNull,
     GraphQLObjectType,
@@ -10,7 +11,7 @@ from graphql.core.error import GraphQLError
 
 def mutationWithClientMutationId(name, inputFields, outputFields, mutateAndGetPayload):
     augmentedInputFields = dict(inputFields,
-        clientMutationId=GraphQLField(GraphQLNonNull(GraphQLString))
+        clientMutationId=GraphQLInputObjectField(GraphQLNonNull(GraphQLString))
     )
     augmentedOutputFields = dict(outputFields,
         clientMutationId=GraphQLField(GraphQLNonNull(GraphQLString))
