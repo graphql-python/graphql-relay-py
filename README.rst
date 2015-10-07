@@ -2,7 +2,7 @@ Relay Library for GraphQL Python
 ================================
 
 This is a library to allow the easy creation of Relay-compliant servers
-using the `GraphQL Python <https://github.com/dittos/graphqllib>`__
+using the `GraphQL Python <https://github.com/graphql-python/graphql-core>`__
 reference implementation of a GraphQL server.
 
 Note: The code is a **exact** port of the original `graphql-relay js
@@ -18,12 +18,12 @@ A basic understanding of GraphQL and of the GraphQL Python
 implementation is needed to provide context for this library.
 
 An overview of GraphQL in general is available in the
-`README <https://github.com/dittos/graphqllib/blob/master/README.md>`__
+`README <https://github.com/graphql-python/graphql-core/blob/master/README.md>`__
 for the `Specification for
-GraphQL <https://github.com/dittos/graphqllib>`__.
+GraphQL <https://github.com/graphql-python/graphql-core>`__.
 
 This library is designed to work with the the `GraphQL
-Python <https://github.com/dittos/graphqllib>`__ reference
+Python <https://github.com/graphql-python/graphql-core>`__ reference
 implementation of a GraphQL server.
 
 An overview of the functionality that a Relay-compliant GraphQL server
@@ -42,11 +42,11 @@ Install Relay Library for GraphQL Python
 
 .. code:: sh
 
-    pip install git+https://github.com/dittos/graphqllib.git # Last version of graphqllib
+    pip install git+https://github.com/graphql-python/graphql-core.git # Last version of graphqllib
     pip install graphql-relay
 
 When building a schema for
-`GraphQL <https://github.com/dittos/graphqllib>`__, the provided library
+`GraphQL <https://github.com/graphql-python/graphql-core>`__, the provided library
 functions can be used to simplify the creation of Relay patterns.
 
 Connections
