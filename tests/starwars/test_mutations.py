@@ -38,5 +38,5 @@ def test_correctely_mutates_dataset():
       }
     }
     result = graphql(StarWarsSchema, query, None, params)
-    assert result.errors == None
+    assert not result.errors
     assert result.data == expected

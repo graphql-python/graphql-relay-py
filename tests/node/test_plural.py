@@ -70,7 +70,7 @@ def test_allows_fetching():
       ]
     }
     result = graphql(schema, query)
-    assert result.errors == None
+    assert not result.errors
     assert result.data == expected
 
 
@@ -146,5 +146,5 @@ def test_correctly_introspects():
       }
     }
     result = graphql(schema, query)
-    assert result.errors == None
+    assert not result.errors
     assert result.data == expected

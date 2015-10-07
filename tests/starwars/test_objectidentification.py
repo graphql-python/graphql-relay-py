@@ -19,7 +19,7 @@ def test_correctly_fetches_id_name_rebels():
       }
     }
     result = graphql(StarWarsSchema, query)
-    assert result.errors == None
+    assert not result.errors
     assert result.data == expected
 
 def test_correctly_refetches_rebels():
@@ -40,7 +40,7 @@ def test_correctly_refetches_rebels():
       }
     }
     result = graphql(StarWarsSchema, query)
-    assert result.errors == None
+    assert not result.errors
     assert result.data == expected
 
 def test_correctly_fetches_id_name_empire():
@@ -59,7 +59,7 @@ def test_correctly_fetches_id_name_empire():
       }
     }
     result = graphql(StarWarsSchema, query)
-    assert result.errors == None
+    assert not result.errors
     assert result.data == expected
 
 def test_correctly_refetches_empire():
@@ -80,7 +80,7 @@ def test_correctly_refetches_empire():
       }
     }
     result = graphql(StarWarsSchema, query)
-    assert result.errors == None
+    assert not result.errors
     assert result.data == expected
 
 def test_correctly_refetches_xwing():
@@ -101,5 +101,5 @@ def test_correctly_refetches_xwing():
       }
     }
     result = graphql(StarWarsSchema, query)
-    assert result.errors == None
+    assert not result.errors
     assert result.data == expected

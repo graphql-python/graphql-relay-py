@@ -81,7 +81,7 @@ def test_returns_the_same_client_mutation_id():
       }
     }
     result = graphql(schema, query)
-    assert result.errors == None
+    assert not result.errors
     assert result.data == expected
 
 def test_contains_correct_input():
@@ -124,7 +124,7 @@ def test_contains_correct_input():
       }
     }
     result = graphql(schema, query)
-    assert result.errors == None
+    assert not result.errors
     assert result.data == expected
 
 def test_contains_correct_payload():
@@ -202,7 +202,7 @@ def test_contains_correct_payload():
       }
     }
     result = graphql(schema, query)
-    assert result.errors == None
+    assert not result.errors
     assert result.data == expected1 or result.data == expected2
 
 def test_contains_correct_field():
@@ -262,5 +262,5 @@ def test_contains_correct_field():
       }
     }
     result = graphql(schema, query)
-    assert result.errors == None
+    assert not result.errors
     assert result.data == expected

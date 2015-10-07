@@ -106,7 +106,7 @@ def test_gives_different_ids():
       ]
     }
     result = graphql(schema, query)
-    assert result.errors == None
+    assert not result.errors
     assert result.data == expected
 
 def test_refetches_the_ids():
@@ -137,5 +137,5 @@ def test_refetches_the_ids():
       }
     }
     result = graphql(schema, query)
-    assert result.errors == None
+    assert not result.errors
     assert result.data == expected

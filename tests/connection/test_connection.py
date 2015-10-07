@@ -109,5 +109,5 @@ def test_include_connections_and_edge_types():
       }
     }
     result = graphql(schema, query)
-    assert result.errors == None
+    assert not result.errors
     assert result.data == expected
