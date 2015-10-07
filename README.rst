@@ -35,14 +35,14 @@ overview describes a simple set of examples that exist as
 this repository is to walk through that documentation and the
 corresponding tests in this library together.
 
-Using Relay Library for GraphQL Python (graphqllib)
+Using Relay Library for GraphQL Python (graphql-core)
 ---------------------------------------------------
 
 Install Relay Library for GraphQL Python
 
 .. code:: sh
 
-    pip install git+https://github.com/graphql-python/graphql-core.git # Last version of graphqllib
+    pip install graphql-core --pre # Last version of graphql-core
     pip install graphql-relay
 
 When building a schema for
