@@ -263,7 +263,7 @@ After developing, the full test suite can be evaluated by running:
 
     python setup.py test # Use --pytest-args="-v -s" for verbose mode
 
-.. |Build Status| image:: https://travis-ci.org/syrusakbary/graphql-relay-py.svg?branch=master
-   :target: https://travis-ci.org/syrusakbary/graphql-relay-py
-.. |Coverage Status| image:: https://coveralls.io/repos/syrusakbary/graphql-relay-py/badge.svg?branch=master&service=github
-   :target: https://coveralls.io/github/syrusakbary/graphql-relay-py?branch=master
+.. |Build Status| image:: https://travis-ci.org/graphql-python/graphql-relay-py.svg?branch=master
+   :target: https://travis-ci.org/graphql-python/graphql-relay-py
+.. |Coverage Status| image:: https://coveralls.io/repos/graphql-python/graphql-relay-py/badge.svg?branch=master&service=github
+   :target: https://coveralls.io/github/graphql-python/graphql-relay-py?branch=master

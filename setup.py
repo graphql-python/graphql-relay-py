@@ -29,7 +29,7 @@ setup(
     description='Relay implementation for Python',
     long_description=open('README.rst').read(),
 
-    url='https://github.com/syrusakbary/graphql-relay-py',
+    url='https://github.com/graphql-python/graphql-relay-py',
 
     author='Syrus Akbary',
     author_email='me@syrusakbary.com',
@@ -54,7 +54,7 @@ setup(
     packages=find_packages(exclude=['tests']),
 
     install_requires=[
-        'graphqllib'
+        'graphql-core==0.1a0'
     ],
     tests_require=['pytest>=2.7.2'],
     extras_require={
