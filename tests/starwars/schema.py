@@ -4,6 +4,7 @@ from graphql.core.type import (
     GraphQLID,
     GraphQLNonNull,
     GraphQLObjectType,
+    GraphQLInputObjectField,
     GraphQLSchema,
     GraphQLString,
     GraphQLField
@@ -256,10 +257,10 @@ def mutateAndGetPayload(data, *_):
 shipMutation = mutationWithClientMutationId(
     'IntroduceShip',
     inputFields={
-        'shipName': GraphQLField(
+        'shipName': GraphQLInputObjectField(
             GraphQLNonNull(GraphQLString)
         ),
-        'factionId': GraphQLField(
+        'factionId': GraphQLInputObjectField(
             GraphQLNonNull(GraphQLID)
         )
     },
