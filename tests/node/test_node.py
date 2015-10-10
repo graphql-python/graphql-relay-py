@@ -14,7 +14,7 @@ from graphql.core.type import (
     GraphQLID,
 )
 
-from graphql_relay.node.node import nodeDefinitions
+from graphql_relay.node.node import node_definitions
 
 User = namedtuple('User', ['id', 'name'])
 Photo = namedtuple('Photo', ['id', 'width'])
@@ -30,7 +30,7 @@ photoData = {
 }
 
 
-def getNode(id, info):
+def get_node(id, info):
     assert info.schema == schema
     if id in userData:
         return userData[id]
@@ -38,14 +38,14 @@ def getNode(id, info):
         return photoData[id]
 
 
-def getNodeType(obj):
+def get_node_type(obj):
     if obj.id in userData:
         return userType
     else:
         return photoType
 
-_nodeDefinitions = nodeDefinitions(getNode, getNodeType)
-nodeField, nodeInterface = _nodeDefinitions.nodeField, _nodeDefinitions.nodeInterface
+_node_definitions = node_definitions(get_node, get_node_type)
+node_field, node_interface = _node_definitions.node_field, _node_definitions.node_interface
 
 userType = GraphQLObjectType(
     'User',
@@ -53,7 +53,7 @@ userType = GraphQLObjectType(
         'id': GraphQLField(GraphQLNonNull(GraphQLID)),
         'name': GraphQLField(GraphQLString),
     },
-    interfaces=[nodeInterface]
+    interfaces=[node_interface]
 )
 
 photoType = GraphQLObjectType(
@@ -62,13 +62,13 @@ photoType = GraphQLObjectType(
         'id': GraphQLField(GraphQLNonNull(GraphQLID)),
         'width': GraphQLField(GraphQLInt),
     },
-    interfaces=[nodeInterface]
+    interfaces=[node_interface]
 )
 
 queryType = GraphQLObjectType(
     'Query',
     fields=lambda: {
-        'node': nodeField,
+        'node': node_field,
     }
 )
 

@@ -15,9 +15,9 @@ from graphql.core.type import (
 )
 
 from graphql_relay.node.node import (
-    fromGlobalId,
-    globalIdField,
-    nodeDefinitions,
+    from_global_id,
+    global_id_field,
+    node_definitions,
 )
 
 User = namedtuple('User', ['id', 'name'])
@@ -34,8 +34,8 @@ photoData = {
 }
 
 
-def getNode(globalId, *args):
-    resolvedGlobalId = fromGlobalId(globalId)
+def get_node(global_id, *args):
+    resolvedGlobalId = from_global_id(global_id)
     _type, _id = resolvedGlobalId.type, resolvedGlobalId.id
     if _type == 'User':
         return userData[_id]
@@ -43,39 +43,39 @@ def getNode(globalId, *args):
         return photoData[_id]
 
 
-def getNodeType(obj):
+def get_node_type(obj):
     if isinstance(obj, User):
         return userType
     else:
         return photoType
 
-_nodeDefinitions = nodeDefinitions(getNode, getNodeType)
-nodeField, nodeInterface = _nodeDefinitions.nodeField, _nodeDefinitions.nodeInterface
+_node_definitions = node_definitions(get_node, get_node_type)
+node_field, node_interface = _node_definitions.node_field, _node_definitions.node_interface
 
 userType = GraphQLObjectType(
     'User',
     fields=lambda: {
-        'id': globalIdField('User'),
+        'id': global_id_field('User'),
         'name': GraphQLField(GraphQLString),
     },
-    interfaces=[nodeInterface]
+    interfaces=[node_interface]
 )
 
 photoType = GraphQLObjectType(
     'Photo',
     fields=lambda: {
-        'id': globalIdField('Photo', lambda obj: obj.photoId),
+        'id': global_id_field('Photo', lambda obj: obj.photoId),
         'width': GraphQLField(GraphQLInt),
     },
-    interfaces=[nodeInterface]
+    interfaces=[node_interface]
 )
 
 queryType = GraphQLObjectType(
     'Query',
     fields=lambda: {
-        'node': nodeField,
+        'node': node_field,
         'allObjects': GraphQLField(
-            GraphQLList(nodeInterface),
+            GraphQLList(node_interface),
             resolver=lambda *
             _: [userData['1'], userData['2'], photoData['1'], photoData['2']]
         )

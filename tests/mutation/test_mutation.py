@@ -9,7 +9,7 @@ from graphql.core.type import (
 )
 
 from graphql_relay.mutation.mutation import (
-    mutationWithClientMutationId,
+    mutation_with_client_mutation_id,
 )
 
 
@@ -19,13 +19,13 @@ class Result(object):
         self.clientMutationId = clientMutationId
         self.result = result
 
-simpleMutation = mutationWithClientMutationId(
+simpleMutation = mutation_with_client_mutation_id(
     'SimpleMutation',
-    inputFields={},
-    outputFields={
+    input_fields={},
+    output_fields={
         'result': GraphQLField(GraphQLInt)
     },
-    mutateAndGetPayload=lambda *_: Result(result=1)
+    mutate_and_get_payload=lambda *_: Result(result=1)
 )
 
 mutation = GraphQLObjectType(

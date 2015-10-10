@@ -1,19 +1,20 @@
 class Connection(object):
 
-    def __init__(self, edges, pageInfo):
+    def __init__(self, edges, page_info):
         self.edges = edges
-        self.pageInfo = pageInfo
+        self.page_info = page_info
 
     def to_dict(self):
         return {
             'edges': [e.to_dict() for e in self.edges],
-            'pageInfo': self.pageInfo.to_dict(),
+            'pageInfo': self.page_info.to_dict(),
         }
 
 
 class PageInfo(object):
 
-    def __init__(self, startCursor="", endCursor="", hasPreviousPage=False, hasNextPage=False):
+    def __init__(self, startCursor="", endCursor="",
+                 hasPreviousPage=False, hasNextPage=False):
         self.startCursor = startCursor
         self.endCursor = endCursor
         self.hasPreviousPage = hasPreviousPage

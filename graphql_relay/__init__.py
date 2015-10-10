@@ -1,31 +1,31 @@
 from .connection.connection import (
     connectionArgs,
-    connectionDefinitions
+    connection_definitions
 )
 from .connection.arrayconnection import (
-    connectionFromArray,
-    connectionFromPromisedArray,
-    cursorForObjectInConnection
+    connection_from_list,
+    connection_from_promised_list,
+    cursor_for_object_in_connection
 )
 from .node.node import (
-    nodeDefinitions,
-    fromGlobalId,
-    toGlobalId,
-    globalIdField,
+    node_definitions,
+    from_global_id,
+    to_global_id,
+    global_id_field,
 )
 from .mutation.mutation import (
-    mutationWithClientMutationId
+    mutation_with_client_mutation_id
 )
 
 __all__ = [
     # Helpers for creating connection types in the schema
-    'connectionArgs', 'connectionDefinitions',
+    'connectionArgs', 'connection_definitions',
     # Helpers for creating connections from arrays
-    'connectionFromArray', 'connectionFromPromisedArray', 'cursorForObjectInConnection',
+    'connection_from_list', 'connection_from_promised_list', 'cursor_for_object_in_connection',
     # Helper for creating node definitions
-    'nodeDefinitions',
+    'node_definitions',
     # Utilities for creating global IDs in systems that don't have them
-    'fromGlobalId', 'toGlobalId', 'globalIdField',
+    'from_global_id', 'to_global_id', 'global_id_field',
     # Helper for creating mutations with client mutation IDs
-    'mutationWithClientMutationId'
+    'mutation_with_client_mutation_id'
 ]

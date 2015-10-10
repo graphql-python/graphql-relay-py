@@ -2,29 +2,28 @@ from graphql.core.type import (
     GraphQLArgument,
     GraphQLList,
     GraphQLNonNull,
-    GraphQLField,
-    GraphQLInputObjectType
+    GraphQLField
 )
 # GraphQLInputObjectType
 
 
-def pluralIdentifyingRootField(argName, inputType, outputType, resolveSingleInput, description=None):
-    inputArgs = {}
-    inputArgs[argName] = GraphQLArgument(
+def plural_identifying_root_field(arg_name, input_type, output_type, resolve_single_input, description=None):
+    input_args = {}
+    input_args[arg_name] = GraphQLArgument(
         GraphQLNonNull(
             GraphQLList(
-                GraphQLNonNull(inputType)
+                GraphQLNonNull(input_type)
             )
         )
     )
 
     def resolver(obj, args, *_):
-        inputs = args[argName]
-        return map(resolveSingleInput, inputs)
+        inputs = args[arg_name]
+        return map(resolve_single_input, inputs)
 
     return GraphQLField(
-        GraphQLList(outputType),
+        GraphQLList(output_type),
         description=description,
-        args=inputArgs,
+        args=input_args,
         resolver=resolver
     )

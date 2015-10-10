@@ -14,10 +14,10 @@ from graphql.core.type import (
     GraphQLID,
 )
 
-from graphql_relay.connection.arrayconnection import connectionFromArray
+from graphql_relay.connection.arrayconnection import connection_from_list
 from graphql_relay.connection.connection import (
     connectionArgs,
-    connectionDefinitions
+    connection_definitions
 )
 
 User = namedtuple('User', ['name'])
@@ -38,27 +38,27 @@ userType = GraphQLObjectType(
             friendConnection,
             args=connectionArgs,
             resolver=lambda user, args, *
-            _: connectionFromArray(allUsers, args),
+            _: connection_from_list(allUsers, args),
         ),
     },
 )
 
-friendConnection = connectionDefinitions(
+friendConnection = connection_definitions(
     'Friend',
     userType,
-    edgeFields=lambda: {
+    edge_fields=lambda: {
         'friendshipTime': GraphQLField(
             GraphQLString,
             resolver=lambda *_: 'Yesterday'
         ),
     },
-    connectionFields=lambda: {
+    connection_fields=lambda: {
         'totalCount': GraphQLField(
             GraphQLInt,
             resolver=lambda *_: len(allUsers)
         ),
     }
-).connectionType
+).connection_type
 
 queryType = GraphQLObjectType(
     'Query',

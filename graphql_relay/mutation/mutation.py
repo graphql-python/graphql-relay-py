@@ -10,22 +10,22 @@ from graphql.core.type import (
 from graphql.core.error import GraphQLError
 
 
-def mutationWithClientMutationId(name, inputFields, outputFields, mutateAndGetPayload):
-    augmentedInputFields = dict(inputFields,
-                                clientMutationId=GraphQLInputObjectField(
-                                    GraphQLNonNull(GraphQLString))
-                                )
-    augmentedOutputFields = dict(outputFields,
-                                 clientMutationId=GraphQLField(
-                                     GraphQLNonNull(GraphQLString))
-                                 )
-    inputType = GraphQLInputObjectType(
-        name+'Input',
-        fields=augmentedInputFields,
+def mutation_with_client_mutation_id(name, input_fields, output_fields, mutate_and_get_payload):
+    augmented_input_fields = dict(input_fields,
+                                  clientMutationId=GraphQLInputObjectField(
+                                      GraphQLNonNull(GraphQLString))
+                                  )
+    augmented_output_fields = dict(output_fields,
+                                   clientMutationId=GraphQLField(
+                                       GraphQLNonNull(GraphQLString))
+                                   )
+    input_type = GraphQLInputObjectType(
+        name + 'Input',
+        fields=augmented_input_fields,
     )
-    outputType = GraphQLObjectType(
-        name+'Payload',
-        fields=augmentedOutputFields,
+    output_type = GraphQLObjectType(
+        name + 'Payload',
+        fields=augmented_output_fields,
     )
 
     def resolver(__, args, info, *_):
@@ -33,7 +33,7 @@ def mutationWithClientMutationId(name, inputFields, outputFields, mutateAndGetPa
         if not input:
             # TODO: Should be raised by Graphql
             raise GraphQLError('Input not provided')
-        payload = mutateAndGetPayload(input, info)
+        payload = mutate_and_get_payload(input, info)
         try:
             payload.clientMutationId = input['clientMutationId']
         except:
@@ -42,9 +42,9 @@ def mutationWithClientMutationId(name, inputFields, outputFields, mutateAndGetPa
         return payload
 
     return GraphQLField(
-        outputType,
+        output_type,
         args={
-            'input': GraphQLArgument(GraphQLNonNull(inputType)),
+            'input': GraphQLArgument(GraphQLNonNull(input_type)),
         },
         resolver=resolver
     )

@@ -58,17 +58,17 @@ returning those types.
 
 -  ``connectionArgs`` returns the arguments that fields should provide
    when they return a connection type.
--  ``connectionDefinitions`` returns a ``connectionType`` and its
+-  ``connection_definitions`` returns a ``connection_type`` and its
    associated ``edgeType``, given a name and a node type.
--  ``connectionFromArray`` is a helper method that takes an array and
+-  ``connection_from_list`` is a helper method that takes an array and
    the arguments from ``connectionArgs``, does pagination and filtering,
-   and returns an object in the shape expected by a ``connectionType``'s
+   and returns an object in the shape expected by a ``connection_type``'s
    ``resolver`` function.
--  ``connectionFromPromisedArray`` is similar to
-   ``connectionFromArray``, but it takes a promise that resolves to an
+-  ``connection_from_promised_list`` is similar to
+   ``connection_from_list``, but it takes a promise that resolves to an
    array, and returns a promise that resolves to the expected shape by
-   ``connectionType``.
--  ``cursorForObjectInConnection`` is a helper method that takes an
+   ``connection_type``.
+-  ``cursor_for_object_in_connection`` is a helper method that takes an
    array and a member object, and returns a cursor for use in the
    mutation payload.
 
@@ -77,13 +77,13 @@ schema <tests/starwars/schema.py>`__:
 
 .. code:: python
 
-    shipConnection = connectionDefinitions('Ship', shipType).connectionType
+    shipConnection = connection_definitions('Ship', shipType).connection_type
 
     factionType = GraphQLObjectType(
         name= 'Faction',
         description= 'A faction in the Star Wars saga',
         fields= lambda: {
-            'id': globalIdField('Faction'),
+            'id': global_id_field('Faction'),
             'name': GraphQLField(
                 GraphQLString,
                 description='The name of the faction.',
@@ -92,21 +92,21 @@ schema <tests/starwars/schema.py>`__:
                 shipConnection,
                 description= 'The ships used by the faction.',
                 args= connectionArgs,
-                resolver= lambda faction, args, *_: connectionFromArray(
+                resolver= lambda faction, args, *_: connection_from_list(
                     map(getShip, faction.ships),
                     args
                 ),
             )
         },
-        interfaces= [nodeInterface]
+        interfaces= [node_interface]
     )
 
 This shows adding a ``ships`` field to the ``Faction`` object that is a
 connection. It uses
-``connectionDefinitions({name: 'Ship', nodeType: shipType})`` to create
+``connection_definitions({name: 'Ship', nodeType: shipType})`` to create
 the connection type, adds ``connectionArgs`` as arguments on this
 function, and then implements the resolver function by passing the array
-of ships and the arguments to ``connectionFromArray``.
+of ships and the arguments to ``connection_from_list``.
 
 Object Identification
 ~~~~~~~~~~~~~~~~~~~~~
@@ -114,17 +114,17 @@ Object Identification
 Helper functions are provided for both building the GraphQL types for
 nodes and for implementing global IDs around local IDs.
 
--  ``nodeDefinitions`` returns the ``Node`` interface that objects can
+-  ``node_definitions`` returns the ``Node`` interface that objects can
    implement, and returns the ``node`` root field to include on the
    query type. To implement this, it takes a function to resolve an ID
    to an object, and to determine the type of a given object.
--  ``toGlobalId`` takes a type name and an ID specific to that type
+-  ``to_global_id`` takes a type name and an ID specific to that type
    name, and returns a "global ID" that is unique among all types.
--  ``fromGlobalId`` takes the "global ID" created by ``toGlobalID``, and
+-  ``from_global_id`` takes the "global ID" created by ``toGlobalID``, and
    retuns the type name and ID used to create it.
--  ``globalIdField`` creates the configuration for an ``id`` field on a
+-  ``global_id_field`` creates the configuration for an ``id`` field on a
    node.
--  ``pluralIdentifyingRootField`` creates a field that accepts a list of
+-  ``plural_identifying_root_field`` creates a field that accepts a list of
    non-ID identifiers (like a username) and maps then to their
    corresponding objects.
 
@@ -133,8 +133,8 @@ schema <tests/starwars/schema.py>`__:
 
 .. code:: python
 
-    def getNode(globalId, *args):
-        resolvedGlobalId = fromGlobalId(globalId)
+    def get_node(global_id, *args):
+        resolvedGlobalId = from_global_id(global_id)
         _type, _id = resolvedGlobalId.type, resolvedGlobalId.id
         if _type == 'Faction':
             return getFaction(_id)
@@ -143,38 +143,38 @@ schema <tests/starwars/schema.py>`__:
         else:
             return None
 
-    def getNodeType(obj):
+    def get_node_type(obj):
         if isinstance(obj, Faction):
             return factionType
         else:
             return shipType
 
-    _nodeDefinitions = nodeDefinitions(getNode, getNodeType)
-    nodeField, nodeInterface = _nodeDefinitions.nodeField, _nodeDefinitions.nodeInterface
+    _node_definitions = node_definitions(get_node, get_node_type)
+    node_field, node_interface = _node_definitions.node_field, _node_definitions.node_interface
 
     factionType = GraphQLObjectType(
         name= 'Faction',
         description= 'A faction in the Star Wars saga',
         fields= lambda: {
-            'id': globalIdField('Faction'),
+            'id': global_id_field('Faction'),
         },
-        interfaces= [nodeInterface]
+        interfaces= [node_interface]
     )
 
     queryType = GraphQLObjectType(
         name= 'Query',
         fields= lambda: {
-            'node': nodeField
+            'node': node_field
         }
     )
 
-This uses ``nodeDefinitions`` to construct the ``Node`` interface and
-the ``node`` field; it uses ``fromGlobalId`` to resolve the IDs passed
+This uses ``node_definitions`` to construct the ``Node`` interface and
+the ``node`` field; it uses ``from_global_id`` to resolve the IDs passed
 in in the implementation of the function mapping ID to object. It then
-uses the ``globalIdField`` method to create the ``id`` field on
-``Faction``, which also ensures implements the ``nodeInterface``.
+uses the ``global_id_field`` method to create the ``id`` field on
+``Faction``, which also ensures implements the ``node_interface``.
 Finally, it adds the ``node`` field to the query type, using the
-``nodeField`` returned by ``nodeDefinitions``.
+``node_field`` returned by ``node_definitions``.
 
 Mutations
 ~~~~~~~~~
@@ -182,7 +182,7 @@ Mutations
 A helper function is provided for building mutations with single inputs
 and client mutation IDs.
 
--  ``mutationWithClientMutationId`` takes a name, input fields, output
+-  ``mutation_with_client_mutation_id`` takes a name, input fields, output
    fields, and a mutation method to map from the input fields to the
    output fields, performing the mutation along the way. It then creates
    and returns a field configuration that can be used as a top-level
@@ -199,7 +199,7 @@ schema <tests/starwars/schema.py>`__:
             self.factionId = factionId
             self.clientMutationId = None
 
-    def mutateAndGetPayload(data, *_):
+    def mutate_and_get_payload(data, *_):
         shipName = data.get('shipName')
         factionId = data.get('factionId')
         newShip = createShip(shipName, factionId)
@@ -208,9 +208,9 @@ schema <tests/starwars/schema.py>`__:
             factionId=factionId,
         )
 
-    shipMutation = mutationWithClientMutationId(
+    shipMutation = mutation_with_client_mutation_id(
         'IntroduceShip',
-        inputFields={
+        input_fields={
             'shipName': GraphQLField(
                 GraphQLNonNull(GraphQLString)
             ),
@@ -218,7 +218,7 @@ schema <tests/starwars/schema.py>`__:
                 GraphQLNonNull(GraphQLID)
             )
         },
-        outputFields= {
+        output_fields= {
             'ship': GraphQLField(
                 shipType,
                 resolver= lambda payload, *_: getShip(payload.shipId)
@@ -228,7 +228,7 @@ schema <tests/starwars/schema.py>`__:
                 resolver= lambda payload, *_: getFaction(payload.factionId)
             )
         },
-        mutateAndGetPayload=mutateAndGetPayload
+        mutate_and_get_payload=mutate_and_get_payload
     )
 
     mutationType = GraphQLObjectType(
@@ -240,13 +240,13 @@ schema <tests/starwars/schema.py>`__:
 
 This code creates a mutation named ``IntroduceShip``, which takes a
 faction ID and a ship name as input. It outputs the ``Faction`` and the
-``Ship`` in question. ``mutateAndGetPayload`` then gets an object with a
+``Ship`` in question. ``mutate_and_get_payload`` then gets an object with a
 property for each input field, performs the mutation by constructing the
 new ship, then returns an object that will be resolved by the output
 fields.
 
 Our mutation type then creates the ``introduceShip`` field using the
-return value of ``mutationWithClientMutationId``.
+return value of ``mutation_with_client_mutation_id``.
 
 Contributing
 ------------
