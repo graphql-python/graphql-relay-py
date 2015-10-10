@@ -9,13 +9,16 @@ from graphql.core.type import (
 )
 from graphql.core.error import GraphQLError
 
+
 def mutationWithClientMutationId(name, inputFields, outputFields, mutateAndGetPayload):
     augmentedInputFields = dict(inputFields,
-        clientMutationId=GraphQLInputObjectField(GraphQLNonNull(GraphQLString))
-    )
+                                clientMutationId=GraphQLInputObjectField(
+                                    GraphQLNonNull(GraphQLString))
+                                )
     augmentedOutputFields = dict(outputFields,
-        clientMutationId=GraphQLField(GraphQLNonNull(GraphQLString))
-    )
+                                 clientMutationId=GraphQLField(
+                                     GraphQLNonNull(GraphQLString))
+                                 )
     inputType = GraphQLInputObjectType(
         name+'Input',
         fields=augmentedInputFields,
@@ -34,7 +37,8 @@ def mutationWithClientMutationId(name, inputFields, outputFields, mutateAndGetPa
         try:
             payload.clientMutationId = input['clientMutationId']
         except:
-            raise GraphQLError('Cannot set clientMutationId in the payload object %s'%repr(payload))
+            raise GraphQLError(
+                'Cannot set clientMutationId in the payload object %s' % repr(payload))
         return payload
 
     return GraphQLField(

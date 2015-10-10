@@ -11,6 +11,7 @@ from graphql.core.type import (
 
 
 class GraphQLNode(object):
+
     def __init__(self, nodeInterface, nodeField):
         self.nodeInterface = nodeInterface
         self.nodeField = nodeField
@@ -29,30 +30,31 @@ def nodeDefinitions(idFetcher, typeResolver=None):
     '''
     nodeInterface = GraphQLInterfaceType(
         'Node',
-        description= 'An object with an ID',
-        fields= lambda:{
+        description='An object with an ID',
+        fields=lambda: {
             'id': GraphQLField(
                 GraphQLNonNull(GraphQLID),
                 description='The id of the object.',
             ),
         },
-        resolve_type= typeResolver
+        resolve_type=typeResolver
     )
     nodeField = GraphQLField(
         nodeInterface,
-        description= 'Fetches an object given its ID',
-        args= {
+        description='Fetches an object given its ID',
+        args={
             'id': GraphQLArgument(
                 GraphQLNonNull(GraphQLID),
                 description='The ID of an object'
             )
         },
-        resolver= lambda obj, args, info: idFetcher(args.get('id'), info)
+        resolver=lambda obj, args, info: idFetcher(args.get('id'), info)
     )
     return GraphQLNode(nodeInterface, nodeField)
 
 
 class ResolvedGlobalId(object):
+
     def __init__(self, type, id):
         self.type = type
         self.id = id
@@ -64,6 +66,7 @@ def toGlobalId(type, id):
     "global ID" that is unique among all types.
     '''
     return base64(':'.join([type, str(id)]))
+
 
 def fromGlobalId(globalId):
     '''
@@ -84,6 +87,7 @@ def globalIdField(typeName, idFetcher=None):
     '''
     return GraphQLField(
         GraphQLNonNull(GraphQLID),
-        description= 'The ID of an object',
-        resolver= lambda obj, *_: toGlobalId(typeName, idFetcher(obj) if idFetcher else obj.id)
+        description='The ID of an object',
+        resolver=lambda obj, *
+        _: toGlobalId(typeName, idFetcher(obj) if idFetcher else obj.id)
     )

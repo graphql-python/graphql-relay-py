@@ -18,7 +18,7 @@ from graphql_relay.node.plural import pluralIdentifyingRootField
 
 userType = GraphQLObjectType(
     'User',
-    fields= lambda: {
+    fields=lambda: {
         'username': GraphQLField(GraphQLString),
         'url': GraphQLField(GraphQLString),
     }
@@ -28,21 +28,22 @@ User = namedtuple('User', ['username', 'url'])
 
 queryType = GraphQLObjectType(
     'Query',
-    fields= lambda: {
+    fields=lambda: {
         'usernames': pluralIdentifyingRootField(
-              'usernames',
-              description='Map from a username to the user',
-              inputType= GraphQLString,
-              outputType=userType,
-              resolveSingleInput=lambda username: User(
-                  username=username,
-                  url='www.facebook.com/' + username
-              )
+            'usernames',
+            description='Map from a username to the user',
+            inputType=GraphQLString,
+            outputType=userType,
+            resolveSingleInput=lambda username: User(
+                username=username,
+                url='www.facebook.com/' + username
+            )
         )
     }
 )
 
 schema = GraphQLSchema(query=queryType)
+
 
 def test_allows_fetching():
     query = '''
@@ -54,20 +55,20 @@ def test_allows_fetching():
     }
     '''
     expected = {
-      'usernames': [
-        {
-          'username': 'dschafer',
-          'url': 'www.facebook.com/dschafer'
-        },
-        {
-          'username': 'leebyron',
-          'url': 'www.facebook.com/leebyron'
-        },
-        {
-          'username': 'schrockn',
-          'url': 'www.facebook.com/schrockn'
-        },
-      ]
+        'usernames': [
+            {
+                'username': 'dschafer',
+                'url': 'www.facebook.com/dschafer'
+            },
+            {
+                'username': 'leebyron',
+                'url': 'www.facebook.com/leebyron'
+            },
+            {
+                'username': 'schrockn',
+                'url': 'www.facebook.com/schrockn'
+            },
+        ]
     }
     result = graphql(schema, query)
     assert not result.errors
@@ -110,40 +111,40 @@ def test_correctly_introspects():
     }
     '''
     expected = {
-      '__schema': {
-        'queryType': {
-          'fields': [
-            {
-              'name': 'usernames',
-              'args': [
-                {
-                  'name': 'usernames',
-                  'type': {
-                    'kind': 'NON_NULL',
-                    'ofType': {
-                      'kind': 'LIST',
-                      'ofType': {
-                        'kind': 'NON_NULL',
-                        'ofType': {
-                          'name': 'String',
-                          'kind': 'SCALAR',
+        '__schema': {
+            'queryType': {
+                'fields': [
+                    {
+                        'name': 'usernames',
+                        'args': [
+                            {
+                                'name': 'usernames',
+                                'type': {
+                                    'kind': 'NON_NULL',
+                                    'ofType': {
+                                        'kind': 'LIST',
+                                        'ofType': {
+                                            'kind': 'NON_NULL',
+                                            'ofType': {
+                                                'name': 'String',
+                                                'kind': 'SCALAR',
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        ],
+                        'type': {
+                            'kind': 'LIST',
+                            'ofType': {
+                                'name': 'User',
+                                'kind': 'OBJECT',
+                            }
                         }
-                      }
                     }
-                  }
-                }
-              ],
-              'type': {
-                'kind': 'LIST',
-                'ofType': {
-                  'name': 'User',
-                  'kind': 'OBJECT',
-                }
-              }
+                ]
             }
-          ]
         }
-      }
     }
     result = graphql(schema, query)
     assert not result.errors

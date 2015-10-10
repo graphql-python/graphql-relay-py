@@ -11,10 +11,12 @@ from graphql.core.type import (
 
 
 class ConnectionConfig(object):
+
     '''
     Returns a GraphQLFieldConfigArgumentMap appropriate to include
     on a field whose return type is a connection type.
     '''
+
     def __init__(self, name, nodeType, edgeFields=None, connectionFields=None):
         self.name = name
         self.nodeType = nodeType
@@ -23,6 +25,7 @@ class ConnectionConfig(object):
 
 
 class GraphQLConnection(object):
+
     def __init__(self, edgeType, connectionType):
         self.edgeType = edgeType
         self.connectionType = connectionType
@@ -88,7 +91,7 @@ def connectionDefinitions(*args, **kwargs):
 pageInfoType = GraphQLObjectType(
     'PageInfo',
     description='Information about pagination in a connection.',
-    fields=lambda:{
+    fields=lambda: {
         'hasNextPage': GraphQLField(
             GraphQLNonNull(GraphQLBoolean),
             description='When paginating forwards, are there more items?',

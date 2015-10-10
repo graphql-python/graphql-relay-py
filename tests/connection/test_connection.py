@@ -23,38 +23,39 @@ from graphql_relay.connection.connection import (
 User = namedtuple('User', ['name'])
 
 allUsers = [
-  User(name='Dan'),
-  User(name='Nick'),
-  User(name='Lee'),
-  User(name='Joe'),
-  User(name='Tim'),
+    User(name='Dan'),
+    User(name='Nick'),
+    User(name='Lee'),
+    User(name='Joe'),
+    User(name='Tim'),
 ]
 
 userType = GraphQLObjectType(
-  'User',
-  fields= lambda: {
-    'name': GraphQLField(GraphQLString),
-    'friends': GraphQLField(
-      friendConnection,
-      args=connectionArgs,
-      resolver= lambda user, args, *_: connectionFromArray(allUsers, args),
-    ),
-  },
+    'User',
+    fields=lambda: {
+        'name': GraphQLField(GraphQLString),
+        'friends': GraphQLField(
+            friendConnection,
+            args=connectionArgs,
+            resolver=lambda user, args, *
+            _: connectionFromArray(allUsers, args),
+        ),
+    },
 )
 
 friendConnection = connectionDefinitions(
     'Friend',
     userType,
-    edgeFields= lambda: {
+    edgeFields=lambda: {
         'friendshipTime': GraphQLField(
             GraphQLString,
-            resolver= lambda *_: 'Yesterday'
+            resolver=lambda *_: 'Yesterday'
         ),
     },
-    connectionFields= lambda: {
+    connectionFields=lambda: {
         'totalCount': GraphQLField(
             GraphQLInt,
-            resolver= lambda *_: len(allUsers)
+            resolver=lambda *_: len(allUsers)
         ),
     }
 ).connectionType
@@ -70,6 +71,7 @@ queryType = GraphQLObjectType(
 )
 
 schema = GraphQLSchema(query=queryType)
+
 
 def test_include_connections_and_edge_types():
     query = '''
@@ -88,25 +90,25 @@ def test_include_connections_and_edge_types():
       }
     '''
     expected = {
-      'user': {
-        'friends': {
-          'totalCount': 5,
-          'edges': [
-            {
-              'friendshipTime': 'Yesterday',
-              'node': {
-                'name': 'Dan'
-              }
-            },
-            {
-              'friendshipTime': 'Yesterday',
-              'node': {
-                'name': 'Nick'
-              }
-            },
-          ]
+        'user': {
+            'friends': {
+                'totalCount': 5,
+                'edges': [
+                    {
+                        'friendshipTime': 'Yesterday',
+                        'node': {
+                            'name': 'Dan'
+                        }
+                    },
+                    {
+                        'friendshipTime': 'Yesterday',
+                        'node': {
+                            'name': 'Nick'
+                        }
+                    },
+                ]
+            }
         }
-      }
     }
     result = graphql(schema, query)
     assert not result.errors

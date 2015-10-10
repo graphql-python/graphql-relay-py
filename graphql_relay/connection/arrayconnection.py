@@ -20,7 +20,7 @@ def connectionFromArray(data, args={}, **kwargs):
     # Slice with cursors
     begin = max(getOffset(after, -1), -1) + 1
     end = min(getOffset(before, count + 1), count)
-    if begin >= count or begin>=end:
+    if begin >= count or begin >= end:
         return emptyConnection()
 
     # Save the pre-slice cursors
@@ -33,7 +33,7 @@ def connectionFromArray(data, args={}, **kwargs):
     if last != None:
         begin = max(end-last, begin)
 
-    if begin >= count or begin>=end:
+    if begin >= count or begin >= end:
         return emptyConnection()
 
     sliced_data = data[begin:end]
@@ -50,8 +50,8 @@ def connectionFromArray(data, args={}, **kwargs):
         PageInfo(
             startCursor=firstEdge.cursor,
             endCursor=lastEdge.cursor,
-            hasPreviousPage= (firstEdge.cursor != firstPresliceCursor),
-            hasNextPage= (lastEdge.cursor != lastPresliceCursor)
+            hasPreviousPage=(firstEdge.cursor != firstPresliceCursor),
+            hasNextPage=(lastEdge.cursor != lastPresliceCursor)
         )
     )
 
@@ -99,6 +99,7 @@ def cursorToOffset(cursor):
         return int(unbase64(cursor)[len(PREFIX):len(PREFIX)+10])
     except:
         return None
+
 
 def cursorForObjectInConnection(data, _object):
     '''

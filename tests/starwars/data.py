@@ -5,8 +5,8 @@
 # JSON objects in a more complex demo.
 from collections import namedtuple
 
-Ship = namedtuple('Ship',['id', 'name'])
-Faction = namedtuple('Faction',['id', 'name', 'ships'])
+Ship = namedtuple('Ship', ['id', 'name'])
+Faction = namedtuple('Faction', ['id', 'name', 'ships'])
 
 xwing = Ship(
     id='1',
@@ -59,7 +59,7 @@ rebels = Faction(
 empire = Faction(
     id='2',
     name='Galactic Empire',
-    ships= ['6', '7', '8']
+    ships=['6', '7', '8']
 )
 
 data = {
@@ -79,6 +79,7 @@ data = {
     }
 }
 
+
 def createShip(shipName, factionId):
     nextShip = len(data['Ship'].keys())+1
     newShip = Ship(
@@ -93,11 +94,14 @@ def createShip(shipName, factionId):
 def getShip(_id):
     return data['Ship'][_id]
 
+
 def getFaction(_id):
     return data['Faction'][_id]
 
+
 def getRebels():
     return rebels
+
 
 def getEmpire():
     return empire

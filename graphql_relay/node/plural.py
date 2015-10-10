@@ -7,6 +7,7 @@ from graphql.core.type import (
 )
 # GraphQLInputObjectType
 
+
 def pluralIdentifyingRootField(argName, inputType, outputType, resolveSingleInput, description=None):
     inputArgs = {}
     inputArgs[argName] = GraphQLArgument(
@@ -16,6 +17,7 @@ def pluralIdentifyingRootField(argName, inputType, outputType, resolveSingleInpu
             )
         )
     )
+
     def resolver(obj, args, *_):
         inputs = args[argName]
         return map(resolveSingleInput, inputs)
@@ -24,5 +26,5 @@ def pluralIdentifyingRootField(argName, inputType, outputType, resolveSingleInpu
         GraphQLList(outputType),
         description=description,
         args=inputArgs,
-        resolver=resolver 
+        resolver=resolver
     )

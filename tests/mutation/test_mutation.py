@@ -12,31 +12,34 @@ from graphql_relay.mutation.mutation import (
     mutationWithClientMutationId,
 )
 
+
 class Result(object):
+
     def __init__(self, result, clientMutationId=None):
         self.clientMutationId = clientMutationId
         self.result = result
 
 simpleMutation = mutationWithClientMutationId(
     'SimpleMutation',
-    inputFields= {},
-    outputFields= {
+    inputFields={},
+    outputFields={
         'result': GraphQLField(GraphQLInt)
     },
-    mutateAndGetPayload= lambda *_: Result(result=1)
+    mutateAndGetPayload=lambda *_: Result(result=1)
 )
 
 mutation = GraphQLObjectType(
     'Mutation',
-    fields= {
+    fields={
         'simpleMutation': simpleMutation
     }
 )
 
 schema = GraphQLSchema(
-    query= mutation,
-    mutation= mutation
+    query=mutation,
+    mutation=mutation
 )
+
 
 def test_requires_an_argument():
     query = '''
@@ -47,23 +50,24 @@ def test_requires_an_argument():
       }
     '''
     expected = {
-      'allObjects': [
-        {
-          'id': 'VXNlcjox'
-        },
-        {
-          'id': 'VXNlcjoy'
-        },
-        {
-          'id': 'UGhvdG86MQ=='
-        },
-        {
-          'id': 'UGhvdG86Mg=='
-        },
-      ]
+        'allObjects': [
+            {
+                'id': 'VXNlcjox'
+            },
+            {
+                'id': 'VXNlcjoy'
+            },
+            {
+                'id': 'UGhvdG86MQ=='
+            },
+            {
+                'id': 'UGhvdG86Mg=='
+            },
+        ]
     }
     result = graphql(schema, query)
     assert len(result.errors) == 1
+
 
 def test_returns_the_same_client_mutation_id():
     query = '''
@@ -75,14 +79,15 @@ def test_returns_the_same_client_mutation_id():
       }
     '''
     expected = {
-      'simpleMutation': {
-        'result': 1,
-        'clientMutationId': 'abc'
-      }
+        'simpleMutation': {
+            'result': 1,
+            'clientMutationId': 'abc'
+        }
     }
     result = graphql(schema, query)
     assert not result.errors
     assert result.data == expected
+
 
 def test_contains_correct_input():
     query = '''
@@ -105,27 +110,28 @@ def test_contains_correct_input():
       }
     '''
     expected = {
-      '__type': {
-        'name': 'SimpleMutationInput',
-        'kind': 'INPUT_OBJECT',
-        'inputFields': [
-          {
-            'name': 'clientMutationId',
-            'type': {
-              'name': None,
-              'kind': 'NON_NULL',
-              'ofType': {
-                'name': 'String',
-                'kind': 'SCALAR'
-              }
-            }
-          }
-        ]
-      }
+        '__type': {
+            'name': 'SimpleMutationInput',
+            'kind': 'INPUT_OBJECT',
+            'inputFields': [
+                {
+                    'name': 'clientMutationId',
+                    'type': {
+                        'name': None,
+                        'kind': 'NON_NULL',
+                        'ofType': {
+                            'name': 'String',
+                            'kind': 'SCALAR'
+                        }
+                    }
+                }
+            ]
+        }
     }
     result = graphql(schema, query)
     assert not result.errors
     assert result.data == expected
+
 
 def test_contains_correct_payload():
     query = '''
@@ -148,62 +154,63 @@ def test_contains_correct_payload():
       }
     '''
     expected1 = {
-      '__type': {
-        'name': 'SimpleMutationPayload',
-        'kind': 'OBJECT',
-        'fields': [
-          {
-            'name': 'clientMutationId',
-            'type': {
-              'name': None,
-              'kind': 'NON_NULL',
-              'ofType': {
-                'name': 'String',
-                'kind': 'SCALAR'
-              }
-            }
-          },
-          {
-            'name': 'result',
-            'type': {
-              'name': 'Int',
-              'kind': 'SCALAR',
-              'ofType': None
-            }
-          },
-        ]
-      }
+        '__type': {
+            'name': 'SimpleMutationPayload',
+            'kind': 'OBJECT',
+            'fields': [
+                {
+                    'name': 'clientMutationId',
+                    'type': {
+                        'name': None,
+                        'kind': 'NON_NULL',
+                        'ofType': {
+                            'name': 'String',
+                            'kind': 'SCALAR'
+                        }
+                    }
+                },
+                {
+                    'name': 'result',
+                    'type': {
+                        'name': 'Int',
+                        'kind': 'SCALAR',
+                        'ofType': None
+                    }
+                },
+            ]
+        }
     }
     expected2 = {
-      '__type': {
-        'name': 'SimpleMutationPayload',
-        'kind': 'OBJECT',
-        'fields': [
-          {
-            'name': 'result',
-            'type': {
-              'name': 'Int',
-              'kind': 'SCALAR',
-              'ofType': None
-            }
-          },
-          {
-            'name': 'clientMutationId',
-            'type': {
-              'name': None,
-              'kind': 'NON_NULL',
-              'ofType': {
-                'name': 'String',
-                'kind': 'SCALAR'
-              }
-            }
-          },
-        ]
-      }
+        '__type': {
+            'name': 'SimpleMutationPayload',
+            'kind': 'OBJECT',
+            'fields': [
+                {
+                    'name': 'result',
+                    'type': {
+                        'name': 'Int',
+                        'kind': 'SCALAR',
+                        'ofType': None
+                    }
+                },
+                {
+                    'name': 'clientMutationId',
+                    'type': {
+                        'name': None,
+                        'kind': 'NON_NULL',
+                        'ofType': {
+                            'name': 'String',
+                            'kind': 'SCALAR'
+                        }
+                    }
+                },
+            ]
+        }
     }
     result = graphql(schema, query)
     assert not result.errors
     assert result.data == expected1 or result.data == expected2
+
 
 def test_contains_correct_field():
     query = '''
@@ -234,32 +241,32 @@ def test_contains_correct_field():
     '''
 
     expected = {
-      '__schema': {
-        'mutationType': {
-          'fields': [
-            {
-              'name': 'simpleMutation',
-              'args': [
-                {
-                  'name': 'input',
-                  'type': {
-                    'name': None,
-                    'kind': 'NON_NULL',
-                    'ofType': {
-                      'name': 'SimpleMutationInput',
-                      'kind': 'INPUT_OBJECT'
-                    }
-                  },
-                }
-              ],
-              'type': {
-                'name': 'SimpleMutationPayload',
-                'kind': 'OBJECT',
-              }
-            },
-          ]
+        '__schema': {
+            'mutationType': {
+                'fields': [
+                    {
+                        'name': 'simpleMutation',
+                        'args': [
+                            {
+                                'name': 'input',
+                                'type': {
+                                    'name': None,
+                                    'kind': 'NON_NULL',
+                                    'ofType': {
+                                        'name': 'SimpleMutationInput',
+                                        'kind': 'INPUT_OBJECT'
+                                    }
+                                },
+                            }
+                        ],
+                        'type': {
+                            'name': 'SimpleMutationPayload',
+                            'kind': 'OBJECT',
+                        }
+                    },
+                ]
+            }
         }
-      }
     }
     result = graphql(schema, query)
     assert not result.errors

@@ -1,4 +1,5 @@
 class Connection(object):
+
     def __init__(self, edges, pageInfo):
         self.edges = edges
         self.pageInfo = pageInfo
@@ -9,7 +10,9 @@ class Connection(object):
             'pageInfo': self.pageInfo.to_dict(),
         }
 
+
 class PageInfo(object):
+
     def __init__(self, startCursor="", endCursor="", hasPreviousPage=False, hasNextPage=False):
         self.startCursor = startCursor
         self.endCursor = endCursor
@@ -24,7 +27,9 @@ class PageInfo(object):
             'hasNextPage': self.hasNextPage,
         }
 
+
 class Edge(object):
+
     def __init__(self, node, cursor):
         self.node = node
         self.cursor = cursor

@@ -33,6 +33,7 @@ photoData = {
     '2': Photo(photoId=2, width=400),
 }
 
+
 def getNode(globalId, *args):
     resolvedGlobalId = fromGlobalId(globalId)
     _type, _id = resolvedGlobalId.type, resolvedGlobalId.id
@@ -40,6 +41,7 @@ def getNode(globalId, *args):
         return userData[_id]
     else:
         return photoData[_id]
+
 
 def getNodeType(obj):
     if isinstance(obj, User):
@@ -52,34 +54,36 @@ nodeField, nodeInterface = _nodeDefinitions.nodeField, _nodeDefinitions.nodeInte
 
 userType = GraphQLObjectType(
     'User',
-    fields= lambda: {
+    fields=lambda: {
         'id': globalIdField('User'),
         'name': GraphQLField(GraphQLString),
     },
-    interfaces= [nodeInterface]
+    interfaces=[nodeInterface]
 )
 
 photoType = GraphQLObjectType(
     'Photo',
-    fields= lambda: {
+    fields=lambda: {
         'id': globalIdField('Photo', lambda obj: obj.photoId),
         'width': GraphQLField(GraphQLInt),
     },
-    interfaces= [nodeInterface]
+    interfaces=[nodeInterface]
 )
 
 queryType = GraphQLObjectType(
     'Query',
-    fields= lambda: {
+    fields=lambda: {
         'node': nodeField,
         'allObjects': GraphQLField(
             GraphQLList(nodeInterface),
-            resolver= lambda *_: [userData['1'], userData['2'], photoData['1'], photoData['2']]
+            resolver=lambda *
+            _: [userData['1'], userData['2'], photoData['1'], photoData['2']]
         )
     }
 )
 
 schema = GraphQLSchema(query=queryType)
+
 
 def test_gives_different_ids():
     query = '''
@@ -90,24 +94,25 @@ def test_gives_different_ids():
     }
     '''
     expected = {
-      'allObjects': [
-        {
-          'id': 'VXNlcjox'
-        },
-        {
-          'id': 'VXNlcjoy'
-        },
-        {
-          'id': 'UGhvdG86MQ=='
-        },
-        {
-          'id': 'UGhvdG86Mg=='
-        },
-      ]
+        'allObjects': [
+            {
+                'id': 'VXNlcjox'
+            },
+            {
+                'id': 'VXNlcjoy'
+            },
+            {
+                'id': 'UGhvdG86MQ=='
+            },
+            {
+                'id': 'UGhvdG86Mg=='
+            },
+        ]
     }
     result = graphql(schema, query)
     assert not result.errors
     assert result.data == expected
+
 
 def test_refetches_the_ids():
     query = '''
@@ -127,14 +132,14 @@ def test_refetches_the_ids():
     }
     '''
     expected = {
-      'user': {
-        'id': 'VXNlcjox',
-        'name': 'John Doe'
-      },
-      'photo': {
-        'id': 'UGhvdG86MQ==',
-        'width': 300
-      }
+        'user': {
+            'id': 'VXNlcjox',
+            'name': 'John Doe'
+        },
+        'photo': {
+            'id': 'UGhvdG86MQ==',
+            'width': 300
+        }
     }
     result = graphql(schema, query)
     assert not result.errors

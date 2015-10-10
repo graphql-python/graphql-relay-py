@@ -29,12 +29,14 @@ photoData = {
     '4': Photo(id=4, width=400),
 }
 
+
 def getNode(id, info):
     assert info.schema == schema
     if id in userData:
         return userData[id]
     else:
         return photoData[id]
+
 
 def getNodeType(obj):
     if obj.id in userData:
@@ -47,30 +49,31 @@ nodeField, nodeInterface = _nodeDefinitions.nodeField, _nodeDefinitions.nodeInte
 
 userType = GraphQLObjectType(
     'User',
-    fields= lambda: {
+    fields=lambda: {
         'id': GraphQLField(GraphQLNonNull(GraphQLID)),
         'name': GraphQLField(GraphQLString),
     },
-    interfaces= [nodeInterface]
+    interfaces=[nodeInterface]
 )
 
 photoType = GraphQLObjectType(
     'Photo',
-    fields= lambda: {
+    fields=lambda: {
         'id': GraphQLField(GraphQLNonNull(GraphQLID)),
         'width': GraphQLField(GraphQLInt),
     },
-    interfaces= [nodeInterface]
+    interfaces=[nodeInterface]
 )
 
 queryType = GraphQLObjectType(
     'Query',
-    fields= lambda: {
+    fields=lambda: {
         'node': nodeField,
     }
 )
 
 schema = GraphQLSchema(query=queryType)
+
 
 def test_include_connections_and_edge_types():
     query = '''
@@ -81,11 +84,10 @@ def test_include_connections_and_edge_types():
       }
     '''
     expected = {
-      'node': {
-        'id': '1',
-      }
+        'node': {
+            'id': '1',
+        }
     }
     result = graphql(schema, query)
     assert not result.errors
     assert result.data == expected
-
