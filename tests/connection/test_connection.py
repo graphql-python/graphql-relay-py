@@ -1,4 +1,3 @@
-import json
 from collections import namedtuple
 from pytest import raises
 from graphql.core import graphql
@@ -34,7 +33,6 @@ allUsers = [
 userType = GraphQLObjectType(
   'User',
   fields= lambda: {
-    'id': GraphQLField(GraphQLString, resolver=lambda *_: 'id'),
     'name': GraphQLField(GraphQLString),
     'friends': GraphQLField(
       friendConnection,
@@ -113,44 +111,3 @@ def test_include_connections_and_edge_types():
     result = graphql(schema, query)
     assert not result.errors
     assert result.data == expected
-
-
-def test_edges_preserve_order1():
-    query = '''
-      query FriendsQuery {
-        user {
-          friends(first: 1) {
-            edges {
-              node {
-                name
-                id
-              }
-            }
-          }
-        }
-      }
-    '''
-    result = graphql(schema, query)
-    assert not result.errors
-    assert json.dumps(result.data) == '{"user": {"friends": {"edges": [{"node": {"name": "Dan", "id": "id"}}]}}}'
-
-
-def test_edges_preserve_order2():
-    query = '''
-      query FriendsQuery {
-        user {
-          friends(first: 1) {
-            edges {
-              node {
-                id
-                name
-              }
-            }
-          }
-        }
-      }
-    '''
-    result = graphql(schema, query)
-    assert not result.errors
-    assert json.dumps(result.data) == '{"user": {"friends": {"edges": [{"node": {"id": "id", "name": "Dan"}}]}}}'
-

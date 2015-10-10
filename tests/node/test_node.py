@@ -1,4 +1,3 @@
-import json
 from collections import namedtuple
 from pytest import raises
 from graphql.core import graphql
@@ -38,7 +37,7 @@ def getNode(id, info):
         return photoData[id]
 
 def getNodeType(obj):
-    if str(obj.id) in userData:
+    if obj.id in userData:
         return userType
     else:
         return photoType
@@ -50,7 +49,7 @@ userType = GraphQLObjectType(
     'User',
     fields= lambda: {
         'id': GraphQLField(GraphQLNonNull(GraphQLID)),
-        'name': GraphQLField(GraphQLString, resolver=lambda *_: 'name'),
+        'name': GraphQLField(GraphQLString),
     },
     interfaces= [nodeInterface]
 )
@@ -68,12 +67,10 @@ queryType = GraphQLObjectType(
     'Query',
     fields= lambda: {
         'node': nodeField,
-        'user': GraphQLField(userType, resolver=lambda *_: userData['1']),
     }
 )
 
 schema = GraphQLSchema(query=queryType)
-
 
 def test_include_connections_and_edge_types():
     query = '''
@@ -92,62 +89,3 @@ def test_include_connections_and_edge_types():
     assert not result.errors
     assert result.data == expected
 
-
-def test_preserves_order1():
-    query = '''
-      {
-        node(id: "1") {
-          ... on User {
-            name
-            id
-          }
-        }
-      }
-    '''
-    result = graphql(schema, query)
-    assert not result.errors
-    assert json.dumps(result.data) == '{"node": {"name": "name", "id": "1"}}'
-
-
-def test_preserves_order2():
-    query = '''
-      {
-        node(id: "1") {
-          ... on User {
-            id
-            name
-          }
-        }
-      }
-    '''
-    result = graphql(schema, query)
-    assert not result.errors
-    assert json.dumps(result.data) == '{"node": {"id": "1", "name": "name"}}'
-
-
-def test_preserves_order_general1():
-    query = '''
-      {
-        user {
-            id
-            name
-        }
-      }
-    '''
-    result = graphql(schema, query)
-    assert not result.errors
-    assert json.dumps(result.data) == '{"user": {"id": "1", "name": "name"}}'
-
-
-def test_preserves_order_general2():
-    query = '''
-      {
-        user {
-            name
-            id
-        }
-      }
-    '''
-    result = graphql(schema, query)
-    assert not result.errors
-    assert json.dumps(result.data) == '{"user": {"name": "name", "id": "1"}}'
