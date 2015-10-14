@@ -30,9 +30,6 @@ def mutation_with_client_mutation_id(name, input_fields, output_fields, mutate_a
 
     def resolver(__, args, info, *_):
         input = args.get('input')
-        if not input:
-            # TODO: Should be raised by Graphql
-            raise GraphQLError('Input not provided')
         payload = mutate_and_get_payload(input, info)
         try:
             payload.clientMutationId = input['clientMutationId']
