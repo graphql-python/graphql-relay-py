@@ -24,7 +24,7 @@ class PyTest(TestCommand):
 
 setup(
     name='graphql-relay',
-    version='0.2.0',
+    version='0.3.3',
 
     description='Relay implementation for Python',
     long_description=open('README.rst').read(),

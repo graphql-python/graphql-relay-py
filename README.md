@@ -7,6 +7,7 @@ of a GraphQL server.
 *Note: The code is a __exact__ port of the original [graphql-relay js implementation](https://github.com/graphql/graphql-relay-js)
 from Facebook*
 
+[![PyPI version](https://badge.fury.io/py/graphql-relay.svg)](https://badge.fury.io/py/graphql-relay)
 [![Build Status](https://travis-ci.org/graphql-python/graphql-relay-py.svg?branch=master)](https://travis-ci.org/graphql-python/graphql-relay-py)
 [![Coverage Status](https://coveralls.io/repos/graphql-python/graphql-relay-py/badge.svg?branch=master&service=github)](https://coveralls.io/github/graphql-python/graphql-relay-py?branch=master)
 
