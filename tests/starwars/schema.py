@@ -21,7 +21,7 @@ from graphql_relay.connection.arrayconnection import (
 )
 
 from graphql_relay.connection.connection import (
-    connectionArgs,
+    connection_args,
     connection_definitions
 )
 
@@ -127,7 +127,7 @@ def get_node(global_id, *args):
         return None
 
 
-def get_node_type(obj):
+def get_node_type(obj, info):
     if isinstance(obj, Faction):
         return factionType
     else:
@@ -193,7 +193,7 @@ factionType = GraphQLObjectType(
         'ships': GraphQLField(
             shipConnection,
             description='The ships used by the faction.',
-            args=connectionArgs,
+            args=connection_args,
             resolver=lambda faction, args, *_: connection_from_list(
                 [getShip(ship) for ship in faction.ships],
                 args

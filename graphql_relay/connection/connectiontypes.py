@@ -13,12 +13,12 @@ class Connection(object):
 
 class PageInfo(object):
 
-    def __init__(self, startCursor="", endCursor="",
-                 hasPreviousPage=False, hasNextPage=False):
-        self.startCursor = startCursor
-        self.endCursor = endCursor
-        self.hasPreviousPage = hasPreviousPage
-        self.hasNextPage = hasNextPage
+    def __init__(self, start_cursor="", end_cursor="",
+                 has_previous_page=False, has_next_page=False):
+        self.startCursor = start_cursor
+        self.endCursor = end_cursor
+        self.hasPreviousPage = has_previous_page
+        self.hasNextPage = has_next_page
 
     def to_dict(self):
         return {

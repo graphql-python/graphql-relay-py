@@ -1,5 +1,5 @@
 from .connection.connection import (
-    connectionArgs,
+    connection_args,
     connection_definitions
 )
 from .connection.arrayconnection import (
@@ -19,7 +19,7 @@ from .mutation.mutation import (
 
 __all__ = [
     # Helpers for creating connection types in the schema
-    'connectionArgs', 'connection_definitions',
+    'connection_args', 'connection_definitions',
     # Helpers for creating connections from arrays
     'connection_from_list', 'connection_from_promised_list', 'cursor_for_object_in_connection',
     # Helper for creating node definitions

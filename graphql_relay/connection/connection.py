@@ -31,7 +31,7 @@ class GraphQLConnection(object):
         self.connection_type = connection_type
 
 
-connectionArgs = {
+connection_args = {
     'before': GraphQLArgument(GraphQLString),
     'after': GraphQLArgument(GraphQLString),
     'first': GraphQLArgument(GraphQLInt),

@@ -38,7 +38,7 @@ def get_node(id, info):
         return photoData[id]
 
 
-def get_node_type(obj):
+def get_node_type(obj, info):
     if obj.id in userData:
         return userType
     else:

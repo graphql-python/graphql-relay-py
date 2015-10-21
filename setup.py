@@ -54,7 +54,7 @@ setup(
     packages=find_packages(exclude=['tests']),
 
     install_requires=[
-        'graphql-core'
+        'graphql-core>=0.4.7a0'
     ],
     tests_require=['pytest>=2.7.2'],
     extras_require={

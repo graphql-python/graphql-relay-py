@@ -49,12 +49,12 @@ Helper functions are provided for both building the GraphQL types
 for connections and for implementing the `resolver` method for fields
 returning those types.
 
- - `connectionArgs` returns the arguments that fields should provide when
+ - `connection_args` returns the arguments that fields should provide when
 they return a connection type.
  - `connection_definitions` returns a `connection_type` and its associated
 `edgeType`, given a name and a node type.
  - `connection_from_list` is a helper method that takes an array and the
-arguments from `connectionArgs`, does pagination and filtering, and returns
+arguments from `connection_args`, does pagination and filtering, and returns
 an object in the shape expected by a `connection_type`'s `resolver` function.
  - `connection_from_promised_list` is similar to `connection_from_list`, but
 it takes a promise that resolves to an array, and returns a promise that
@@ -79,7 +79,7 @@ factionType = GraphQLObjectType(
         'ships': GraphQLField(
             shipConnection,
             description= 'The ships used by the faction.',
-            args= connectionArgs,
+            args= connection_args,
             resolver= lambda faction, args, *_: connection_from_list(
                 map(getShip, faction.ships),
                 args
@@ -92,7 +92,7 @@ factionType = GraphQLObjectType(
 
 This shows adding a `ships` field to the `Faction` object that is a connection.
 It uses `connection_definitions({name: 'Ship', nodeType: shipType})` to create
-the connection type, adds `connectionArgs` as arguments on this function, and
+the connection type, adds `connection_args` as arguments on this function, and
 then implements the resolver function by passing the array of ships and the
 arguments to `connection_from_list`.
 

@@ -3,12 +3,17 @@ from graphql_relay.utils import base64, unbase64
 from .connectiontypes import Connection, PageInfo, Edge
 
 
-def connection_from_list(data, args={}, **kwargs):
+def connection_from_list(data, args={}, connection_type=None,
+                         edge_type=None, pageinfo_type=None, **kwargs):
     '''
     A simple function that accepts an array and connection arguments, and returns
     a connection object for use in GraphQL. It uses array offsets as pagination,
     so pagination will only work if the array is static.
     '''
+    connection_type = connection_type or Connection
+    edge_type = edge_type or Edge
+    pageinfo_type = pageinfo_type or PageInfo
+
     full_args = dict(args, **kwargs)
 
     before = full_args.get('before')
@@ -21,7 +26,7 @@ def connection_from_list(data, args={}, **kwargs):
     begin = max(get_offset(after, -1), -1) + 1
     end = min(get_offset(before, count + 1), count)
     if begin >= count or begin >= end:
-        return empty_connection()
+        return empty_connection(connection_type, pageinfo_type)
 
     # Save the pre-slice cursors
     first_preslice_cursor = offset_to_cursor(begin)
@@ -34,24 +39,24 @@ def connection_from_list(data, args={}, **kwargs):
         begin = max(end - last, begin)
 
     if begin >= count or begin >= end:
-        return empty_connection()
+        return empty_connection(connection_type, pageinfo_type)
 
     sliced_data = data[begin:end]
     edges = [
-        Edge(node, cursor=offset_to_cursor(i + begin))
+        edge_type(node=node, cursor=offset_to_cursor(i + begin))
         for i, node in enumerate(sliced_data)
     ]
 
     # Construct the connection
     first_edge = edges[0]
     last_edge = edges[len(edges) - 1]
-    return Connection(
-        edges,
-        PageInfo(
-            startCursor=first_edge.cursor,
-            endCursor=last_edge.cursor,
-            hasPreviousPage=(first_edge.cursor != first_preslice_cursor),
-            hasNextPage=(last_edge.cursor != last_preslice_cursor)
+    return connection_type(
+        edges=edges,
+        page_info=pageinfo_type(
+            start_cursor=first_edge.cursor,
+            end_cursor=last_edge.cursor,
+            has_previous_page=(first_edge.cursor != first_preslice_cursor),
+            has_next_page=(last_edge.cursor != last_preslice_cursor)
         )
     )
 
@@ -66,17 +71,20 @@ def connection_from_promised_list(data_promise, args={}, **kwargs):
     # return dataPromise.then(lambda data:connection_from_list(data, args))
 
 
-def empty_connection():
+def empty_connection(connection_type=None, pageinfo_type=None):
     '''
     Helper to get an empty connection.
     '''
-    return Connection(
-        [],
-        PageInfo(
-            startCursor=None,
-            endCursor=None,
-            hasPreviousPage=False,
-            hasNextPage=False,
+    connection_type = connection_type or Connection
+    pageinfo_type = pageinfo_type or PageInfo
+
+    return connection_type(
+        edges=[],
+        page_info=pageinfo_type(
+            start_cursor=None,
+            end_cursor=None,
+            has_previous_page=False,
+            has_next_page=False,
         )
     )
 

@@ -16,7 +16,7 @@ from graphql.core.type import (
 
 from graphql_relay.connection.arrayconnection import connection_from_list
 from graphql_relay.connection.connection import (
-    connectionArgs,
+    connection_args,
     connection_definitions
 )
 
@@ -36,7 +36,7 @@ userType = GraphQLObjectType(
         'name': GraphQLField(GraphQLString),
         'friends': GraphQLField(
             friendConnection,
-            args=connectionArgs,
+            args=connection_args,
             resolver=lambda user, args, *
             _: connection_from_list(allUsers, args),
         ),

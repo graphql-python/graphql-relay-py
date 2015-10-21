@@ -35,15 +35,15 @@ photoData = {
 
 
 def get_node(global_id, *args):
-    resolvedGlobalId = from_global_id(global_id)
-    _type, _id = resolvedGlobalId.type, resolvedGlobalId.id
+    resolved_global_id = from_global_id(global_id)
+    _type, _id = resolved_global_id.type, resolved_global_id.id
     if _type == 'User':
         return userData[_id]
     else:
         return photoData[_id]
 
 
-def get_node_type(obj):
+def get_node_type(obj, info):
     if isinstance(obj, User):
         return userType
     else:
