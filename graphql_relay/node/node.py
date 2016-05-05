@@ -1,19 +1,12 @@
 from graphql_relay.utils import base64, unbase64
 
-from graphql.core.type import (
+from graphql.type import (
     GraphQLArgument,
     GraphQLNonNull,
     GraphQLID,
     GraphQLField,
     GraphQLInterfaceType,
 )
-
-
-class GraphQLNode(object):
-
-    def __init__(self, node_interface, node_field):
-        self.node_interface = node_interface
-        self.node_field = node_field
 
 
 def node_definitions(id_fetcher, type_resolver=None):
@@ -47,16 +40,9 @@ def node_definitions(id_fetcher, type_resolver=None):
                 description='The ID of an object'
             )
         },
-        resolver=lambda obj, args, info: id_fetcher(args.get('id'), info)
+        resolver=lambda obj, args, *_: id_fetcher(args.get('id'), *_)
     )
-    return GraphQLNode(node_interface, node_field)
-
-
-class ResolvedGlobalId(object):
-
-    def __init__(self, type, id):
-        self.type = type
-        self.id = id
+    return node_interface, node_field
 
 
 def to_global_id(type, id):
@@ -74,7 +60,7 @@ def from_global_id(global_id):
     '''
     unbased_global_id = unbase64(global_id)
     _type, _id = unbased_global_id.split(':', 1)
-    return ResolvedGlobalId(_type, _id)
+    return _type, _id
 
 
 def global_id_field(type_name, id_fetcher=None):
@@ -87,6 +73,8 @@ def global_id_field(type_name, id_fetcher=None):
     return GraphQLField(
         GraphQLNonNull(GraphQLID),
         description='The ID of an object',
-        resolver=lambda obj, *
-        _: to_global_id(type_name, id_fetcher(obj) if id_fetcher else obj.id)
+        resolver=lambda obj, args, context, info: to_global_id(
+            type_name or info.parent_type.name,
+            id_fetcher(obj, context, info) if id_fetcher else obj.id
+        )
     )

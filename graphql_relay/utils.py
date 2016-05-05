@@ -10,3 +10,9 @@ except NameError:
 
     def unbase64(s):
         return _unbase64(s).decode('utf-8')
+
+
+def resolve_maybe_thunk(f):
+    if callable(f):
+        return f()
+    return f

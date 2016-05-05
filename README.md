@@ -66,7 +66,7 @@ member object, and returns a cursor for use in the mutation payload.
 An example usage of these methods from the [test schema](tests/starwars/schema.py):
 
 ```python
-shipConnection = connection_definitions('Ship', shipType).connection_type
+ship_edge, ship_connection = connection_definitions('Ship', shipType)
 
 factionType = GraphQLObjectType(
     name= 'Faction',
@@ -118,7 +118,7 @@ objects.
 An example usage of these methods from the [test schema](tests/starwars/schema.py):
 
 ```python
-def get_node(global_id, *args):
+def get_node(global_id, context, info):
     resolvedGlobalId = from_global_id(global_id)
     _type, _id = resolvedGlobalId.type, resolvedGlobalId.id
     if _type == 'Faction':
@@ -128,14 +128,13 @@ def get_node(global_id, *args):
     else:
         return None
 
-def get_node_type(obj):
+def get_node_type(obj, context, info):
     if isinstance(obj, Faction):
         return factionType
     else:
         return shipType
 
-_node_definitions = node_definitions(get_node, get_node_type)
-node_field, node_interface = _node_definitions.node_field, _node_definitions.node_interface
+node_interface, node_field = node_definitions(get_node, get_node_type)
 
 factionType = GraphQLObjectType(
     name= 'Faction',

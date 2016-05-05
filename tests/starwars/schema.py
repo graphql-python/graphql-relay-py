@@ -1,6 +1,6 @@
 from collections import namedtuple
 
-from graphql.core.type import (
+from graphql.type import (
     GraphQLID,
     GraphQLNonNull,
     GraphQLObjectType,
@@ -117,8 +117,7 @@ from .data import (
 
 
 def get_node(global_id, *args):
-    resolvedGlobalId = from_global_id(global_id)
-    _type, _id = resolvedGlobalId.type, resolvedGlobalId.id
+    _type, _id = from_global_id(global_id)
     if _type == 'Faction':
         return getFaction(_id)
     elif _type == 'Ship':
@@ -127,14 +126,13 @@ def get_node(global_id, *args):
         return None
 
 
-def get_node_type(obj, info):
+def get_node_type(obj, context, info):
     if isinstance(obj, Faction):
         return factionType
     else:
         return shipType
 
-_node_definitions = node_definitions(get_node, get_node_type)
-node_field, node_interface = _node_definitions.node_field, _node_definitions.node_interface
+node_interface, node_field = node_definitions(get_node, get_node_type)
 
 
 # We define our basic ship type.
@@ -171,7 +169,7 @@ shipType = GraphQLObjectType(
 #     cursor: String!
 #     node: Ship
 #   }
-shipConnection = connection_definitions('Ship', shipType).connection_type
+shipEdge, shipConnection = connection_definitions('Ship', shipType)
 
 # We define our faction type, which implements the node interface.
 #

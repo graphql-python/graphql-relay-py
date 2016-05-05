@@ -1,95 +1,114 @@
-from graphql_relay.utils import base64, unbase64
+from promise import Promise
 
+from ..utils import base64, unbase64
 from .connectiontypes import Connection, PageInfo, Edge
 
 
-def connection_from_list(data, args={}, connection_type=None,
-                         edge_type=None, pageinfo_type=None, **kwargs):
+def connection_from_list(data, args=None, **kwargs):
     '''
     A simple function that accepts an array and connection arguments, and returns
     a connection object for use in GraphQL. It uses array offsets as pagination,
     so pagination will only work if the array is static.
     '''
+    return connection_from_list_slice(
+        data,
+        args,
+        slice_start=0,
+        list_length=len(data),
+        **kwargs
+    )
+
+
+def connection_from_promised_list(data_promise, args=None, **kwargs):
+    '''
+    A version of `connectionFromArray` that takes a promised array, and returns a
+    promised connection.
+    '''
+    return data_promise.then(lambda data: connection_from_list(data, args, **kwargs))
+
+
+def connection_from_list_slice(list_slice, args=None, connection_type=None,
+                               edge_type=None, pageinfo_type=None,
+                               slice_start=0, list_length=0):
+    '''
+    Given a slice (subset) of an array, returns a connection object for use in
+    GraphQL.
+    This function is similar to `connectionFromArray`, but is intended for use
+    cases where you know the cardinality of the connection, consider it too large
+    to materialize the entire array, and instead wish pass in a slice of the
+    total result large enough to cover the range specified in `args`.
+    '''
     connection_type = connection_type or Connection
     edge_type = edge_type or Edge
     pageinfo_type = pageinfo_type or PageInfo
 
-    full_args = dict(args, **kwargs)
+    args = args or {}
 
-    before = full_args.get('before')
-    after = full_args.get('after')
-    first = full_args.get('first')
-    last = full_args.get('last')
+    before = args.get('before')
+    after = args.get('after')
+    first = args.get('first')
+    last = args.get('last')
+    list_slice_length = len(list_slice)
+    slice_end = slice_start + list_slice_length
+    before_offset = get_offset_with_default(before, list_length)
+    after_offset = get_offset_with_default(after, -1)
 
-    count = len(data)
-    # Slice with cursors
-    begin = max(get_offset(after, -1), -1) + 1
-    end = min(get_offset(before, count + 1), count)
-    if begin >= count or begin >= end:
-        return empty_connection(connection_type, pageinfo_type)
+    start_offset = max(
+        slice_start - 1,
+        after_offset,
+        -1
+    ) + 1
+    end_offset = min(
+        slice_end,
+        before_offset,
+        list_length
+    )
+    if isinstance(first, int):
+        end_offset = min(
+            end_offset,
+            start_offset + first
+        )
+    if isinstance(last, int):
+        start_offset = max(
+            start_offset,
+            end_offset - last
+        )
 
-    # Save the pre-slice cursors
-    first_preslice_cursor = offset_to_cursor(begin)
-    last_preslice_cursor = offset_to_cursor(min(end, count) - 1)
-
-    # Slice with limits
-    if first is not None:
-        end = min(begin + first, end)
-    if last is not None:
-        begin = max(end - last, begin)
-
-    if begin >= count or begin >= end:
-        return empty_connection(connection_type, pageinfo_type)
-
-    sliced_data = data[begin:end]
+    # If supplied slice is too large, trim it down before mapping over it.
+    _slice = list_slice[
+        max(start_offset - slice_start, 0):
+        list_slice_length - (slice_end - end_offset)
+    ]
     edges = [
-        edge_type(node=node, cursor=offset_to_cursor(i + begin))
-        for i, node in enumerate(sliced_data)
+        edge_type(
+            node=node,
+            cursor=offset_to_cursor(start_offset + i)
+        )
+        for i, node in enumerate(_slice)
     ]
 
-    # Construct the connection
-    first_edge = edges[0]
-    last_edge = edges[len(edges) - 1]
+
+    first_edge_cursor = edges[0].cursor if edges else None
+    last_edge_cursor = edges[-1].cursor if edges else None
+    lower_bound = after_offset + 1 if after else 0
+    upper_bound = before_offset if before else list_length
+
     return connection_type(
         edges=edges,
         page_info=pageinfo_type(
-            start_cursor=first_edge.cursor,
-            end_cursor=last_edge.cursor,
-            has_previous_page=(first_edge.cursor != first_preslice_cursor),
-            has_next_page=(last_edge.cursor != last_preslice_cursor)
-        )
-    )
-
-
-def connection_from_promised_list(data_promise, args={}, **kwargs):
-    '''
-    A version of the above that takes a promised array, and returns a promised
-    connection.
-    '''
-    # TODO: Promises not implemented
-    raise Exception('connection_from_promised_list is not implemented yet')
-    # return dataPromise.then(lambda data:connection_from_list(data, args))
-
-
-def empty_connection(connection_type=None, pageinfo_type=None):
-    '''
-    Helper to get an empty connection.
-    '''
-    connection_type = connection_type or Connection
-    pageinfo_type = pageinfo_type or PageInfo
-
-    return connection_type(
-        edges=[],
-        page_info=pageinfo_type(
-            start_cursor=None,
-            end_cursor=None,
-            has_previous_page=False,
-            has_next_page=False,
+            start_cursor=first_edge_cursor,
+            end_cursor=last_edge_cursor,
+            has_previous_page=isinstance(last, int) and start_offset > lower_bound,
+            has_next_page=isinstance(first, int) and end_offset < upper_bound
         )
     )
 
 
 PREFIX = 'arrayconnection:'
+
+
+def connection_from_promised_list_slice(data_promise, args=None, **kwargs):
+    return data_promise.then(lambda data: connection_from_list_slice(data, args, **kwargs))
 
 
 def offset_to_cursor(offset):
@@ -104,7 +123,7 @@ def cursor_to_offset(cursor):
     Rederives the offset from the cursor string.
     '''
     try:
-        return int(unbase64(cursor)[len(PREFIX):len(PREFIX) + 10])
+        return int(unbase64(cursor)[len(PREFIX):])
     except:
         return None
 
@@ -120,13 +139,13 @@ def cursor_for_object_in_connection(data, _object):
     return offset_to_cursor(offset)
 
 
-def get_offset(cursor, default_offset=0):
+def get_offset_with_default(cursor=None, default_offset=0):
     '''
     Given an optional cursor and a default offset, returns the offset
     to use; if the cursor contains a valid offset, that will be used,
     otherwise it will be the default.
     '''
-    if cursor is None:
+    if not isinstance(cursor, str):
         return default_offset
 
     offset = cursor_to_offset(cursor)

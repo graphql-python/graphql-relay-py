@@ -1,5 +1,5 @@
 from pytest import raises
-from graphql.core import graphql
+from graphql import graphql
 
 from .schema import StarWarsSchema
 
@@ -38,6 +38,6 @@ def test_correctely_mutates_dataset():
             'clientMutationId': 'abcde',
         }
     }
-    result = graphql(StarWarsSchema, query, None, params)
+    result = graphql(StarWarsSchema, query, variable_values=params)
     assert not result.errors
     assert result.data == expected

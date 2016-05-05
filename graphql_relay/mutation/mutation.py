@@ -1,4 +1,5 @@
-from graphql.core.type import (
+from promise import Promise
+from graphql.type import (
     GraphQLArgument,
     GraphQLInputObjectField,
     GraphQLInputObjectType,
@@ -7,15 +8,16 @@ from graphql.core.type import (
     GraphQLString,
     GraphQLField,
 )
-from graphql.core.error import GraphQLError
+from graphql.error import GraphQLError
+from ..utils import resolve_maybe_thunk
 
 
 def mutation_with_client_mutation_id(name, input_fields, output_fields, mutate_and_get_payload):
-    augmented_input_fields = dict(input_fields,
+    augmented_input_fields = dict(resolve_maybe_thunk(input_fields),
                                   clientMutationId=GraphQLInputObjectField(
                                       GraphQLNonNull(GraphQLString))
                                   )
-    augmented_output_fields = dict(output_fields,
+    augmented_output_fields = dict(resolve_maybe_thunk(output_fields),
                                    clientMutationId=GraphQLField(
                                        GraphQLNonNull(GraphQLString))
                                    )
@@ -28,15 +30,17 @@ def mutation_with_client_mutation_id(name, input_fields, output_fields, mutate_a
         fields=augmented_output_fields,
     )
 
-    def resolver(__, args, info, *_):
+    def resolver(__, args, *_):
         input = args.get('input')
-        payload = mutate_and_get_payload(input, info)
-        try:
-            payload.clientMutationId = input['clientMutationId']
-        except:
-            raise GraphQLError(
-                'Cannot set clientMutationId in the payload object %s' % repr(payload))
-        return payload
+
+        def on_resolve(payload):
+            try:
+                payload.clientMutationId = input['clientMutationId']
+            except:
+                raise GraphQLError('Cannot set clientMutationId in the payload object {}'.format(repr(payload)))
+            return payload
+
+        return Promise.resolve(mutate_and_get_payload(input, *_)).then(on_resolve)
 
     return GraphQLField(
         output_type,

@@ -1,10 +1,10 @@
-from graphql.core.type import (
+from promise import Promise
+from graphql.type import (
     GraphQLArgument,
     GraphQLList,
     GraphQLNonNull,
     GraphQLField
 )
-# GraphQLInputObjectType
 
 
 def plural_identifying_root_field(arg_name, input_type, output_type, resolve_single_input, description=None):
@@ -17,9 +17,12 @@ def plural_identifying_root_field(arg_name, input_type, output_type, resolve_sin
         )
     )
 
-    def resolver(obj, args, *_):
+    def resolver(obj, args, context, info):
         inputs = args[arg_name]
-        return map(resolve_single_input, inputs)
+        return Promise.all([
+            resolve_single_input(input, context, info)
+            for input in inputs
+        ])
 
     return GraphQLField(
         GraphQLList(output_type),
