@@ -10,11 +10,13 @@ def connection_from_list(data, args=None, **kwargs):
     a connection object for use in GraphQL. It uses array offsets as pagination,
     so pagination will only work if the array is static.
     '''
+    _len = len(data)
     return connection_from_list_slice(
         data,
         args,
         slice_start=0,
-        list_length=len(data),
+        list_length=_len,
+        list_slice_length=_len,
         **kwargs
     )
 
@@ -29,7 +31,7 @@ def connection_from_promised_list(data_promise, args=None, **kwargs):
 
 def connection_from_list_slice(list_slice, args=None, connection_type=None,
                                edge_type=None, pageinfo_type=None,
-                               slice_start=0, list_length=0):
+                               slice_start=0, list_length=0, list_slice_length=None):
     '''
     Given a slice (subset) of an array, returns a connection object for use in
     GraphQL.
@@ -48,7 +50,8 @@ def connection_from_list_slice(list_slice, args=None, connection_type=None,
     after = args.get('after')
     first = args.get('first')
     last = args.get('last')
-    list_slice_length = len(list_slice)
+    if list_slice_length is None:
+        list_slice_length = len(list_slice)
     slice_end = slice_start + list_slice_length
     before_offset = get_offset_with_default(before, list_length)
     after_offset = get_offset_with_default(after, -1)
