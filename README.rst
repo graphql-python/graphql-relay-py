@@ -2,14 +2,15 @@ Relay Library for GraphQL Python
 ================================
 
 This is a library to allow the easy creation of Relay-compliant servers
-using the `GraphQL Python <https://github.com/graphql-python/graphql-core>`__
-reference implementation of a GraphQL server.
+using the `GraphQL
+Python <https://github.com/graphql-python/graphql-core>`__ reference
+implementation of a GraphQL server.
 
 Note: The code is a **exact** port of the original `graphql-relay js
 implementation <https://github.com/graphql/graphql-relay-js>`__ from
 Facebook
 
-|Build Status| |Coverage Status|
+|PyPI version| |Build Status| |Coverage Status|
 
 Getting Started
 ---------------
@@ -36,7 +37,7 @@ this repository is to walk through that documentation and the
 corresponding tests in this library together.
 
 Using Relay Library for GraphQL Python (graphql-core)
----------------------------------------------------
+-----------------------------------------------------
 
 Install Relay Library for GraphQL Python
 
@@ -46,8 +47,9 @@ Install Relay Library for GraphQL Python
     pip install graphql-relay
 
 When building a schema for
-`GraphQL <https://github.com/graphql-python/graphql-core>`__, the provided library
-functions can be used to simplify the creation of Relay patterns.
+`GraphQL <https://github.com/graphql-python/graphql-core>`__, the
+provided library functions can be used to simplify the creation of Relay
+patterns.
 
 Connections
 ~~~~~~~~~~~
@@ -61,9 +63,9 @@ returning those types.
 -  ``connection_definitions`` returns a ``connection_type`` and its
    associated ``edgeType``, given a name and a node type.
 -  ``connection_from_list`` is a helper method that takes an array and
-   the arguments from ``connection_args``, does pagination and filtering,
-   and returns an object in the shape expected by a ``connection_type``'s
-   ``resolver`` function.
+   the arguments from ``connection_args``, does pagination and
+   filtering, and returns an object in the shape expected by a
+   ``connection_type``'s ``resolver`` function.
 -  ``connection_from_promised_list`` is similar to
    ``connection_from_list``, but it takes a promise that resolves to an
    array, and returns a promise that resolves to the expected shape by
@@ -77,7 +79,7 @@ schema <tests/starwars/schema.py>`__:
 
 .. code:: python
 
-    shipConnection = connection_definitions('Ship', shipType).connection_type
+    ship_edge, ship_connection = connection_definitions('Ship', shipType)
 
     factionType = GraphQLObjectType(
         name= 'Faction',
@@ -120,12 +122,12 @@ nodes and for implementing global IDs around local IDs.
    to an object, and to determine the type of a given object.
 -  ``to_global_id`` takes a type name and an ID specific to that type
    name, and returns a "global ID" that is unique among all types.
--  ``from_global_id`` takes the "global ID" created by ``toGlobalID``, and
-   retuns the type name and ID used to create it.
--  ``global_id_field`` creates the configuration for an ``id`` field on a
-   node.
--  ``plural_identifying_root_field`` creates a field that accepts a list of
-   non-ID identifiers (like a username) and maps then to their
+-  ``from_global_id`` takes the "global ID" created by ``toGlobalID``,
+   and retuns the type name and ID used to create it.
+-  ``global_id_field`` creates the configuration for an ``id`` field on
+   a node.
+-  ``plural_identifying_root_field`` creates a field that accepts a list
+   of non-ID identifiers (like a username) and maps then to their
    corresponding objects.
 
 An example usage of these methods from the `test
@@ -133,7 +135,7 @@ schema <tests/starwars/schema.py>`__:
 
 .. code:: python
 
-    def get_node(global_id, *args):
+    def get_node(global_id, context, info):
         resolvedGlobalId = from_global_id(global_id)
         _type, _id = resolvedGlobalId.type, resolvedGlobalId.id
         if _type == 'Faction':
@@ -143,14 +145,13 @@ schema <tests/starwars/schema.py>`__:
         else:
             return None
 
-    def get_node_type(obj):
+    def get_node_type(obj, context, info):
         if isinstance(obj, Faction):
             return factionType
         else:
             return shipType
 
-    _node_definitions = node_definitions(get_node, get_node_type)
-    node_field, node_interface = _node_definitions.node_field, _node_definitions.node_interface
+    node_interface, node_field = node_definitions(get_node, get_node_type)
 
     factionType = GraphQLObjectType(
         name= 'Faction',
@@ -182,11 +183,11 @@ Mutations
 A helper function is provided for building mutations with single inputs
 and client mutation IDs.
 
--  ``mutation_with_client_mutation_id`` takes a name, input fields, output
-   fields, and a mutation method to map from the input fields to the
-   output fields, performing the mutation along the way. It then creates
-   and returns a field configuration that can be used as a top-level
-   field on the mutation type.
+-  ``mutation_with_client_mutation_id`` takes a name, input fields,
+   output fields, and a mutation method to map from the input fields to
+   the output fields, performing the mutation along the way. It then
+   creates and returns a field configuration that can be used as a
+   top-level field on the mutation type.
 
 An example usage of these methods from the `test
 schema <tests/starwars/schema.py>`__:
@@ -240,10 +241,10 @@ schema <tests/starwars/schema.py>`__:
 
 This code creates a mutation named ``IntroduceShip``, which takes a
 faction ID and a ship name as input. It outputs the ``Faction`` and the
-``Ship`` in question. ``mutate_and_get_payload`` then gets an object with a
-property for each input field, performs the mutation by constructing the
-new ship, then returns an object that will be resolved by the output
-fields.
+``Ship`` in question. ``mutate_and_get_payload`` then gets an object
+with a property for each input field, performs the mutation by
+constructing the new ship, then returns an object that will be resolved
+by the output fields.
 
 Our mutation type then creates the ``introduceShip`` field using the
 return value of ``mutation_with_client_mutation_id``.
@@ -263,6 +264,8 @@ After developing, the full test suite can be evaluated by running:
 
     python setup.py test # Use --pytest-args="-v -s" for verbose mode
 
+.. |PyPI version| image:: https://badge.fury.io/py/graphql-relay.svg
+   :target: https://badge.fury.io/py/graphql-relay
 .. |Build Status| image:: https://travis-ci.org/graphql-python/graphql-relay-py.svg?branch=master
    :target: https://travis-ci.org/graphql-python/graphql-relay-py
 .. |Coverage Status| image:: https://coveralls.io/repos/graphql-python/graphql-relay-py/badge.svg?branch=master&service=github
