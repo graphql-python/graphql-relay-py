@@ -1,6 +1,6 @@
 from promise import Promise
 
-from ..utils import base64, unbase64
+from ..utils import base64, unbase64, is_str
 from .connectiontypes import Connection, PageInfo, Edge
 
 
@@ -148,7 +148,7 @@ def get_offset_with_default(cursor=None, default_offset=0):
     to use; if the cursor contains a valid offset, that will be used,
     otherwise it will be the default.
     '''
-    if not isinstance(cursor, str):
+    if not is_str(cursor):
         return default_offset
 
     offset = cursor_to_offset(cursor)
