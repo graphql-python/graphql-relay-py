@@ -94,8 +94,8 @@ def connection_from_list_slice(list_slice, args=None, connection_type=None,
         ]
 
 
-    first_edge_cursor = edges[0].cursor if edges else None
-    last_edge_cursor = edges[-1].cursor if edges else None
+    first_edge_cursor = getattr(edges[0], 'cursor', None) if edges else None
+    last_edge_cursor = getattr(edges[-1], 'cursor', None) if edges else None
     lower_bound = after_offset + 1 if after else 0
     upper_bound = before_offset if before else list_length
 
