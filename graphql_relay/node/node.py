@@ -9,7 +9,7 @@ from graphql.type import (
 )
 
 
-def node_definitions(id_fetcher, type_resolver=None):
+def node_definitions(id_fetcher, type_resolver=None, id_resolver=None):
     '''
     Given a function to map from an ID to an underlying object, and a function
     to map from an underlying object to the concrete GraphQLObjectType it
@@ -27,6 +27,7 @@ def node_definitions(id_fetcher, type_resolver=None):
             'id': GraphQLField(
                 GraphQLNonNull(GraphQLID),
                 description='The id of the object.',
+                resolver=id_resolver,
             ),
         },
         resolve_type=type_resolver
