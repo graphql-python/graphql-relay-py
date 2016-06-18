@@ -1,3 +1,4 @@
+from collections import OrderedDict
 from promise import Promise
 from graphql.type import (
     GraphQLArgument,
@@ -13,14 +14,19 @@ from ..utils import resolve_maybe_thunk
 
 
 def mutation_with_client_mutation_id(name, input_fields, output_fields, mutate_and_get_payload):
-    augmented_input_fields = dict(resolve_maybe_thunk(input_fields),
-                                  clientMutationId=GraphQLInputObjectField(
-                                      GraphQLNonNull(GraphQLString))
-                                  )
-    augmented_output_fields = dict(resolve_maybe_thunk(output_fields),
-                                   clientMutationId=GraphQLField(
-                                       GraphQLNonNull(GraphQLString))
-                                   )
+    augmented_input_fields = OrderedDict(
+        resolve_maybe_thunk(input_fields),
+        clientMutationId=GraphQLInputObjectField(
+            GraphQLNonNull(GraphQLString)
+        )
+    )
+    augmented_output_fields = OrderedDict(
+        resolve_maybe_thunk(output_fields),
+        clientMutationId=GraphQLField(
+            GraphQLNonNull(GraphQLString)
+        )
+    )
+
     input_type = GraphQLInputObjectType(
         name + 'Input',
         fields=augmented_input_fields,
@@ -44,8 +50,8 @@ def mutation_with_client_mutation_id(name, input_fields, output_fields, mutate_a
 
     return GraphQLField(
         output_type,
-        args={
-            'input': GraphQLArgument(GraphQLNonNull(input_type)),
-        },
+        args=OrderedDict((
+            ('input', GraphQLArgument(GraphQLNonNull(input_type))),
+        )),
         resolver=resolver
     )

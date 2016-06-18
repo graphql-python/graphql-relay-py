@@ -1,3 +1,4 @@
+from collections import OrderedDict
 from graphql_relay.utils import base64, unbase64
 
 from graphql.type import (
@@ -23,24 +24,24 @@ def node_definitions(id_fetcher, type_resolver=None, id_resolver=None):
     node_interface = GraphQLInterfaceType(
         'Node',
         description='An object with an ID',
-        fields=lambda: {
-            'id': GraphQLField(
+        fields=lambda: OrderedDict((
+            ('id', GraphQLField(
                 GraphQLNonNull(GraphQLID),
                 description='The id of the object.',
                 resolver=id_resolver,
-            ),
-        },
+            )),
+        )),
         resolve_type=type_resolver
     )
     node_field = GraphQLField(
         node_interface,
         description='Fetches an object given its ID',
-        args={
-            'id': GraphQLArgument(
+        args=OrderedDict((
+            ('id', GraphQLArgument(
                 GraphQLNonNull(GraphQLID),
                 description='The ID of an object'
-            )
-        },
+            )),
+        )),
         resolver=lambda obj, args, *_: id_fetcher(args.get('id'), *_)
     )
     return node_interface, node_field

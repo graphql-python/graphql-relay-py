@@ -1,3 +1,4 @@
+from collections import OrderedDict
 from promise import Promise
 from graphql.type import (
     GraphQLArgument,
@@ -8,7 +9,7 @@ from graphql.type import (
 
 
 def plural_identifying_root_field(arg_name, input_type, output_type, resolve_single_input, description=None):
-    input_args = {}
+    input_args = OrderedDict()
     input_args[arg_name] = GraphQLArgument(
         GraphQLNonNull(
             GraphQLList(
