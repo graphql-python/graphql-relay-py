@@ -407,4 +407,4 @@ def test_contains_correct_field():
     })
     result = graphql(schema, query)
     assert not result.errors
-    assert result.data == expected
+    assert dict(result.data) == expected
