@@ -1,3 +1,5 @@
+from collections import OrderedDict
+
 from promise import Promise
 from graphql import graphql
 from graphql.type import (
@@ -315,7 +317,7 @@ def test_contains_correct_field():
         }
       }
     '''
-    expected = {
+    expected = OrderedDict({
         '__schema': {
           'mutationType': {
             'fields': [
@@ -402,7 +404,7 @@ def test_contains_correct_field():
             ]
           }
         }
-    }
+    })
     result = graphql(schema, query)
     assert not result.errors
     assert result.data == expected
