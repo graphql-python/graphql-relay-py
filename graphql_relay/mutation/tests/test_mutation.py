@@ -1,5 +1,3 @@
-from collections import OrderedDict
-
 from promise import Promise
 from graphql import graphql
 from graphql.type import (
@@ -322,46 +320,6 @@ def test_contains_correct_field():
           'mutationType': {
             'fields': [
               {
-                'name': 'simpleMutation',
-                'args': [
-                  {
-                    'name': 'input',
-                    'type': {
-                      'name': None,
-                      'kind': 'NON_NULL',
-                      'ofType': {
-                        'name': 'SimpleMutationInput',
-                        'kind': 'INPUT_OBJECT'
-                      }
-                    },
-                  }
-                ],
-                'type': {
-                  'name': 'SimpleMutationPayload',
-                  'kind': 'OBJECT',
-                }
-              },
-              {
-                'name': 'simpleMutationWithThunkFields',
-                'args': [
-                  {
-                    'name': 'input',
-                    'type': {
-                      'name': None,
-                      'kind': 'NON_NULL',
-                      'ofType': {
-                        'name': 'SimpleMutationWithThunkFieldsInput',
-                        'kind': 'INPUT_OBJECT'
-                      }
-                    },
-                  }
-                ],
-                'type': {
-                  'name': 'SimpleMutationWithThunkFieldsPayload',
-                  'kind': 'OBJECT',
-                }
-              },
-              {
                 'name': 'simplePromiseMutation',
                 'args': [
                   {
@@ -401,17 +359,50 @@ def test_contains_correct_field():
                   'kind': 'OBJECT',
                 }
               },
+              {
+                'name': 'simpleMutation',
+                'args': [
+                  {
+                    'name': 'input',
+                    'type': {
+                      'name': None,
+                      'kind': 'NON_NULL',
+                      'ofType': {
+                        'name': 'SimpleMutationInput',
+                        'kind': 'INPUT_OBJECT'
+                      }
+                    },
+                  }
+                ],
+                'type': {
+                  'name': 'SimpleMutationPayload',
+                  'kind': 'OBJECT',
+                }
+              },
+              {
+                'name': 'simpleMutationWithThunkFields',
+                'args': [
+                  {
+                    'name': 'input',
+                    'type': {
+                      'name': None,
+                      'kind': 'NON_NULL',
+                      'ofType': {
+                        'name': 'SimpleMutationWithThunkFieldsInput',
+                        'kind': 'INPUT_OBJECT'
+                      }
+                    },
+                  }
+                ],
+                'type': {
+                  'name': 'SimpleMutationWithThunkFieldsPayload',
+                  'kind': 'OBJECT',
+                }
+              },
             ]
           }
         }
     }
     result = graphql(schema, query)
     assert not result.errors
-    # ensure the ordering is correct for the assertion
-    expected['__schema']['mutationType']['fields'] = sorted(
-        expected['__schema']['mutationType']['fields']
-    )
-    result.data['__schema']['mutationType']['fields'] = sorted(
-        result.data['__schema']['mutationType']['fields']
-    )
     assert result.data == expected
