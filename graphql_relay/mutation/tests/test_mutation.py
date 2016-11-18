@@ -317,7 +317,7 @@ def test_contains_correct_field():
         }
       }
     '''
-    expected = OrderedDict({
+    expected = {
         '__schema': {
           'mutationType': {
             'fields': [
@@ -404,7 +404,16 @@ def test_contains_correct_field():
             ]
           }
         }
-    })
+    }
     result = graphql(schema, query)
     assert not result.errors
-    assert dict(result.data) == expected
+    # ensure the ordering is correct for the assertion
+    expected['__schema']['mutationType']['fields'] = sorted(
+        expected['__schema']['mutationType']['fields'],
+        key=lambda k: k['name']
+    )
+    result.data['__schema']['mutationType']['fields'] = sorted(
+        result.data['__schema']['mutationType']['fields'],
+        key=lambda k: k['name']
+    )
+    assert result.data == expected
