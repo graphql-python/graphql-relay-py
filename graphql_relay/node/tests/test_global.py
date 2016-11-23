@@ -1,17 +1,12 @@
 from collections import namedtuple
-from pytest import raises
 from graphql import graphql
 from graphql.type import (
     GraphQLSchema,
     GraphQLObjectType,
     GraphQLField,
-    GraphQLArgument,
     GraphQLList,
-    GraphQLNonNull,
     GraphQLInt,
     GraphQLString,
-    GraphQLBoolean,
-    GraphQLID,
 )
 
 from graphql_relay.node.node import (

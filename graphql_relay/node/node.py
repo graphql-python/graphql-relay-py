@@ -1,6 +1,8 @@
 from collections import OrderedDict
 from graphql_relay.utils import base64, unbase64
 
+from six import text_type
+
 from graphql.type import (
     GraphQLArgument,
     GraphQLNonNull,
@@ -52,7 +54,7 @@ def to_global_id(type, id):
     Takes a type name and an ID specific to that type name, and returns a
     "global ID" that is unique among all types.
     '''
-    return base64(':'.join([type, str(id)]))
+    return base64(':'.join([type, text_type(id)]))
 
 
 def from_global_id(global_id):

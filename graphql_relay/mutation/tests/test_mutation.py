@@ -1,6 +1,6 @@
+from collections import OrderedDict
+
 from promise import Promise
-from collections import namedtuple
-from pytest import raises
 from graphql import graphql
 from graphql.type import (
     GraphQLSchema,
@@ -83,22 +83,6 @@ def test_requires_an_argument():
         }
       }
     '''
-    expected = {
-        'allObjects': [
-            {
-                'id': 'VXNlcjox'
-            },
-            {
-                'id': 'VXNlcjoy'
-            },
-            {
-                'id': 'UGhvdG86MQ=='
-            },
-            {
-                'id': 'UGhvdG86Mg=='
-            },
-        ]
-    }
     result = graphql(schema, query)
     assert len(result.errors) == 1
 
@@ -333,51 +317,10 @@ def test_contains_correct_field():
         }
       }
     '''
-
     expected = {
         '__schema': {
           'mutationType': {
             'fields': [
-              {
-                'name': 'simpleMutation',
-                'args': [
-                  {
-                    'name': 'input',
-                    'type': {
-                      'name': None,
-                      'kind': 'NON_NULL',
-                      'ofType': {
-                        'name': 'SimpleMutationInput',
-                        'kind': 'INPUT_OBJECT'
-                      }
-                    },
-                  }
-                ],
-                'type': {
-                  'name': 'SimpleMutationPayload',
-                  'kind': 'OBJECT',
-                }
-              },
-              {
-                'name': 'simpleMutationWithThunkFields',
-                'args': [
-                  {
-                    'name': 'input',
-                    'type': {
-                      'name': None,
-                      'kind': 'NON_NULL',
-                      'ofType': {
-                        'name': 'SimpleMutationWithThunkFieldsInput',
-                        'kind': 'INPUT_OBJECT'
-                      }
-                    },
-                  }
-                ],
-                'type': {
-                  'name': 'SimpleMutationWithThunkFieldsPayload',
-                  'kind': 'OBJECT',
-                }
-              },
               {
                 'name': 'simplePromiseMutation',
                 'args': [
@@ -418,11 +361,59 @@ def test_contains_correct_field():
                   'kind': 'OBJECT',
                 }
               },
+              {
+                'name': 'simpleMutation',
+                'args': [
+                  {
+                    'name': 'input',
+                    'type': {
+                      'name': None,
+                      'kind': 'NON_NULL',
+                      'ofType': {
+                        'name': 'SimpleMutationInput',
+                        'kind': 'INPUT_OBJECT'
+                      }
+                    },
+                  }
+                ],
+                'type': {
+                  'name': 'SimpleMutationPayload',
+                  'kind': 'OBJECT',
+                }
+              },
+              {
+                'name': 'simpleMutationWithThunkFields',
+                'args': [
+                  {
+                    'name': 'input',
+                    'type': {
+                      'name': None,
+                      'kind': 'NON_NULL',
+                      'ofType': {
+                        'name': 'SimpleMutationWithThunkFieldsInput',
+                        'kind': 'INPUT_OBJECT'
+                      }
+                    },
+                  }
+                ],
+                'type': {
+                  'name': 'SimpleMutationWithThunkFieldsPayload',
+                  'kind': 'OBJECT',
+                }
+              },
             ]
           }
         }
-
     }
     result = graphql(schema, query)
     assert not result.errors
+    # ensure the ordering is correct for the assertion
+    expected['__schema']['mutationType']['fields'] = sorted(
+        expected['__schema']['mutationType']['fields'],
+        key=lambda k: k['name']
+    )
+    result.data['__schema']['mutationType']['fields'] = sorted(
+        result.data['__schema']['mutationType']['fields'],
+        key=lambda k: k['name']
+    )
     assert result.data == expected

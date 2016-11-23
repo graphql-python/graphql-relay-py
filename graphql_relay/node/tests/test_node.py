@@ -1,20 +1,19 @@
+#!/usr/bin/env python
+# -*- coding: utf-8 -*-
+
 from collections import namedtuple
-from pytest import raises
 from graphql import graphql
 from graphql.type import (
     GraphQLSchema,
     GraphQLObjectType,
     GraphQLField,
-    GraphQLArgument,
-    GraphQLList,
     GraphQLNonNull,
     GraphQLInt,
     GraphQLString,
-    GraphQLBoolean,
     GraphQLID,
 )
 
-from graphql_relay.node.node import node_definitions
+from ..node import node_definitions, to_global_id, from_global_id
 
 User = namedtuple('User', ['id', 'name'])
 Photo = namedtuple('Photo', ['id', 'width'])
@@ -332,3 +331,25 @@ def test_has_correct_node_root_field():
     result = graphql(schema, query)
     assert not result.errors
     assert result.data == expected
+
+
+def test_to_global_id_converts_unicode_strings_correctly():
+    my_unicode_id = u'ûñö'
+    g_id = to_global_id('MyType', my_unicode_id)
+    assert g_id == 'TXlUeXBlOsO7w7HDtg=='
+
+    my_unicode_id = u'\u06ED'
+    g_id = to_global_id('MyType', my_unicode_id)
+    assert g_id == 'TXlUeXBlOtut'
+
+
+def test_from_global_id_converts_unicode_strings_correctly():
+    my_unicode_id = u'ûñö'
+    my_type, my_id = from_global_id('TXlUeXBlOsO7w7HDtg==')
+    assert my_type == 'MyType'
+    assert my_id == my_unicode_id
+
+    my_unicode_id = u'\u06ED'
+    my_type, my_id = from_global_id('TXlUeXBlOtut')
+    assert my_type == 'MyType'
+    assert my_id == my_unicode_id
