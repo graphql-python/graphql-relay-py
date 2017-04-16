@@ -30,7 +30,7 @@ def connection_from_promised_list(data_promise, args=None, **kwargs):
 
 
 def connection_from_list_slice(list_slice, args=None, connection_type=None,
-                               edge_type=None, pageinfo_type=None,
+                               edge_type=None, pageinfo_type=None, simple_list=False,
                                slice_start=0, list_length=0, list_slice_length=None):
     '''
     Given a slice (subset) of an array, returns a connection object for use in
@@ -82,17 +82,20 @@ def connection_from_list_slice(list_slice, args=None, connection_type=None,
         max(start_offset - slice_start, 0):
         list_slice_length - (slice_end - end_offset)
     ]
-    edges = [
-        edge_type(
-            node=node,
-            cursor=offset_to_cursor(start_offset + i)
-        )
-        for i, node in enumerate(_slice)
-    ]
+    if simple_list:
+        edges = [node for node in _slice]
+    else:
+        edges = [
+            edge_type(
+                node=node,
+                cursor=offset_to_cursor(start_offset + i)
+            )
+            for i, node in enumerate(_slice)
+        ]
 
 
-    first_edge_cursor = edges[0].cursor if edges else None
-    last_edge_cursor = edges[-1].cursor if edges else None
+    first_edge_cursor = getattr(edges[0], 'cursor', None) if edges else None
+    last_edge_cursor = getattr(edges[-1], 'cursor', None) if edges else None
     lower_bound = after_offset + 1 if after else 0
     upper_bound = before_offset if before else list_length
 
