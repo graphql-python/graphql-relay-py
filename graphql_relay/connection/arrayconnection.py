@@ -29,7 +29,7 @@ def connection_from_promised_list(data_promise, args=None, **kwargs):
 
 def connection_from_list_slice(list_slice, args=None, connection_type=None,
                                edge_type=None, pageinfo_type=None,
-                               slice_start=0, list_length=0, list_slice_length=None):
+                               slice_start=0, list_length=0, list_slice_length=None, limit=None):
     """
     Given a slice (subset) of an array, returns a connection object for use in
     GraphQL.
@@ -75,11 +75,13 @@ def connection_from_list_slice(list_slice, args=None, connection_type=None,
             end_offset - last
         )
 
+    _start = max(start_offset - slice_start, 0)
+    _finish = list_slice_length - (slice_end - end_offset)
+    if limit and _finish - _start > limit:
+        _finish = _start + limit
+
     # If supplied slice is too large, trim it down before mapping over it.
-    _slice = list_slice[
-        max(start_offset - slice_start, 0):
-        list_slice_length - (slice_end - end_offset)
-    ]
+    _slice = list_slice[_start:_finish]
     edges = [
         edge_type(
             node=node,
@@ -90,16 +92,14 @@ def connection_from_list_slice(list_slice, args=None, connection_type=None,
 
     first_edge_cursor = edges[0].cursor if edges else None
     last_edge_cursor = edges[-1].cursor if edges else None
-    lower_bound = after_offset + 1 if after else 0
-    upper_bound = before_offset if before else list_length
 
     return connection_type(
         edges=edges,
         page_info=pageinfo_type(
             start_cursor=first_edge_cursor,
             end_cursor=last_edge_cursor,
-            has_previous_page=isinstance(last, int) and start_offset > lower_bound,
-            has_next_page=isinstance(first, int) and end_offset < upper_bound
+            has_previous_page= _start > 0,
+            has_next_page= _finish < list_slice_length
         )
     )
 
