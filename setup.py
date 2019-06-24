@@ -55,7 +55,7 @@ setup(
 
     install_requires=[
         'six>=1.10.0',
-        'graphql-core>=0.5.0',
+        'graphql-core>=0.5.0,<2',
         'promise>=0.4.0'
     ],
     tests_require=['pytest>=2.7.2'],
