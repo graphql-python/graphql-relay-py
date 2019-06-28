@@ -34,7 +34,7 @@ setup(
     name='graphql-relay',
     version=version,
 
-    description='Relay implementation for Python',
+    description='Relay library for graphql-core-next',
     long_description=readme,
     long_description_content_type="text/markdown",
 
@@ -56,7 +56,7 @@ setup(
         'Programming Language :: Python :: Implementation :: PyPy',
     ],
 
-    keywords='api graphql protocol rest relay',
+    keywords='graphql relay api ',
 
     packages=find_packages(exclude=['tests']),
 
