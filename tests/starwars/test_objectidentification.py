@@ -1,10 +1,12 @@
-from pytest import raises
+from pytest import mark
+
 from graphql import graphql
 
 from .schema import StarWarsSchema
 
 
-def test_correctly_fetches_id_name_rebels():
+@mark.asyncio
+async def test_correctly_fetches_id_name_rebels():
     query = '''
       query RebelsQuery {
         rebels {
@@ -19,12 +21,13 @@ def test_correctly_fetches_id_name_rebels():
             'name': 'Alliance to Restore the Republic'
         }
     }
-    result = graphql(StarWarsSchema, query)
+    result = await graphql(StarWarsSchema, query)
     assert not result.errors
     assert result.data == expected
 
 
-def test_correctly_refetches_rebels():
+@mark.asyncio
+async def test_correctly_refetches_rebels():
     query = '''
       query RebelsRefetchQuery {
         node(id: "RmFjdGlvbjox") {
@@ -41,12 +44,13 @@ def test_correctly_refetches_rebels():
             'name': 'Alliance to Restore the Republic'
         }
     }
-    result = graphql(StarWarsSchema, query)
+    result = await graphql(StarWarsSchema, query)
     assert not result.errors
     assert result.data == expected
 
 
-def test_correctly_fetches_id_name_empire():
+@mark.asyncio
+async def test_correctly_fetches_id_name_empire():
     query = '''
       query EmpireQuery {
         empire {
@@ -61,12 +65,13 @@ def test_correctly_fetches_id_name_empire():
             'name': 'Galactic Empire'
         }
     }
-    result = graphql(StarWarsSchema, query)
+    result = await graphql(StarWarsSchema, query)
     assert not result.errors
     assert result.data == expected
 
 
-def test_correctly_refetches_empire():
+@mark.asyncio
+async def test_correctly_refetches_empire():
     query = '''
       query EmpireRefetchQuery {
         node(id: "RmFjdGlvbjoy") {
@@ -83,12 +88,13 @@ def test_correctly_refetches_empire():
             'name': 'Galactic Empire'
         }
     }
-    result = graphql(StarWarsSchema, query)
+    result = await graphql(StarWarsSchema, query)
     assert not result.errors
     assert result.data == expected
 
 
-def test_correctly_refetches_xwing():
+@mark.asyncio
+async def test_correctly_refetches_xwing():
     query = '''
       query XWingRefetchQuery {
         node(id: "U2hpcDox") {
@@ -105,6 +111,6 @@ def test_correctly_refetches_xwing():
             'name': 'X-Wing'
         }
     }
-    result = graphql(StarWarsSchema, query)
+    result = await graphql(StarWarsSchema, query)
     assert not result.errors
     assert result.data == expected

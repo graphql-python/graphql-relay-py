@@ -1,10 +1,12 @@
-from pytest import raises
+from pytest import mark
+
 from graphql import graphql
 
 from .schema import StarWarsSchema
 
 
-def test_correctely_mutates_dataset():
+@mark.asyncio
+async def test_correctely_mutates_dataset():
     query = '''
       mutation AddBWingQuery($input: IntroduceShipInput!) {
         introduceShip(input: $input) {
@@ -38,6 +40,5 @@ def test_correctely_mutates_dataset():
             'clientMutationId': 'abcde',
         }
     }
-    result = graphql(StarWarsSchema, query, variable_values=params)
-    assert not result.errors
+    result = await graphql(StarWarsSchema, query, variable_values=params)
     assert result.data == expected

@@ -1,24 +1,21 @@
+from pytest import mark
+
 from collections import namedtuple
-from pytest import raises
+
 from graphql import graphql
 from graphql.type import (
-    GraphQLSchema,
-    GraphQLObjectType,
     GraphQLField,
-    GraphQLArgument,
-    GraphQLList,
-    GraphQLNonNull,
     GraphQLInt,
+    GraphQLObjectType,
+    GraphQLSchema,
     GraphQLString,
-    GraphQLBoolean,
-    GraphQLID,
 )
 
-from ..arrayconnection import connection_from_list
-from ..connection import (
+from graphql_relay import (
     connection_args,
-    connection_definitions
-)
+    connection_definitions,
+    connection_from_list)
+
 
 User = namedtuple('User', ['name', 'friends'])
 
@@ -37,8 +34,8 @@ userType = GraphQLObjectType(
         'friends': GraphQLField(
             friendConnection,
             args=connection_args,
-            resolver=lambda user, args, *
-            _: connection_from_list(user.friends, args),
+            resolve=lambda user, info_, **args:
+            connection_from_list(user.friends, args),
         ),
     },
 )
@@ -50,13 +47,13 @@ friendEdge, friendConnection = connection_definitions(
     edge_fields=lambda: {
         'friendshipTime': GraphQLField(
             GraphQLString,
-            resolver=lambda *_: 'Yesterday'
+            resolve=lambda user_, info_: 'Yesterday'
         ),
     },
     connection_fields=lambda: {
         'totalCount': GraphQLField(
             GraphQLInt,
-            resolver=lambda *_: len(allUsers) - 1
+            resolve=lambda user_, info_: len(allUsers) - 1
         ),
     }
 )
@@ -66,7 +63,7 @@ queryType = GraphQLObjectType(
     fields=lambda: {
         'user': GraphQLField(
             userType,
-            resolver=lambda *_: allUsers[0]
+            resolve=lambda root_, info_: allUsers[0]
         ),
     }
 )
@@ -74,7 +71,8 @@ queryType = GraphQLObjectType(
 schema = GraphQLSchema(query=queryType)
 
 
-def test_include_connections_and_edge_types():
+@mark.asyncio
+async def test_include_connections_and_edge_types():
     query = '''
       query FriendsQuery {
         user {
@@ -111,12 +109,13 @@ def test_include_connections_and_edge_types():
             }
         }
     }
-    result = graphql(schema, query)
+    result = await graphql(schema, query)
     assert not result.errors
     assert result.data == expected
 
 
-def test_works_with_forward_connection_args():
+@mark.asyncio
+async def test_works_with_forward_connection_args():
     query = '''
       query FriendsQuery {
         user {
@@ -148,12 +147,13 @@ def test_works_with_forward_connection_args():
             }
         }
     }
-    result = graphql(schema, query)
+    result = await graphql(schema, query)
     assert not result.errors
     assert result.data == expected
 
 
-def test_works_with_backward_connection_args():
+@mark.asyncio
+async def test_works_with_backward_connection_args():
     query = '''
       query FriendsQuery {
         user {
@@ -185,6 +185,6 @@ def test_works_with_backward_connection_args():
             }
         }
     }
-    result = graphql(schema, query)
+    result = await graphql(schema, query)
     assert not result.errors
     assert result.data == expected

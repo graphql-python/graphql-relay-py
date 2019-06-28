@@ -1,7 +1,14 @@
 import sys
+from re import search
 
 from setuptools import setup, find_packages
 from setuptools.command.test import test as TestCommand
+
+with open("graphql_relay/version.py") as version_file:
+    version = search('version = "(.*)"', version_file.read()).group(1)
+
+with open("README.md") as readme_file:
+    readme = readme_file.read()
 
 
 class PyTest(TestCommand):
@@ -22,12 +29,14 @@ class PyTest(TestCommand):
         errno = pytest.main(self.pytest_args)
         sys.exit(errno)
 
+
 setup(
     name='graphql-relay',
-    version='0.4.5',
+    version=version,
 
     description='Relay implementation for Python',
-    long_description=open('README.rst').read(),
+    long_description=readme,
+    long_description_content_type="text/markdown",
 
     url='https://github.com/graphql-python/graphql-relay-py',
 
@@ -40,12 +49,10 @@ setup(
         'Development Status :: 3 - Alpha',
         'Intended Audience :: Developers',
         'Topic :: Software Development :: Libraries',
-        'Programming Language :: Python :: 2',
-        'Programming Language :: Python :: 2.7',
+        "License :: OSI Approved :: MIT License",
         'Programming Language :: Python :: 3',
-        'Programming Language :: Python :: 3.3',
-        'Programming Language :: Python :: 3.4',
-        'Programming Language :: Python :: 3.5',
+        'Programming Language :: Python :: 3.6',
+        'Programming Language :: Python :: 3.7',
         'Programming Language :: Python :: Implementation :: PyPy',
     ],
 
@@ -54,13 +61,10 @@ setup(
     packages=find_packages(exclude=['tests']),
 
     install_requires=[
-        'six>=1.10.0',
-        'graphql-core>=0.5.0,<2',
-        'promise>=0.4.0'
+        'graphql-core-next>=1.0.5',
     ],
-    tests_require=['pytest>=2.7.2'],
-    extras_require={
-    },
+    tests_require=['pytest', 'pytest-asyncio'],
+    extras_require={},
 
     cmdclass={'test': PyTest},
 )

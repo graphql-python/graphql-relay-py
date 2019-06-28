@@ -1,18 +1,29 @@
 language: python
-dist: xenial
 
-python:
-  - 2.7
-  - 3.5
-  - 3.6
-  - 3.7
-  - pypy3
+matrix:
+  include:
+    - env: TOXENV=flake8
+      python: 3.7
+      dist: xenial
+      sudo: true
+    - env: TOXENV=py37
+      python: 3.7
+      dist: xenial
+      sudo: true
+    - env: TOXENV=py36
+      python: 3.6
+
+cache:
+  directories:
+    - $HOME/.cache/pip
+    - $TRAVIS_BUILD_DIR/.tox
+
 install:
-  - pip install pytest pytest-cov flake8
+  - pip install pytest pytest-asyncio pytest-cov flake8
   - pip install .
+
 script:
-  - py.test --cov=graphql_relay
-# - flake8
+   - tox -e $TOXENV -- --cov-report term-missing --cov=graphql
+
 after_success:
-  - pip install coveralls
-  - coveralls
+   - codecov

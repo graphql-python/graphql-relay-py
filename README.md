@@ -31,12 +31,12 @@ describes a simple set of examples that exist as [tests](tests) in this
 repository. A good way to get started with this repository is to walk through
 that documentation and the corresponding tests in this library together.
 
-## Using Relay Library for GraphQL Python (graphql-core)
+## Using Relay Library for GraphQL Python (graphql-core-next)
 
 Install Relay Library for GraphQL Python
 
 ```sh
-pip install graphql-core --pre # Last version of graphql-core
+pip install graphql-core-next
 pip install graphql-relay
 ```
 
@@ -69,25 +69,23 @@ An example usage of these methods from the [test schema](tests/starwars/schema.p
 ship_edge, ship_connection = connection_definitions('Ship', shipType)
 
 factionType = GraphQLObjectType(
-    name= 'Faction',
-    description= 'A faction in the Star Wars saga',
-    fields= lambda: {
+    name='Faction',
+    description='A faction in the Star Wars saga',
+    fields=lambda: {
         'id': global_id_field('Faction'),
         'name': GraphQLField(
             GraphQLString,
             description='The name of the faction.',
         ),
         'ships': GraphQLField(
-            shipConnection,
-            description= 'The ships used by the faction.',
-            args= connection_args,
-            resolver= lambda faction, args, *_: connection_from_list(
-                map(getShip, faction.ships),
-                args
-            ),
+            ship_connection,
+            description='The ships used by the faction.',
+            args=connection_args,
+            resolve=lambda faction, _info, **args: connection_from_list(
+                [getShip(ship) for ship in faction.ships], args),
         )
     },
-    interfaces= [node_interface]
+    interfaces=[node_interface]
 )
 ```
 
@@ -108,7 +106,7 @@ this, it takes a function to resolve an ID to an object, and to determine
 the type of a given object.
  - `to_global_id` takes a type name and an ID specific to that type name,
 and returns a "global ID" that is unique among all types.
- - `from_global_id` takes the "global ID" created by `toGlobalID`, and retuns
+ - `from_global_id` takes the "global ID" created by `toGlobalID`, and returns
 the type name and ID used to create it.
  - `global_id_field` creates the configuration for an `id` field on a node.
  - `plural_identifying_root_field` creates a field that accepts a list of
@@ -118,17 +116,16 @@ objects.
 An example usage of these methods from the [test schema](tests/starwars/schema.py):
 
 ```python
-def get_node(global_id, context, info):
-    resolvedGlobalId = from_global_id(global_id)
-    _type, _id = resolvedGlobalId.type, resolvedGlobalId.id
-    if _type == 'Faction':
-        return getFaction(_id)
-    elif _type == 'Ship':
-        return getShip(_id)
+def get_node(global_id, _info):
+    type_, id_ = from_global_id(global_id)
+    if type_ == 'Faction':
+        return getFaction(id_)
+    elif type_ == 'Ship':
+        return getShip(id_)
     else:
         return None
 
-def get_node_type(obj, context, info):
+def get_node_type(obj, _info, _type):
     if isinstance(obj, Faction):
         return factionType
     else:
@@ -173,39 +170,34 @@ configuration that can be used as a top-level field on the mutation type.
 An example usage of these methods from the [test schema](tests/starwars/schema.py):
 
 ```python
-class IntroduceShipMutation(object):
+class IntroduceShipMutation:
     def __init__(self, shipId, factionId, clientMutationId=None):
         self.shipId = shipId
         self.factionId = factionId
-        self.clientMutationId = None
+        self.clientMutationId = clientMutationId
 
-def mutate_and_get_payload(data, *_):
-    shipName = data.get('shipName')
-    factionId = data.get('factionId')
+def mutate_and_get_payload(_info, shipName, factionId, **_input):
     newShip = createShip(shipName, factionId)
-    return IntroduceShipMutation(
-        shipId=newShip.id,
-        factionId=factionId,
-    )
+    return IntroduceShipMutation(shipId=newShip.id, factionId=factionId)
 
 shipMutation = mutation_with_client_mutation_id(
     'IntroduceShip',
     input_fields={
-        'shipName': GraphQLField(
+        'shipName': GraphQLInputField(
             GraphQLNonNull(GraphQLString)
         ),
-        'factionId': GraphQLField(
+        'factionId': GraphQLInputField(
             GraphQLNonNull(GraphQLID)
         )
     },
-    output_fields= {
+    output_fields={
         'ship': GraphQLField(
             shipType,
-            resolver= lambda payload, *_: getShip(payload.shipId)
+            resolve=lambda payload, _info: getShip(payload.shipId)
         ),
         'faction': GraphQLField(
             factionType,
-            resolver= lambda payload, *_: getFaction(payload.factionId)
+            resolve=lambda payload, _info: getFaction(payload.factionId)
         )
     },
     mutate_and_get_payload=mutate_and_get_payload
@@ -213,7 +205,7 @@ shipMutation = mutation_with_client_mutation_id(
 
 mutationType = GraphQLObjectType(
     'Mutation',
-    fields= lambda: {
+    fields=lambda: {
         'introduceShip': shipMutation
     }
 )

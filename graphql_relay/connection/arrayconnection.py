@@ -1,10 +1,10 @@
-from promise import Promise
+import binascii
 
-from ..utils import base64, unbase64, is_str
+from ..utils import base64, unbase64
 from .connectiontypes import Connection, PageInfo, Edge
 
 
-def connection_from_list(data, args=None, **kwargs):
+def connection_from_list(data, args=None):
     '''
     A simple function that accepts an array and connection arguments, and returns
     a connection object for use in GraphQL. It uses array offsets as pagination,
@@ -17,21 +17,13 @@ def connection_from_list(data, args=None, **kwargs):
         slice_start=0,
         list_length=_len,
         list_slice_length=_len,
-        **kwargs
     )
 
 
-def connection_from_promised_list(data_promise, args=None, **kwargs):
-    '''
-    A version of `connectionFromArray` that takes a promised array, and returns a
-    promised connection.
-    '''
-    return data_promise.then(lambda data: connection_from_list(data, args, **kwargs))
-
-
-def connection_from_list_slice(list_slice, args=None, connection_type=None,
-                               edge_type=None, pageinfo_type=None,
-                               slice_start=0, list_length=0, list_slice_length=None):
+def connection_from_list_slice(
+        list_slice, args=None, connection_type=None,
+        edge_type=None, pageinfo_type=None,
+        slice_start=0, list_length=0, list_slice_length=None):
     '''
     Given a slice (subset) of an array, returns a connection object for use in
     GraphQL.
@@ -90,7 +82,6 @@ def connection_from_list_slice(list_slice, args=None, connection_type=None,
         for i, node in enumerate(_slice)
     ]
 
-
     first_edge_cursor = edges[0].cursor if edges else None
     last_edge_cursor = edges[-1].cursor if edges else None
     lower_bound = after_offset + 1 if after else 0
@@ -110,10 +101,6 @@ def connection_from_list_slice(list_slice, args=None, connection_type=None,
 PREFIX = 'arrayconnection:'
 
 
-def connection_from_promised_list_slice(data_promise, args=None, **kwargs):
-    return data_promise.then(lambda data: connection_from_list_slice(data, args, **kwargs))
-
-
 def offset_to_cursor(offset):
     '''
     Creates the cursor string from an offset.
@@ -127,7 +114,7 @@ def cursor_to_offset(cursor):
     '''
     try:
         return int(unbase64(cursor)[len(PREFIX):])
-    except:
+    except binascii.Error:
         return None
 
 
@@ -148,11 +135,11 @@ def get_offset_with_default(cursor=None, default_offset=0):
     to use; if the cursor contains a valid offset, that will be used,
     otherwise it will be the default.
     '''
-    if not is_str(cursor):
+    if not isinstance(cursor, str):
         return default_offset
 
     offset = cursor_to_offset(cursor)
     try:
         return int(offset)
-    except:
+    except (TypeError, ValueError):
         return default_offset

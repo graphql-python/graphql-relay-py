@@ -1,10 +1,12 @@
-from pytest import raises
+from pytest import mark
+
 from graphql import graphql
 
 from .schema import StarWarsSchema
 
 
-def test_correct_fetch_first_ship_rebels():
+@mark.asyncio
+async def test_correct_fetch_first_ship_rebels():
     query = '''
     query RebelsShipsQuery {
       rebels {
@@ -33,6 +35,6 @@ def test_correct_fetch_first_ship_rebels():
             }
         }
     }
-    result = graphql(StarWarsSchema, query)
+    result = await graphql(StarWarsSchema, query)
     assert not result.errors
     assert result.data == expected

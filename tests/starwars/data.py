@@ -3,6 +3,7 @@
 # This data is hard coded for the sake of the demo, but you could imagine
 # fetching this data from a backend service rather than from hardcoded
 # JSON objects in a more complex demo.
+
 from collections import namedtuple
 
 Ship = namedtuple('Ship', ['id', 'name'])
@@ -80,23 +81,21 @@ data = {
 }
 
 
+# noinspection PyPep8Naming
 def createShip(shipName, factionId):
     nextShip = len(data['Ship'].keys())+1
-    newShip = Ship(
-        id=str(nextShip),
-        name=shipName
-    )
+    newShip = Ship(id=str(nextShip), name=shipName)
     data['Ship'][newShip.id] = newShip
     data['Faction'][factionId].ships.append(newShip.id)
     return newShip
 
 
-def getShip(_id):
-    return data['Ship'][_id]
+def getShip(id_):
+    return data['Ship'][id_]
 
 
-def getFaction(_id):
-    return data['Faction'][_id]
+def getFaction(id_):
+    return data['Faction'][id_]
 
 
 def getRebels():

@@ -1,10 +1,8 @@
-from collections import namedtuple
-
 from graphql.type import (
     GraphQLID,
     GraphQLNonNull,
     GraphQLObjectType,
-    GraphQLInputObjectField,
+    GraphQLInputField,
     GraphQLSchema,
     GraphQLString,
     GraphQLField
@@ -31,7 +29,6 @@ from graphql_relay.mutation.mutation import (
 
 from .data import (
     Faction,
-    Ship,
     getFaction,
     getShip,
     getRebels,
@@ -54,7 +51,7 @@ from .data import (
 # Wars trilogy.
 
 # Using our shorthand to describe type systems, the type system for our
-# example will be the followng:
+# example will be the following:
 #
 # interface Node {
 #   id: ID!
@@ -116,21 +113,22 @@ from .data import (
 # way we resolve an object that implements node to its type.
 
 
-def get_node(global_id, *args):
-    _type, _id = from_global_id(global_id)
-    if _type == 'Faction':
-        return getFaction(_id)
-    elif _type == 'Ship':
-        return getShip(_id)
+def get_node(global_id, _info):
+    type_, id_ = from_global_id(global_id)
+    if type_ == 'Faction':
+        return getFaction(id_)
+    elif type_ == 'Ship':
+        return getShip(id_)
     else:
         return None
 
 
-def get_node_type(obj, context, info):
+def get_node_type(obj, _info, _type):
     if isinstance(obj, Faction):
         return factionType
     else:
         return shipType
+
 
 node_interface, node_field = node_definitions(get_node, get_node_type)
 
@@ -169,7 +167,7 @@ shipType = GraphQLObjectType(
 #     cursor: String!
 #     node: Ship
 #   }
-shipEdge, shipConnection = connection_definitions('Ship', shipType)
+ship_edge, ship_connection = connection_definitions('Ship', shipType)
 
 # We define our faction type, which implements the node interface.
 #
@@ -189,13 +187,11 @@ factionType = GraphQLObjectType(
             description='The name of the faction.',
         ),
         'ships': GraphQLField(
-            shipConnection,
+            ship_connection,
             description='The ships used by the faction.',
             args=connection_args,
-            resolver=lambda faction, args, *_: connection_from_list(
-                [getShip(ship) for ship in faction.ships],
-                args
-            ),
+            resolve=lambda faction, _info, **args: connection_from_list(
+                [getShip(ship) for ship in faction.ships], args),
         )
     },
     interfaces=[node_interface]
@@ -215,11 +211,11 @@ queryType = GraphQLObjectType(
     fields=lambda: {
         'rebels': GraphQLField(
             factionType,
-            resolver=lambda *_: getRebels(),
+            resolve=lambda _obj, _info: getRebels(),
         ),
         'empire': GraphQLField(
             factionType,
-            resolver=lambda *_: getEmpire(),
+            resolve=lambda _obj, _info: getEmpire(),
         ),
         'node': node_field
     }
@@ -242,41 +238,39 @@ queryType = GraphQLObjectType(
 #   }
 
 
-class IntroduceShipMutation(object):
+class IntroduceShipMutation:
 
+    # noinspection PyPep8Naming
     def __init__(self, shipId, factionId, clientMutationId=None):
         self.shipId = shipId
         self.factionId = factionId
-        self.clientMutationId = None
+        self.clientMutationId = clientMutationId
 
 
-def mutate_and_get_payload(data, *_):
-    shipName = data.get('shipName')
-    factionId = data.get('factionId')
+# noinspection PyPep8Naming
+def mutate_and_get_payload(_info, shipName, factionId, **_input):
     newShip = createShip(shipName, factionId)
-    return IntroduceShipMutation(
-        shipId=newShip.id,
-        factionId=factionId,
-    )
+    return IntroduceShipMutation(shipId=newShip.id, factionId=factionId)
+
 
 shipMutation = mutation_with_client_mutation_id(
     'IntroduceShip',
     input_fields={
-        'shipName': GraphQLInputObjectField(
+        'shipName': GraphQLInputField(
             GraphQLNonNull(GraphQLString)
         ),
-        'factionId': GraphQLInputObjectField(
+        'factionId': GraphQLInputField(
             GraphQLNonNull(GraphQLID)
         )
     },
     output_fields={
         'ship': GraphQLField(
             shipType,
-            resolver=lambda payload, *_: getShip(payload.shipId)
+            resolve=lambda payload, _info: getShip(payload.shipId)
         ),
         'faction': GraphQLField(
             factionType,
-            resolver=lambda payload, *_: getFaction(payload.factionId)
+            resolve=lambda payload, _info: getFaction(payload.factionId)
         )
     },
     mutate_and_get_payload=mutate_and_get_payload

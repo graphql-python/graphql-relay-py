@@ -1,25 +1,23 @@
-from collections import OrderedDict
+from pytest import mark
 
-from promise import Promise
 from graphql import graphql
 from graphql.type import (
-    GraphQLSchema,
-    GraphQLObjectType,
-    GraphQLInt,
     GraphQLField,
-    GraphQLInputObjectField
-)
+    GraphQLInputField,
+    GraphQLInt,
+    GraphQLObjectType,
+    GraphQLSchema)
 
-from graphql_relay.mutation.mutation import (
-    mutation_with_client_mutation_id,
-)
+from graphql_relay import mutation_with_client_mutation_id
 
 
-class Result(object):
+class Result:
 
+    # noinspection PyPep8Naming
     def __init__(self, result, clientMutationId=None):
         self.clientMutationId = clientMutationId
         self.result = result
+
 
 simpleMutation = mutation_with_client_mutation_id(
     'SimpleMutation',
@@ -27,27 +25,33 @@ simpleMutation = mutation_with_client_mutation_id(
     output_fields={
         'result': GraphQLField(GraphQLInt)
     },
-    mutate_and_get_payload=lambda *_: Result(result=1)
+    mutate_and_get_payload=lambda _info, **_input: Result(result=1)
 )
 
 simpleMutationWithThunkFields = mutation_with_client_mutation_id(
     'SimpleMutationWithThunkFields',
     input_fields=lambda: {
-        'inputData': GraphQLInputObjectField(GraphQLInt)
+        'inputData': GraphQLInputField(GraphQLInt)
     },
     output_fields=lambda: {
         'result': GraphQLField(GraphQLInt)
     },
-    mutate_and_get_payload=lambda args, *_: Result(result=args.get('inputData'))
+    mutate_and_get_payload=lambda _info, **input_:
+        Result(result=input_['inputData'])
 )
 
-simplePromiseMutation = mutation_with_client_mutation_id(
-    'SimplePromiseMutation',
+
+# noinspection PyPep8Naming
+async def mutate_and_get_one_as_payload_async(_info, **_input):
+    return Result(1)
+
+simpleAsyncMutation = mutation_with_client_mutation_id(
+    'SimpleAsyncMutation',
     input_fields={},
     output_fields={
         'result': GraphQLField(GraphQLInt)
     },
-    mutate_and_get_payload=lambda *_: Promise.resolve(Result(result=1))
+    mutate_and_get_payload=mutate_and_get_one_as_payload_async
 )
 
 simpleRootValueMutation = mutation_with_client_mutation_id(
@@ -56,7 +60,7 @@ simpleRootValueMutation = mutation_with_client_mutation_id(
     output_fields={
         'result': GraphQLField(GraphQLInt)
     },
-    mutate_and_get_payload=lambda params, context, info: info.root_value
+    mutate_and_get_payload=lambda info, **_input: info.root_value
 )
 
 mutation = GraphQLObjectType(
@@ -64,7 +68,7 @@ mutation = GraphQLObjectType(
     fields={
         'simpleMutation': simpleMutation,
         'simpleMutationWithThunkFields': simpleMutationWithThunkFields,
-        'simplePromiseMutation': simplePromiseMutation,
+        'simpleAsyncMutation': simpleAsyncMutation,
         'simpleRootValueMutation': simpleRootValueMutation
     }
 )
@@ -75,7 +79,8 @@ schema = GraphQLSchema(
 )
 
 
-def test_requires_an_argument():
+@mark.asyncio
+async def test_requires_an_argument():
     query = '''
       mutation M {
         simpleMutation {
@@ -83,11 +88,12 @@ def test_requires_an_argument():
         }
       }
     '''
-    result = graphql(schema, query)
+    result = await graphql(schema, query)
     assert len(result.errors) == 1
 
 
-def test_returns_the_same_client_mutation_id():
+@mark.asyncio
+async def test_returns_the_same_client_mutation_id():
     query = '''
       mutation M {
         simpleMutation(input: {clientMutationId: "abc"}) {
@@ -102,15 +108,17 @@ def test_returns_the_same_client_mutation_id():
             'clientMutationId': 'abc'
         }
     }
-    result = graphql(schema, query)
+    result = await graphql(schema, query)
     assert not result.errors
     assert result.data == expected
 
 
-def test_supports_thunks_as_input_and_output_fields():
+@mark.asyncio
+async def test_supports_thunks_as_input_and_output_fields():
     query = '''
       mutation M {
-        simpleMutationWithThunkFields(input: {inputData: 1234, clientMutationId: "abc"}) {
+        simpleMutationWithThunkFields(
+            input: {inputData: 1234, clientMutationId: "abc"}) {
           result
           clientMutationId
         }
@@ -122,32 +130,34 @@ def test_supports_thunks_as_input_and_output_fields():
             'clientMutationId': 'abc'
         }
     }
-    result = graphql(schema, query)
+    result = await graphql(schema, query)
     assert not result.errors
     assert result.data == expected
 
 
-def test_supports_promise_mutations():
+@mark.asyncio
+async def test_supports_async_mutations():
     query = '''
       mutation M {
-        simplePromiseMutation(input: {clientMutationId: "abc"}) {
+        simpleAsyncMutation(input: {clientMutationId: "abc"}) {
           result
           clientMutationId
         }
       }
     '''
     expected = {
-        'simplePromiseMutation': {
+        'simpleAsyncMutation': {
             'result': 1,
             'clientMutationId': 'abc'
         }
     }
-    result = graphql(schema, query)
+    result = await graphql(schema, query)
     assert not result.errors
     assert result.data == expected
 
 
-def test_can_access_root_value():
+@mark.asyncio
+async def test_can_access_root_value():
     query = '''
       mutation M {
         simpleRootValueMutation(input: {clientMutationId: "abc"}) {
@@ -162,12 +172,13 @@ def test_can_access_root_value():
             'clientMutationId': 'abc'
         }
     }
-    result = graphql(schema, query, root_value=Result(result=1))
+    result = await graphql(schema, query, root_value=Result(result=1))
     assert not result.errors
     assert result.data == expected
 
 
-def test_contains_correct_input():
+@mark.asyncio
+async def test_contains_correct_input():
     query = '''
       {
         __type(name: "SimpleMutationInput") {
@@ -206,12 +217,13 @@ def test_contains_correct_input():
             ]
         }
     }
-    result = graphql(schema, query)
+    result = await graphql(schema, query)
     assert not result.errors
     assert result.data == expected
 
 
-def test_contains_correct_payload():
+@mark.asyncio
+async def test_contains_correct_payload():
     query = '''
       {
         __type(name: "SimpleMutationPayload") {
@@ -285,12 +297,13 @@ def test_contains_correct_payload():
             ]
         }
     }
-    result = graphql(schema, query)
+    result = await graphql(schema, query)
     assert not result.errors
     assert result.data == expected1 or result.data == expected2
 
 
-def test_contains_correct_field():
+@mark.asyncio
+async def test_contains_correct_field():
     query = '''
       {
         __schema {
@@ -321,99 +334,93 @@ def test_contains_correct_field():
         '__schema': {
           'mutationType': {
             'fields': [
-              {
-                'name': 'simplePromiseMutation',
-                'args': [
-                  {
-                    'name': 'input',
+                {
+                    'name': 'simpleMutation',
+                    'args': [
+                        {
+                            'name': 'input',
+                            'type': {
+                                'name': None,
+                                'kind': 'NON_NULL',
+                                'ofType': {
+                                    'name': 'SimpleMutationInput',
+                                    'kind': 'INPUT_OBJECT'
+                                }
+                            },
+                        }
+                    ],
                     'type': {
-                      'name': None,
-                      'kind': 'NON_NULL',
-                      'ofType': {
-                        'name': 'SimplePromiseMutationInput',
-                        'kind': 'INPUT_OBJECT'
-                      }
-                    },
-                  }
-                ],
-                'type': {
-                  'name': 'SimplePromiseMutationPayload',
-                  'kind': 'OBJECT',
-                }
-              },
-              {
-                'name': 'simpleRootValueMutation',
-                'args': [
-                  {
-                    'name': 'input',
+                        'name': 'SimpleMutationPayload',
+                        'kind': 'OBJECT',
+                    }
+                },
+                {
+                    'name': 'simpleMutationWithThunkFields',
+                    'args': [
+                        {
+                            'name': 'input',
+                            'type': {
+                                'name': None,
+                                'kind': 'NON_NULL',
+                                'ofType': {
+                                    'name':
+                                        'SimpleMutationWithThunkFieldsInput',
+                                    'kind': 'INPUT_OBJECT'
+                                }
+                            },
+                        }
+                    ],
                     'type': {
-                      'name': None,
-                      'kind': 'NON_NULL',
-                      'ofType': {
-                        'name': 'SimpleRootValueMutationInput',
-                        'kind': 'INPUT_OBJECT'
+                        'name': 'SimpleMutationWithThunkFieldsPayload',
+                        'kind': 'OBJECT',
+                    }
+                },
+                {
+                    'name': 'simpleAsyncMutation',
+                    'args': [
+                      {
+                        'name': 'input',
+                        'type': {
+                          'name': None,
+                          'kind': 'NON_NULL',
+                          'ofType': {
+                            'name': 'SimpleAsyncMutationInput',
+                            'kind': 'INPUT_OBJECT'
+                          }
+                        },
                       }
-                    },
-                  }
-                ],
-                'type': {
-                  'name': 'SimpleRootValueMutationPayload',
-                  'kind': 'OBJECT',
-                }
-              },
-              {
-                'name': 'simpleMutation',
-                'args': [
-                  {
-                    'name': 'input',
+                    ],
                     'type': {
-                      'name': None,
-                      'kind': 'NON_NULL',
-                      'ofType': {
-                        'name': 'SimpleMutationInput',
-                        'kind': 'INPUT_OBJECT'
+                      'name': 'SimpleAsyncMutationPayload',
+                      'kind': 'OBJECT',
+                    }
+                  },
+                {
+                    'name': 'simpleRootValueMutation',
+                    'args': [
+                      {
+                        'name': 'input',
+                        'type': {
+                          'name': None,
+                          'kind': 'NON_NULL',
+                          'ofType': {
+                            'name': 'SimpleRootValueMutationInput',
+                            'kind': 'INPUT_OBJECT'
+                          }
+                        },
                       }
-                    },
-                  }
-                ],
-                'type': {
-                  'name': 'SimpleMutationPayload',
-                  'kind': 'OBJECT',
-                }
-              },
-              {
-                'name': 'simpleMutationWithThunkFields',
-                'args': [
-                  {
-                    'name': 'input',
+                    ],
                     'type': {
-                      'name': None,
-                      'kind': 'NON_NULL',
-                      'ofType': {
-                        'name': 'SimpleMutationWithThunkFieldsInput',
-                        'kind': 'INPUT_OBJECT'
-                      }
-                    },
-                  }
-                ],
-                'type': {
-                  'name': 'SimpleMutationWithThunkFieldsPayload',
-                  'kind': 'OBJECT',
-                }
-              },
+                      'name': 'SimpleRootValueMutationPayload',
+                      'kind': 'OBJECT',
+                    }
+                },
+
             ]
           }
         }
     }
-    result = graphql(schema, query)
+    result = await graphql(schema, query)
     assert not result.errors
     # ensure the ordering is correct for the assertion
-    expected['__schema']['mutationType']['fields'] = sorted(
-        expected['__schema']['mutationType']['fields'],
-        key=lambda k: k['name']
-    )
-    result.data['__schema']['mutationType']['fields'] = sorted(
-        result.data['__schema']['mutationType']['fields'],
-        key=lambda k: k['name']
-    )
     assert result.data == expected

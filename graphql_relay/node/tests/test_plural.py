@@ -1,20 +1,15 @@
 from collections import namedtuple
-from pytest import raises
+
+from pytest import mark
+
 from graphql import graphql
 from graphql.type import (
-    GraphQLSchema,
-    GraphQLObjectType,
     GraphQLField,
-    GraphQLArgument,
-    GraphQLList,
-    GraphQLNonNull,
-    GraphQLInt,
-    GraphQLString,
-    GraphQLBoolean,
-    GraphQLID,
-)
+    GraphQLObjectType,
+    GraphQLSchema,
+    GraphQLString)
 
-from graphql_relay.node.plural import plural_identifying_root_field
+from graphql_relay import plural_identifying_root_field
 
 userType = GraphQLObjectType(
     'User',
@@ -26,29 +21,30 @@ userType = GraphQLObjectType(
 User = namedtuple('User', ['username', 'url'])
 
 
+def resolve_single_input(info, username):
+    assert info.schema is schema
+    url = f'www.facebook.com/{username}?lang={info.root_value.lang}'
+    return User(username=username, url=url)
+
+
 queryType = GraphQLObjectType(
-    'Query',
-    fields=lambda: {
-        'usernames': plural_identifying_root_field(
+    'Query', lambda: {
+        'usernames':  plural_identifying_root_field(
             'usernames',
             description='Map from a username to the user',
             input_type=GraphQLString,
             output_type=userType,
-            resolve_single_input=lambda username, context, info: User(
-                username=username,
-                url='www.facebook.com/' + username + '?lang=' + info.root_value.lang
-            )
-        )
-    }
-)
-
-class root_value:
-    lang = 'en'
+            resolve_single_input=resolve_single_input)})
 
 schema = GraphQLSchema(query=queryType)
 
+RootValue = namedtuple('RootValue', ['lang'])
 
-def test_allows_fetching():
+root_value = RootValue(lang='en')
+
+
+@mark.asyncio
+async def test_allows_fetching():
     query = '''
     {
       usernames(usernames:["dschafer", "leebyron", "schrockn"]) {
@@ -73,12 +69,13 @@ def test_allows_fetching():
             },
         ]
     }
-    result = graphql(schema, query, root_value=root_value)
+    result = await graphql(schema, query, root_value=root_value)
     assert not result.errors
     assert result.data == expected
 
 
-def test_correctly_introspects():
+@mark.asyncio
+async def test_correctly_introspects():
     query = '''
     {
       __schema {
@@ -149,6 +146,6 @@ def test_correctly_introspects():
             }
         }
     }
-    result = graphql(schema, query)
+    result = await graphql(schema, query)
     assert not result.errors
     assert result.data == expected

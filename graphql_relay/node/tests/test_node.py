@@ -1,19 +1,18 @@
-#!/usr/bin/env python
-# -*- coding: utf-8 -*-
-
 from collections import namedtuple
+
+from pytest import mark
+
 from graphql import graphql
 from graphql.type import (
-    GraphQLSchema,
-    GraphQLObjectType,
     GraphQLField,
-    GraphQLNonNull,
-    GraphQLInt,
-    GraphQLString,
     GraphQLID,
-)
+    GraphQLInt,
+    GraphQLNonNull,
+    GraphQLObjectType,
+    GraphQLString,
+    GraphQLSchema)
 
-from ..node import node_definitions, to_global_id, from_global_id
+from graphql_relay import node_definitions, to_global_id, from_global_id
 
 User = namedtuple('User', ['id', 'name'])
 Photo = namedtuple('Photo', ['id', 'width'])
@@ -29,25 +28,26 @@ photoData = {
 }
 
 
-def get_node(id, context, info):
-    assert info.schema == schema
+def get_node(id, info):
+    assert info.schema is schema
     if id in userData:
         return userData.get(id)
     else:
         return photoData.get(id)
 
 
-def get_node_type(obj, context, info):
+def get_node_type(obj, info, _type):
+    assert info.schema is schema
     if obj.id in userData:
         return userType
     else:
         return photoType
 
+
 node_interface, node_field = node_definitions(get_node, get_node_type)
 
 userType = GraphQLObjectType(
-    'User',
-    fields=lambda: {
+    'User', lambda: {
         'id': GraphQLField(GraphQLNonNull(GraphQLID)),
         'name': GraphQLField(GraphQLString),
     },
@@ -55,8 +55,7 @@ userType = GraphQLObjectType(
 )
 
 photoType = GraphQLObjectType(
-    'Photo',
-    fields=lambda: {
+    'Photo', lambda: {
         'id': GraphQLField(GraphQLNonNull(GraphQLID)),
         'width': GraphQLField(GraphQLInt),
     },
@@ -64,8 +63,7 @@ photoType = GraphQLObjectType(
 )
 
 queryType = GraphQLObjectType(
-    'Query',
-    fields=lambda: {
+    'Query', lambda: {
         'node': node_field,
     }
 )
@@ -76,7 +74,8 @@ schema = GraphQLSchema(
 )
 
 
-def test_gets_the_correct_id_for_users():
+@mark.asyncio
+async def test_gets_the_correct_id_for_users():
     query = '''
       {
         node(id: "1") {
@@ -89,12 +88,13 @@ def test_gets_the_correct_id_for_users():
             'id': '1',
         }
     }
-    result = graphql(schema, query)
+    result = await graphql(schema, query)
     assert not result.errors
     assert result.data == expected
 
 
-def test_gets_the_correct_id_for_photos():
+@mark.asyncio
+async def test_gets_the_correct_id_for_photos():
     query = '''
       {
         node(id: "4") {
@@ -107,12 +107,13 @@ def test_gets_the_correct_id_for_photos():
             'id': '4',
         }
     }
-    result = graphql(schema, query)
+    result = await graphql(schema, query)
     assert not result.errors
     assert result.data == expected
 
 
-def test_gets_the_correct_name_for_users():
+@mark.asyncio
+async def test_gets_the_correct_name_for_users():
     query = '''
       {
         node(id: "1") {
@@ -129,12 +130,13 @@ def test_gets_the_correct_name_for_users():
             'name': 'John Doe'
         }
     }
-    result = graphql(schema, query)
+    result = await graphql(schema, query)
     assert not result.errors
     assert result.data == expected
 
 
-def test_gets_the_correct_width_for_photos():
+@mark.asyncio
+async def test_gets_the_correct_width_for_photos():
     query = '''
       {
         node(id: "4") {
@@ -151,12 +153,13 @@ def test_gets_the_correct_width_for_photos():
             'width': 400
         }
     }
-    result = graphql(schema, query)
+    result = await graphql(schema, query)
     assert not result.errors
     assert result.data == expected
 
 
-def test_gets_the_correct_typename_for_users():
+@mark.asyncio
+async def test_gets_the_correct_typename_for_users():
     query = '''
       {
         node(id: "1") {
@@ -171,12 +174,13 @@ def test_gets_the_correct_typename_for_users():
             '__typename': 'User'
         }
     }
-    result = graphql(schema, query)
+    result = await graphql(schema, query)
     assert not result.errors
     assert result.data == expected
 
 
-def test_gets_the_correct_typename_for_photos():
+@mark.asyncio
+async def test_gets_the_correct_typename_for_photos():
     query = '''
       {
         node(id: "4") {
@@ -191,12 +195,13 @@ def test_gets_the_correct_typename_for_photos():
             '__typename': 'Photo'
         }
     }
-    result = graphql(schema, query)
+    result = await graphql(schema, query)
     assert not result.errors
     assert result.data == expected
 
 
-def test_ignores_photo_fragments_on_user():
+@mark.asyncio
+async def test_ignores_photo_fragments_on_user():
     query = '''
       {
         node(id: "1") {
@@ -212,12 +217,13 @@ def test_ignores_photo_fragments_on_user():
             'id': '1',
         }
     }
-    result = graphql(schema, query)
+    result = await graphql(schema, query)
     assert not result.errors
     assert result.data == expected
 
 
-def test_returns_null_for_bad_ids():
+@mark.asyncio
+async def test_returns_null_for_bad_ids():
     query = '''
       {
         node(id: "5") {
@@ -228,12 +234,13 @@ def test_returns_null_for_bad_ids():
     expected = {
         'node': None
     }
-    result = graphql(schema, query)
+    result = await graphql(schema, query)
     assert not result.errors
     assert result.data == expected
 
 
-def test_have_correct_node_interface():
+@mark.asyncio
+async def test_have_correct_node_interface():
     query = '''
       {
         __type(name: "Node") {
@@ -270,12 +277,13 @@ def test_have_correct_node_interface():
           ]
         }
     }
-    result = graphql(schema, query)
+    result = await graphql(schema, query)
     assert not result.errors
     assert result.data == expected
 
 
-def test_has_correct_node_root_field():
+@mark.asyncio
+async def test_has_correct_node_root_field():
     query = '''
       {
         __schema {
@@ -328,7 +336,7 @@ def test_has_correct_node_root_field():
           }
         }
     }
-    result = graphql(schema, query)
+    result = await graphql(schema, query)
     assert not result.errors
     assert result.data == expected
 

@@ -1,4 +1,7 @@
 from collections import namedtuple
+
+from pytest import mark
+
 from graphql import graphql
 from graphql.type import (
     GraphQLSchema,
@@ -6,14 +9,10 @@ from graphql.type import (
     GraphQLField,
     GraphQLList,
     GraphQLInt,
-    GraphQLString,
-)
 
-from graphql_relay.node.node import (
-    from_global_id,
-    global_id_field,
-    node_definitions,
-)
+    GraphQLString)
+
+from graphql_relay import from_global_id, global_id_field, node_definitions
 
 User = namedtuple('User', ['id', 'name'])
 Photo = namedtuple('Photo', ['photoId', 'width'])
@@ -43,6 +42,7 @@ def get_node_type(obj, context, info):
     else:
         return photoType
 
+
 node_interface, node_field = node_definitions(get_node, get_node_type)
 
 userType = GraphQLObjectType(
@@ -69,7 +69,7 @@ queryType = GraphQLObjectType(
         'node': node_field,
         'allObjects': GraphQLField(
             GraphQLList(node_interface),
-            resolver=lambda *_: [userData['1'], userData['2'], photoData['1'], photoData['2']]
+            resolve=lambda _root, _info: [userData['1'], userData['2'], photoData['1'], photoData['2']]
         )
     }
 )
@@ -80,7 +80,8 @@ schema = GraphQLSchema(
 )
 
 
-def test_gives_different_ids():
+@mark.asyncio
+async def test_gives_different_ids():
     query = '''
     {
       allObjects {
@@ -104,12 +105,13 @@ def test_gives_different_ids():
             },
         ]
     }
-    result = graphql(schema, query)
+    result = await graphql(schema, query)
     assert not result.errors
     assert result.data == expected
 
 
-def test_refetches_the_ids():
+@mark.asyncio
+async def test_refetches_the_ids():
     query = '''
     {
       user: node(id: "VXNlcjox") {
@@ -136,6 +138,6 @@ def test_refetches_the_ids():
             'width': 300
         }
     }
-    result = graphql(schema, query)
+    result = await graphql(schema, query)
     assert not result.errors
     assert result.data == expected
