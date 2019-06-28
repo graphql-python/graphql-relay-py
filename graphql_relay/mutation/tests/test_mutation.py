@@ -332,92 +332,91 @@ async def test_contains_correct_field():
     '''
     expected = {
         '__schema': {
-          'mutationType': {
-            'fields': [
-                {
-                    'name': 'simpleMutation',
-                    'args': [
-                        {
-                            'name': 'input',
-                            'type': {
-                                'name': None,
-                                'kind': 'NON_NULL',
-                                'ofType': {
-                                    'name': 'SimpleMutationInput',
-                                    'kind': 'INPUT_OBJECT'
-                                }
-                            },
+            'mutationType': {
+                'fields': [
+                    {
+                        'name': 'simpleMutation',
+                        'args': [
+                            {
+                                'name': 'input',
+                                'type': {
+                                    'name': None,
+                                    'kind': 'NON_NULL',
+                                    'ofType': {
+                                        'name': 'SimpleMutationInput',
+                                        'kind': 'INPUT_OBJECT'
+                                    }
+                                },
+                            }
+                        ],
+                        'type': {
+                            'name': 'SimpleMutationPayload',
+                            'kind': 'OBJECT',
                         }
-                    ],
-                    'type': {
-                        'name': 'SimpleMutationPayload',
-                        'kind': 'OBJECT',
-                    }
-                },
-                {
-                    'name': 'simpleMutationWithThunkFields',
-                    'args': [
-                        {
-                            'name': 'input',
-                            'type': {
-                                'name': None,
-                                'kind': 'NON_NULL',
-                                'ofType': {
-                                    'name':
+                    },
+                    {
+                        'name': 'simpleMutationWithThunkFields',
+                        'args': [
+                            {
+                                'name': 'input',
+                                'type': {
+                                    'name': None,
+                                    'kind': 'NON_NULL',
+                                    'ofType': {
+                                        'name':
                                         'SimpleMutationWithThunkFieldsInput',
-                                    'kind': 'INPUT_OBJECT'
-                                }
-                            },
+                                        'kind': 'INPUT_OBJECT'
+                                    }
+                                },
+                            }
+                        ],
+                        'type': {
+                            'name': 'SimpleMutationWithThunkFieldsPayload',
+                            'kind': 'OBJECT',
                         }
-                    ],
-                    'type': {
-                        'name': 'SimpleMutationWithThunkFieldsPayload',
-                        'kind': 'OBJECT',
-                    }
-                },
-                {
-                    'name': 'simpleAsyncMutation',
-                    'args': [
-                      {
-                        'name': 'input',
+                    },
+                    {
+                        'name': 'simpleAsyncMutation',
+                        'args': [
+                            {
+                                'name': 'input',
+                                'type': {
+                                    'name': None,
+                                    'kind': 'NON_NULL',
+                                    'ofType': {
+                                        'name': 'SimpleAsyncMutationInput',
+                                        'kind': 'INPUT_OBJECT'
+                                    }
+                                },
+                            }
+                        ],
                         'type': {
-                          'name': None,
-                          'kind': 'NON_NULL',
-                          'ofType': {
-                            'name': 'SimpleAsyncMutationInput',
-                            'kind': 'INPUT_OBJECT'
-                          }
-                        },
-                      }
-                    ],
-                    'type': {
-                      'name': 'SimpleAsyncMutationPayload',
-                      'kind': 'OBJECT',
-                    }
-                  },
-                {
-                    'name': 'simpleRootValueMutation',
-                    'args': [
-                      {
-                        'name': 'input',
+                            'name': 'SimpleAsyncMutationPayload',
+                            'kind': 'OBJECT',
+                        }
+                    },
+                    {
+                        'name': 'simpleRootValueMutation',
+                        'args': [
+                            {
+                                'name': 'input',
+                                'type': {
+                                    'name': None,
+                                    'kind': 'NON_NULL',
+                                    'ofType': {
+                                        'name': 'SimpleRootValueMutationInput',
+                                        'kind': 'INPUT_OBJECT'
+                                    }
+                                },
+                            }
+                        ],
                         'type': {
-                          'name': None,
-                          'kind': 'NON_NULL',
-                          'ofType': {
-                            'name': 'SimpleRootValueMutationInput',
-                            'kind': 'INPUT_OBJECT'
-                          }
-                        },
-                      }
-                    ],
-                    'type': {
-                      'name': 'SimpleRootValueMutationPayload',
-                      'kind': 'OBJECT',
-                    }
-                },
-
-            ]
-          }
+                            'name': 'SimpleRootValueMutationPayload',
+                            'kind': 'OBJECT',
+                        }
+                    },
+                ]
+            }
         }
     }
     result = await graphql(schema, query)

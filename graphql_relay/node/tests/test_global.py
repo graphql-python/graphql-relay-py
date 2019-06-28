@@ -69,7 +69,8 @@ queryType = GraphQLObjectType(
         'node': node_field,
         'allObjects': GraphQLField(
             GraphQLList(node_interface),
-            resolve=lambda _root, _info: [userData['1'], userData['2'], photoData['1'], photoData['2']]
+            resolve=lambda _root, _info:
+                [userData['1'], userData['2'], photoData['1'], photoData['2']]
         )
     }
 )

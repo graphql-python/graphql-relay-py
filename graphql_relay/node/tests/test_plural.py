@@ -29,7 +29,7 @@ def resolve_single_input(info, username):
 
 queryType = GraphQLObjectType(
     'Query', lambda: {
-        'usernames':  plural_identifying_root_field(
+        'usernames': plural_identifying_root_field(
             'usernames',
             description='Map from a username to the user',
             input_type=GraphQLString,

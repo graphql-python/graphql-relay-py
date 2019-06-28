@@ -261,20 +261,20 @@ async def test_have_correct_node_interface():
     '''
     expected = {
         '__type': {
-          'name': 'Node',
-          'kind': 'INTERFACE',
-          'fields': [
-            {
-              'name': 'id',
-              'type': {
-                'kind': 'NON_NULL',
-                'ofType': {
-                  'name': 'ID',
-                  'kind': 'SCALAR'
+            'name': 'Node',
+            'kind': 'INTERFACE',
+            'fields': [
+                {
+                    'name': 'id',
+                    'type': {
+                        'kind': 'NON_NULL',
+                        'ofType': {
+                            'name': 'ID',
+                            'kind': 'SCALAR'
+                        }
+                    }
                 }
-              }
-            }
-          ]
+            ]
         }
     }
     result = await graphql(schema, query)
@@ -311,29 +311,29 @@ async def test_has_correct_node_root_field():
     '''
     expected = {
         '__schema': {
-          'queryType': {
-            'fields': [
-              {
-                'name': 'node',
-                'type': {
-                  'name': 'Node',
-                  'kind': 'INTERFACE'
-                },
-                'args': [
-                  {
-                    'name': 'id',
-                    'type': {
-                      'kind': 'NON_NULL',
-                      'ofType': {
-                        'name': 'ID',
-                        'kind': 'SCALAR'
-                      }
+            'queryType': {
+                'fields': [
+                    {
+                        'name': 'node',
+                        'type': {
+                            'name': 'Node',
+                            'kind': 'INTERFACE'
+                        },
+                        'args': [
+                            {
+                                'name': 'id',
+                                'type': {
+                                    'kind': 'NON_NULL',
+                                    'ofType': {
+                                        'name': 'ID',
+                                        'kind': 'SCALAR'
+                                    }
+                                }
+                            }
+                        ]
                     }
-                  }
                 ]
-              }
-            ]
-          }
+            }
         }
     }
     result = await graphql(schema, query)

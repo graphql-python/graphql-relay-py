@@ -83,7 +83,7 @@ data = {
 
 # noinspection PyPep8Naming
 def createShip(shipName, factionId):
-    nextShip = len(data['Ship'].keys())+1
+    nextShip = len(data['Ship']) + 1
     newShip = Ship(id=str(nextShip), name=shipName)
     data['Ship'][newShip.id] = newShip
     data['Faction'][factionId].ships.append(newShip.id)
