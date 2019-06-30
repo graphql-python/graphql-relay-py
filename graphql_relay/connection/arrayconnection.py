@@ -4,7 +4,8 @@ from ..utils import base64, unbase64
 from .connectiontypes import Connection, PageInfo, Edge
 
 
-def connection_from_list(data, args=None):
+def connection_from_list(data, args=None, connection_type=None,
+        edge_type=None, pageinfo_type=None):
     '''
     A simple function that accepts an array and connection arguments, and returns
     a connection object for use in GraphQL. It uses array offsets as pagination,
@@ -14,6 +15,9 @@ def connection_from_list(data, args=None):
     return connection_from_list_slice(
         data,
         args,
+        connection_type=connection_type,
+        edge_type=edge_type,
+        pageinfo_type=pageinfo_type,
         slice_start=0,
         list_length=_len,
         list_slice_length=_len,
