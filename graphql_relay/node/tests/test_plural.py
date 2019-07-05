@@ -1,17 +1,11 @@
 from collections import namedtuple
-from pytest import raises
+
 from graphql import graphql
 from graphql.type import (
     GraphQLSchema,
     GraphQLObjectType,
     GraphQLField,
-    GraphQLArgument,
-    GraphQLList,
-    GraphQLNonNull,
-    GraphQLInt,
     GraphQLString,
-    GraphQLBoolean,
-    GraphQLID,
 )
 
 from graphql_relay.node.plural import plural_identifying_root_field
@@ -34,7 +28,7 @@ queryType = GraphQLObjectType(
             description='Map from a username to the user',
             input_type=GraphQLString,
             output_type=userType,
-            resolve_single_input=lambda username, context, info: User(
+            resolve_single_input=lambda info, username: User(
                 username=username,
                 url='www.facebook.com/' + username + '?lang=' + info.root_value.lang
             )
@@ -42,8 +36,10 @@ queryType = GraphQLObjectType(
     }
 )
 
-class root_value:
+
+class RootValue:
     lang = 'en'
+
 
 schema = GraphQLSchema(query=queryType)
 
@@ -73,7 +69,7 @@ def test_allows_fetching():
             },
         ]
     }
-    result = graphql(schema, query, root_value=root_value)
+    result = graphql(schema, query, root=RootValue())
     assert not result.errors
     assert result.data == expected
 
