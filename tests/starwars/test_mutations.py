@@ -6,7 +6,7 @@ from .schema import StarWarsSchema
 
 
 @mark.asyncio
-async def test_correctely_mutates_dataset():
+async def test_correctly_mutates_dataset():
     query = '''
       mutation AddBWingQuery($input: IntroduceShipInput!) {
         introduceShip(input: $input) {

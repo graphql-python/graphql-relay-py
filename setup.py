@@ -46,7 +46,7 @@ setup(
     license='MIT',
 
     classifiers=[
-        'Development Status :: 3 - Alpha',
+        'Development Status :: 5 - Production/Stable',
         'Intended Audience :: Developers',
         'Topic :: Software Development :: Libraries',
         "License :: OSI Approved :: MIT License",
@@ -56,14 +56,14 @@ setup(
         'Programming Language :: Python :: Implementation :: PyPy',
     ],
 
-    keywords='graphql relay api ',
+    keywords='graphql relay api',
 
     packages=find_packages(exclude=['tests']),
 
     install_requires=[
         'graphql-core-next>=1.0.5',
     ],
-    tests_require=['pytest', 'pytest-asyncio'],
+    tests_require=['pytest>=5', 'pytest-asyncio>=0.10'],
     extras_require={},
 
     cmdclass={'test': PyTest},

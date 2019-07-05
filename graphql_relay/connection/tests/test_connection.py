@@ -34,7 +34,7 @@ userType = GraphQLObjectType(
         'friends': GraphQLField(
             friendConnection,
             args=connection_args,
-            resolve=lambda user, info_, **args:
+            resolve=lambda user, _info, **args:
             connection_from_list(user.friends, args),
         ),
     },
@@ -43,7 +43,7 @@ userType = GraphQLObjectType(
 friendEdge, friendConnection = connection_definitions(
     'Friend',
     userType,
-    resolve_node=lambda edge, *_: allUsers[edge.node],
+    resolve_node=lambda edge, _info: allUsers[edge.node],
     edge_fields=lambda: {
         'friendshipTime': GraphQLField(
             GraphQLString,
@@ -53,7 +53,7 @@ friendEdge, friendConnection = connection_definitions(
     connection_fields=lambda: {
         'totalCount': GraphQLField(
             GraphQLInt,
-            resolve=lambda user_, info_: len(allUsers) - 1
+            resolve=lambda _user, _info: len(allUsers) - 1
         ),
     }
 )
@@ -63,7 +63,7 @@ queryType = GraphQLObjectType(
     fields=lambda: {
         'user': GraphQLField(
             userType,
-            resolve=lambda root_, info_: allUsers[0]
+            resolve=lambda _root, _info: allUsers[0]
         ),
     }
 )

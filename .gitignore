@@ -1,9 +1,6 @@
 __pycache__/
 *.py[cod]
 
-*.so
-
-# Distribution / packaging
 .Python
 build/
 develop-eggs/
@@ -41,7 +38,6 @@ coverage.xml
 *.cover
 .pytest_cache/
 
-# Translations
 *.mo
 *.pot
 

@@ -38,9 +38,9 @@ queryType = GraphQLObjectType(
 
 schema = GraphQLSchema(query=queryType)
 
-RootValue = namedtuple('RootValue', ['lang'])
 
-root_value = RootValue(lang='en')
+class RootValue:
+    lang = 'en'
 
 
 @mark.asyncio
@@ -69,7 +69,7 @@ async def test_allows_fetching():
             },
         ]
     }
-    result = await graphql(schema, query, root_value=root_value)
+    result = await graphql(schema, query, root_value=RootValue())
     assert not result.errors
     assert result.data == expected
 

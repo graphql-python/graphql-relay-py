@@ -4,13 +4,14 @@ from ..utils import base64, unbase64
 from .connectiontypes import Connection, PageInfo, Edge
 
 
-def connection_from_list(data, args=None, connection_type=None,
-        edge_type=None, pageinfo_type=None):
-    '''
+def connection_from_list(
+        data, args=None,
+        connection_type=None, edge_type=None, pageinfo_type=None):
+    """
     A simple function that accepts an array and connection arguments, and returns
     a connection object for use in GraphQL. It uses array offsets as pagination,
     so pagination will only work if the array is static.
-    '''
+    """
     _len = len(data)
     return connection_from_list_slice(
         data,
@@ -25,17 +26,17 @@ def connection_from_list(data, args=None, connection_type=None,
 
 
 def connection_from_list_slice(
-        list_slice, args=None, connection_type=None,
-        edge_type=None, pageinfo_type=None,
+        list_slice, args=None,
+        connection_type=None, edge_type=None, pageinfo_type=None,
         slice_start=0, list_length=0, list_slice_length=None):
-    '''
+    """
     Given a slice (subset) of an array, returns a connection object for use in
     GraphQL.
     This function is similar to `connectionFromArray`, but is intended for use
     cases where you know the cardinality of the connection, consider it too large
     to materialize the entire array, and instead wish pass in a slice of the
     total result large enough to cover the range specified in `args`.
-    '''
+    """
     connection_type = connection_type or Connection
     edge_type = edge_type or Edge
     pageinfo_type = pageinfo_type or PageInfo
@@ -106,16 +107,16 @@ PREFIX = 'arrayconnection:'
 
 
 def offset_to_cursor(offset):
-    '''
+    """
     Creates the cursor string from an offset.
-    '''
+    """
     return base64(PREFIX + str(offset))
 
 
 def cursor_to_offset(cursor):
-    '''
+    """
     Rederives the offset from the cursor string.
-    '''
+    """
     try:
         return int(unbase64(cursor)[len(PREFIX):])
     except binascii.Error:
@@ -123,9 +124,9 @@ def cursor_to_offset(cursor):
 
 
 def cursor_for_object_in_connection(data, _object):
-    '''
+    """
     Return the cursor associated with an object in an array.
-    '''
+    """
     if _object not in data:
         return None
 
@@ -134,11 +135,11 @@ def cursor_for_object_in_connection(data, _object):
 
 
 def get_offset_with_default(cursor=None, default_offset=0):
-    '''
+    """
     Given an optional cursor and a default offset, returns the offset
     to use; if the cursor contains a valid offset, that will be used,
     otherwise it will be the default.
-    '''
+    """
     if not isinstance(cursor, str):
         return default_offset
 
