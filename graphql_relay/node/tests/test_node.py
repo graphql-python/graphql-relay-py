@@ -342,22 +342,22 @@ async def test_has_correct_node_root_field():
 
 
 def test_to_global_id_converts_unicode_strings_correctly():
-    my_unicode_id = u'ûñö'
+    my_unicode_id = 'ûñö'
     g_id = to_global_id('MyType', my_unicode_id)
     assert g_id == 'TXlUeXBlOsO7w7HDtg=='
 
-    my_unicode_id = u'\u06ED'
+    my_unicode_id = '\u06ED'
     g_id = to_global_id('MyType', my_unicode_id)
     assert g_id == 'TXlUeXBlOtut'
 
 
 def test_from_global_id_converts_unicode_strings_correctly():
-    my_unicode_id = u'ûñö'
+    my_unicode_id = 'ûñö'
     my_type, my_id = from_global_id('TXlUeXBlOsO7w7HDtg==')
     assert my_type == 'MyType'
     assert my_id == my_unicode_id
 
-    my_unicode_id = u'\u06ED'
+    my_unicode_id = '\u06ED'
     my_type, my_id = from_global_id('TXlUeXBlOtut')
     assert my_type == 'MyType'
     assert my_id == my_unicode_id

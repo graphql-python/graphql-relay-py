@@ -7,11 +7,11 @@ from .. import utils
 
 
 def test_base64_encode_unicode_strings_correctly():
-    my_unicode = u'ûñö'
+    my_unicode = 'ûñö'
     my_base64 = utils.base64(my_unicode)
     assert my_base64 == base64.b64encode(my_unicode.encode('utf-8')).decode('utf-8')
 
-    my_unicode = u'\u06ED'
+    my_unicode = '\u06ED'
     my_base64 = utils.base64(my_unicode)
     assert my_base64 == base64.b64encode(my_unicode.encode('utf-8')).decode('utf-8')
 
@@ -23,7 +23,7 @@ def test_base64_encode_strings_correctly():
 
 
 def test_unbase64_decodes_unicode_strings_correctly():
-    my_unicode = u'ûñö'
+    my_unicode = 'ûñö'
     my_converted_unicode = utils.unbase64(utils.base64(my_unicode))
     assert my_unicode == my_converted_unicode
 
