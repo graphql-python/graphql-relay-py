@@ -245,11 +245,23 @@ You can then run the complete test suite like this:
 poetry run pytest
 ```
 
-Use [tox](https://tox.readthedocs.io/) to run the test suite with different
-Python versions and perform additional testing on the code base. You need
-to install and run tox separately, as it uses its own virtual environments.
+In order to run only a part of the tests with increased verbosity,
+you can add pytest options, like this:
+
+```sh
+poetry run pytest tests/node -vv
+```
+
+In order to check the code style with flake8, use this:
+
+```sh
+poetry run flake8
+```
+
+Use the `tox` command to run the test suite with different
+Python versions and perform all additional source code checks.
 You can also restrict tox to an individual environment, like this:
 
 ```sh
-tox -e py37
+petry run tox -e py37
 ```

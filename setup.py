@@ -1,7 +1,7 @@
 from re import search
 from setuptools import setup, find_packages
 
-with open('graphql_relay/version.py') as version_file:
+with open('src/graphql_relay/version.py') as version_file:
     version = search('version = "(.*)"', version_file.read()).group(1)
 
 with open('README.md') as readme_file:
@@ -29,7 +29,8 @@ setup(
         'Programming Language :: Python :: Implementation :: PyPy',
     ],
     install_requires=['graphql-core-next>=1.0.5'],
-    python_requires='>=3.6',
-    packages=find_packages(include=['graphql_relay']),
+    python_requires='>=3.6,<4',
+    packages=find_packages('src'),
+    package_dir={'': 'src'},
     zip_safe=False,
 )

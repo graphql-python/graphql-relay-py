@@ -23,7 +23,7 @@ classifiers = [
     "Programming Language :: Python :: 3.7"
 ]
 packages = [
-    { include = "graphql_relay" },
+    { include = "graphql_relay", from = "src" },
 ]
 
 [tool.poetry.dependencies]
@@ -39,6 +39,7 @@ black = ">=19.3b0"
 flake8 = "^3.7"
 codecov = "^2"
 check-manifest = ">=0.39"
+tox = "^3.13"
 
 [tool.black]
 target-version = ['py36', 'py37', 'py38']
