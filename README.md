@@ -1,11 +1,18 @@
 # Relay Library for GraphQL Python
 
-This is a library to allow the easy creation of Relay-compliant servers using
-the [GraphQL Python](https://github.com/graphql-python/graphql-core) reference implementation
-of a GraphQL server.
+GraphQL-relay-py is the [Relay](https://relay.dev/) library for
+[GraphQL-core](https://github.com/graphql-python/graphql-core).
 
-*Note: The code is a __exact__ port of the original [graphql-relay js implementation](https://github.com/graphql/graphql-relay-js)
-from Facebook*
+It allows the easy creation of Relay-compliant servers using GraphQL-core.
+
+GraphQL-relay-py is a Python port of
+[graphql-relay-js](https://github.com/graphql/graphql-relay-js),
+while GraphQL-core is a Python port of
+[GraphQL.js](https://github.com/graphql/graphql-js),
+the reference implementation of GraphQL for JavaScript.
+
+Since version 3, GraphQL-relay-py and GraphQL-core support Python 3.6 and above only.
+For older versions of Python, you can use version 2 of these libraries.
 
 [![PyPI version](https://badge.fury.io/py/graphql-relay.svg)](https://badge.fury.io/py/graphql-relay)
 [![Build Status](https://travis-ci.org/graphql-python/graphql-relay-py.svg?branch=master)](https://travis-ci.org/graphql-python/graphql-relay-py)
@@ -21,15 +28,16 @@ An overview of GraphQL in general is available in the
 [Specification for GraphQL](https://github.com/graphql-python/graphql-core).
 
 This library is designed to work with the 
-the [GraphQL Python](https://github.com/graphql-python/graphql-core) reference implementation
-of a GraphQL server.
+the [GraphQL-core](https://github.com/graphql-python/graphql-core)
+Python reference implementation of a GraphQL server.
 
-An overview of the functionality that a Relay-compliant GraphQL server should
-provide is in the [GraphQL Relay Specification](https://facebook.github.io/relay/docs/graphql-relay-specification.html)
-on the [Relay website](https://facebook.github.io/relay/). That overview
-describes a simple set of examples that exist as [tests](tests) in this
-repository. A good way to get started with this repository is to walk through
-that documentation and the corresponding tests in this library together.
+An overview of the functionality that a Relay-compliant GraphQL server should provide
+is in the [GraphQL Relay Specification](https://facebook.github.io/relay/docs/graphql-relay-specification.html)
+on the [Relay website](https://facebook.github.io/relay/).
+That overview describes a simple set of examples that exist
+as [tests](tests) in this repository.
+A good way to get started with this repository is to walk through that documentation
+and the corresponding tests in this library together.
 
 ## Using Relay Library for GraphQL Python (graphql-core-next)
 
