@@ -2,7 +2,7 @@ from pytest import mark
 
 from graphql import graphql
 
-from .schema import StarWarsSchema
+from .star_wars_schema import StarWarsSchema
 
 
 @mark.asyncio

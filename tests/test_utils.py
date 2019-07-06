@@ -1,9 +1,6 @@
-#!/usr/bin/env python
-# -*- coding: utf-8 -*-
-
 import base64
 
-from .. import utils
+from graphql_relay import utils
 
 
 def test_base64_encode_unicode_strings_correctly():

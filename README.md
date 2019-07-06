@@ -5,13 +5,13 @@ GraphQL-relay-py is the [Relay](https://relay.dev/) library for
 
 It allows the easy creation of Relay-compliant servers using GraphQL-core.
 
-GraphQL-relay-py is a Python port of
+GraphQL-Relay-Py is a Python port of
 [graphql-relay-js](https://github.com/graphql/graphql-relay-js),
-while GraphQL-core is a Python port of
+while GraphQL-Core is a Python port of
 [GraphQL.js](https://github.com/graphql/graphql-js),
 the reference implementation of GraphQL for JavaScript.
 
-Since version 3, GraphQL-relay-py and GraphQL-core support Python 3.6 and above only.
+Since version 3, GraphQL-Relay-Py and GraphQL-Core support Python 3.6 and above only.
 For older versions of Python, you can use version 2 of these libraries.
 
 [![PyPI version](https://badge.fury.io/py/graphql-relay.svg)](https://badge.fury.io/py/graphql-relay)
@@ -28,7 +28,7 @@ An overview of GraphQL in general is available in the
 [Specification for GraphQL](https://github.com/graphql-python/graphql-core).
 
 This library is designed to work with the 
-the [GraphQL-core](https://github.com/graphql-python/graphql-core)
+the [GraphQL-Core](https://github.com/graphql-python/graphql-core)
 Python reference implementation of a GraphQL server.
 
 An overview of the functionality that a Relay-compliant GraphQL server should provide
@@ -230,14 +230,26 @@ value of `mutation_with_client_mutation_id`.
 
 ## Contributing
 
-After cloning this repo, ensure dependencies are installed by running:
+After cloning this repository from GitHub,
+we recommend using [Poetry](https://poetry.eustace.io/)
+to create a test environment. With poetry installed,
+you do this with the following command:
 
 ```sh
-python setup.py install
+poetry install
 ```
 
-After developing, the full test suite can be evaluated by running:
+You can then run the complete test suite like this:
 
 ```sh
-python setup.py test # Use --pytest-args="-v -s" for verbose mode
+poetry run pytest
+```
+
+Use [tox](https://tox.readthedocs.io/) to run the test suite with different
+Python versions and perform additional testing on the code base. You need
+to install and run tox separately, as it uses its own virtual environments.
+You can also restrict tox to an individual environment, like this:
+
+```sh
+tox -e py37
 ```

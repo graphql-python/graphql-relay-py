@@ -13,21 +13,18 @@ from graphql_relay.node.node import (
     global_id_field,
     from_global_id
 )
-
 from graphql_relay.connection.arrayconnection import (
     connection_from_list
 )
-
 from graphql_relay.connection.connection import (
     connection_args,
     connection_definitions
 )
-
 from graphql_relay.mutation.mutation import (
     mutation_with_client_mutation_id
 )
 
-from .data import (
+from .star_wars_data import (
     Faction,
     getFaction,
     getShip,

@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "graphql-relay"
-version = "1.0.0a0"
+version = "3.0.0a0"
 description = """
 Relay library for graphql-core-next"""
 licese="MIT"
@@ -16,6 +16,7 @@ keywords="graphql relay api"
 classifiers = [
     "Development Status :: 5 - Production/Stable",
     "Intended Audience :: Developers",
+    "Topic :: Software Development :: Libraries",
     "License :: OSI Approved :: MIT License",
     "Programming Language :: Python :: 3",
     "Programming Language :: Python :: 3.6",
@@ -27,20 +28,20 @@ packages = [
 
 [tool.poetry.dependencies]
 python = "^3.6"
+graphql-core-next = "^1.0.5"
 
 [tool.poetry.dev-dependencies]
-pytest = "^4.6"
-pytest-asyncio = "^0.10"
+pytest = "^5"
+pytest-asyncio = ">=0.10"
 pytest-cov = "^2.7"
-pytest-describe = "^0.12"
 pyyaml = "^5.1"
+black = ">=19.3b0"
 flake8 = "^3.7"
-tox = "^3.12"
-codecov = "^2.0"
+codecov = "^2"
+check-manifest = ">=0.39"
 
 [tool.black]
 target-version = ['py36', 'py37', 'py38']
 [build-system]
 requires = ["poetry>=0.12.16"]
 build-backend = "poetry.masonry.api"
-
