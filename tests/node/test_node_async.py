@@ -1,6 +1,6 @@
 from typing import NamedTuple
 
-from pytest import mark
+from pytest import mark  # type: ignore
 
 from graphql import graphql
 from graphql.type import (
@@ -23,6 +23,8 @@ user_data = {
     '1': User(id='1', name='John Doe'),
     '2': User(id='2', name='Jane Smith'),
 }
+
+user_type: GraphQLObjectType
 
 node_interface, node_field = node_definitions(
     lambda id_, _info: user_data[id_], lambda _obj, _info, _type: user_type)[:2]

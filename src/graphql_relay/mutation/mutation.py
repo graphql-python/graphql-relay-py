@@ -1,44 +1,76 @@
 from inspect import isawaitable
+from typing import Any, Callable, Dict
 
+from graphql.error import GraphQLError
+from graphql.pyutils import AwaitableOrValue, inspect
 from graphql.type import (
     GraphQLArgument,
+    GraphQLField,
+    GraphQLFieldMap,
     GraphQLInputField,
+    GraphQLInputFieldMap,
     GraphQLInputObjectType,
     GraphQLNonNull,
     GraphQLObjectType,
+    GraphQLResolveInfo,
     GraphQLString,
-    GraphQLField,
+    Thunk
 )
-from graphql.error import GraphQLError
-from graphql.pyutils import inspect
 
-from ..utils import resolve_maybe_thunk
+MutationFn = Callable[[Dict[str, Any], GraphQLResolveInfo], AwaitableOrValue[Any]]
+
+
+def resolve_maybe_thunk(thing_or_thunk: Thunk) -> Any:
+    return thing_or_thunk() if callable(thing_or_thunk) else thing_or_thunk
 
 
 def mutation_with_client_mutation_id(
-        name, input_fields, output_fields, mutate_and_get_payload):
-    augmented_input_fields = dict(
-        resolve_maybe_thunk(input_fields),
-        clientMutationId=GraphQLInputField(
-            GraphQLNonNull(GraphQLString)))
-    augmented_output_fields = dict(
-        resolve_maybe_thunk(output_fields),
-        clientMutationId=GraphQLField(
-            GraphQLNonNull(GraphQLString)))
-    input_type = GraphQLInputObjectType(
-        name + 'Input',
-        fields=augmented_input_fields)
+        name: str,
+        input_fields: Thunk[GraphQLInputFieldMap],
+        output_fields: Thunk[GraphQLFieldMap],
+        mutate_and_get_payload: MutationFn,
+        description: str = None,
+        deprecation_reason: str = None) -> GraphQLField:
+    """
+    Returns a GraphQLFieldConfig for the specified mutation.
+
+    The input_fields and output_fields should not include `clientMutationId`,
+    as this will be provided automatically.
+
+    An input object will be created containing the input fields, and an
+    object will be created containing the output fields.
+
+    mutate_and_get_payload will receive a dict with a key for each input field,
+    and it should return an object (or a dict) with an attribute (or a key)
+    for each output field. It may return synchronously or asynchronously.
+    """
+    def augmented_input_fields() -> GraphQLInputFieldMap:
+        return dict(
+            resolve_maybe_thunk(input_fields),
+            clientMutationId=GraphQLInputField(
+                GraphQLNonNull(GraphQLString)))
+
+    def augmented_output_fields() -> GraphQLFieldMap:
+        return dict(
+            resolve_maybe_thunk(output_fields),
+            clientMutationId=GraphQLField(
+                GraphQLNonNull(GraphQLString)))
+
     output_type = GraphQLObjectType(
         name + 'Payload',
         fields=augmented_output_fields)
 
-    async def resolve(_root, info, **args):
-        input_ = args.get('input') or {}
-        payload = mutate_and_get_payload(info, **input_)
+    input_type = GraphQLInputObjectType(
+        name + 'Input',
+        fields=augmented_input_fields)
+
+    # noinspection PyShadowingBuiltins
+    async def resolve(_root, info, input):
+        payload = mutate_and_get_payload(input, info)
         if isawaitable(payload):
             payload = await payload
         try:
-            payload.clientMutationId = input_['clientMutationId']
+            payload.clientMutationId = input['clientMutationId']
         except KeyError:
             raise GraphQLError(
                 'Cannot set clientMutationId'
@@ -47,5 +79,7 @@ def mutation_with_client_mutation_id(
 
     return GraphQLField(
         output_type,
+        description=description,
+        deprecation_reason=deprecation_reason,
         args={'input': GraphQLArgument(GraphQLNonNull(input_type))},
         resolve=resolve)

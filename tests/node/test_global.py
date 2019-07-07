@@ -1,6 +1,6 @@
-from typing import Any, Dict, NamedTuple, Union
+from typing import Any, Dict, NamedTuple, Optional, Union
 
-from pytest import fixture
+from pytest import fixture  # type: ignore
 
 from graphql import graphql_sync as graphql
 from graphql.type import (
@@ -62,7 +62,7 @@ def schema(request):
 
     def get_node(
             global_id: str, info: GraphQLResolveInfo
-    ) -> Union[User, Photo, Post, Dict]:
+    ) -> Optional[Union[User, Photo, Post, Dict]]:
         assert info.schema is schema
         type_, id_ = from_global_id(global_id)
         if type_ == 'User':
@@ -71,10 +71,11 @@ def schema(request):
             return photo_data[id_]
         if type_ == 'Post':
             return post_data[id_]
+        return None
 
     def get_node_type(
             obj: Union[User, Photo], info: GraphQLResolveInfo,
-            _type: Any) -> GraphQLObjectType:
+            _type: Any) -> Optional[GraphQLObjectType]:
         assert info.schema is schema
         if 'name' in obj if use_dicts else isinstance(obj, User):
             return user_type
@@ -82,6 +83,7 @@ def schema(request):
             return photo_type
         if 'text' in obj if use_dicts else isinstance(obj, Post):
             return post_type
+        return None
 
     node_interface, node_field = node_definitions(get_node, get_node_type)[:2]
 

@@ -1,15 +1,16 @@
+from typing import Any
+
 from graphql.type import (
     GraphQLArgument,
     GraphQLBoolean,
+    GraphQLField,
     GraphQLInt,
-    GraphQLNonNull,
     GraphQLList,
+    GraphQLNonNull,
     GraphQLObjectType,
     GraphQLString,
-    GraphQLField
+    Thunk
 )
-from ..utils import resolve_maybe_thunk
-
 
 connection_args = {
     'before': GraphQLArgument(GraphQLString),
@@ -17,6 +18,10 @@ connection_args = {
     'first': GraphQLArgument(GraphQLInt),
     'last': GraphQLArgument(GraphQLInt),
 }
+
+
+def resolve_maybe_thunk(thing_or_thunk: Thunk) -> Any:
+    return thing_or_thunk() if callable(thing_or_thunk) else thing_or_thunk
 
 
 def connection_definitions(

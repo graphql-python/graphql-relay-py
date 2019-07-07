@@ -1,4 +1,4 @@
-from typing import Any, NamedTuple, Union
+from typing import Any, NamedTuple, Optional, Union
 
 from graphql import graphql_sync as graphql
 from graphql.type import (
@@ -35,22 +35,24 @@ photo_data = {
 }
 
 
-def get_node(id_: str, info: GraphQLResolveInfo) -> Union[User, Photo]:
+def get_node(id_: str, info: GraphQLResolveInfo) -> Optional[Union[User, Photo]]:
     assert info.schema is schema
     if id_ in user_data:
         return user_data[id_]
     if id_ in photo_data:
         return photo_data[id_]
+    return None
 
 
 def get_node_type(
         obj: Union[User, Photo], info: GraphQLResolveInfo,
-        _type: Any) -> GraphQLObjectType:
+        _type: Any) -> Optional[GraphQLObjectType]:
     assert info.schema is schema
     if obj.id in user_data:
         return user_type
     if obj.id in photo_data:
         return photo_type
+    return None
 
 
 node_interface, node_field, nodes_field = node_definitions(get_node, get_node_type)

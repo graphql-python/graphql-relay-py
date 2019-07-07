@@ -1,4 +1,4 @@
-from pytest import mark
+from pytest import mark  # type: ignore
 
 from collections import namedtuple
 
