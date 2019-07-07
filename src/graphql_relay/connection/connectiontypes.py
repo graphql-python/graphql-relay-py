@@ -1,42 +1,44 @@
-class Connection:
+from typing import Any, Dict, List, NamedTuple, Optional
 
-    def __init__(self, edges, page_info):
-        self.edges = edges
-        self.page_info = page_info
-
-    def to_dict(self):
-        return {
-            'edges': [e.to_dict() for e in self.edges],
-            'pageInfo': self.page_info.to_dict(),
-        }
+__all__ = [
+    'Connection', 'ConnectionArguments', 'ConnectionCursor', 'Edge', 'PageInfo'
+]
 
 
-class PageInfo:
-
-    def __init__(self, start_cursor="", end_cursor="",
-                 has_previous_page=False, has_next_page=False):
-        self.startCursor = start_cursor
-        self.endCursor = end_cursor
-        self.hasPreviousPage = has_previous_page
-        self.hasNextPage = has_next_page
-
-    def to_dict(self):
-        return {
-            'startCursor': self.startCursor,
-            'endCursor': self.endCursor,
-            'hasPreviousPage': self.hasPreviousPage,
-            'hasNextPage': self.hasNextPage,
-        }
+"""A type alias for cursors in this implementation."""
+ConnectionCursor = str
 
 
-class Edge:
+class PageInfo(NamedTuple):
+    """A type designed to be exposed as `PageInfo` over GraphQL."""
 
-    def __init__(self, node, cursor):
-        self.node = node
-        self.cursor = cursor
+    startCursor: Optional[ConnectionCursor]
+    endCursor: Optional[ConnectionCursor]
+    hasPreviousPage: Optional[bool]
+    hasNextPage: Optional[bool]
 
-    def to_dict(self):
-        return {
-            'node': self.node,
-            'cursor': self.cursor,
-        }
+
+class Edge(NamedTuple):
+    """A type designed to be exposed as a `Edge` over GraphQL."""
+
+    node: Any
+    cursor: ConnectionCursor
+
+
+class Connection(NamedTuple):
+    """A type designed to be exposed as a `Connection` over GraphQL."""
+
+    edges: List[Edge]
+    pageInfo: PageInfo
+
+
+"""A type describing the arguments a connection field receives in GraphQL.
+
+The following kinds of arguments are expected (all optional):
+ 
+    before: ConnectionCursor
+    after: ConnectionCursor
+    first: int
+    last: int
+"""
+ConnectionArguments = Dict[str, Any]

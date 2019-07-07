@@ -1,9 +1,12 @@
-from typing import Any
+from typing import Any, NamedTuple
 
 from graphql.type import (
     GraphQLArgument,
+    GraphQLArgumentMap,
     GraphQLBoolean,
     GraphQLField,
+    GraphQLFieldMap,
+    GraphQLFieldResolver,
     GraphQLInt,
     GraphQLList,
     GraphQLNonNull,
@@ -12,12 +15,37 @@ from graphql.type import (
     Thunk
 )
 
-connection_args = {
-    'before': GraphQLArgument(GraphQLString),
+__all__ = [
+    'connection_definitions',
+    'forward_connection_args', 'backward_connection_args', 'connection_args',
+    'GraphQLConnectionDefinitions'
+]
+
+
+# Returns a GraphQLArgumentMap appropriate to include on a field
+# whose return type is a connection type with forward pagination.
+forward_connection_args: GraphQLArgumentMap = {
     'after': GraphQLArgument(GraphQLString),
     'first': GraphQLArgument(GraphQLInt),
+}
+
+# Returns a GraphQLArgumentMap appropriate to include on a field
+# whose return type is a connection type with backward pagination.
+backward_connection_args: GraphQLArgumentMap = {
+    'before': GraphQLArgument(GraphQLString),
     'last': GraphQLArgument(GraphQLInt),
 }
+
+# Returns a GraphQLArgumentMap appropriate to include on a field
+# whose return type is a connection type with bidirectional pagination.
+connection_args = {
+    **forward_connection_args, **backward_connection_args
+}
+
+
+class GraphQLConnectionDefinitions(NamedTuple):
+    edge_type: GraphQLObjectType
+    connection_type: GraphQLObjectType
 
 
 def resolve_maybe_thunk(thing_or_thunk: Thunk) -> Any:
@@ -25,11 +53,21 @@ def resolve_maybe_thunk(thing_or_thunk: Thunk) -> Any:
 
 
 def connection_definitions(
-        name, node_type,
-        resolve_node=None, resolve_cursor=None,
-        edge_fields=None, connection_fields=None):
+        node_type: GraphQLObjectType,
+        name: str = None,
+        resolve_node: GraphQLFieldResolver = None,
+        resolve_cursor: GraphQLFieldResolver = None,
+        edge_fields: Thunk[GraphQLFieldMap] = None,
+        connection_fields: Thunk[GraphQLFieldMap] = None
+        ) -> GraphQLConnectionDefinitions:
+    """Return GraphQLObjectTypes for a connection with the given name.
+
+    The nodes of the returned object types will be of the specified type.
+    """
+    name = name or node_type.name
     edge_fields = edge_fields or {}
     connection_fields = connection_fields or {}
+
     edge_type = GraphQLObjectType(
         name + 'Edge',
         description='An edge in a connection.',
@@ -60,7 +98,7 @@ def connection_definitions(
             ),
             **resolve_maybe_thunk(connection_fields)})
 
-    return edge_type, connection_type
+    return GraphQLConnectionDefinitions(edge_type, connection_type)
 
 
 # The common page info type used by all connections.

@@ -1,6 +1,6 @@
-from pytest import mark  # type: ignore
+from typing import List, NamedTuple
 
-from collections import namedtuple
+from pytest import mark  # type: ignore
 
 from graphql import graphql
 from graphql.type import (
@@ -12,14 +12,19 @@ from graphql.type import (
 )
 
 from graphql_relay import (
+    backward_connection_args,
     connection_args,
     connection_definitions,
-    connection_from_list)
+    connection_from_array,
+    forward_connection_args)
 
 
-User = namedtuple('User', ['name', 'friends'])
+class User(NamedTuple):
+    name: str
+    friends: List[int]
 
-allUsers = [
+
+all_users = [
     User(name='Dan', friends=[1, 2, 3, 4]),
     User(name='Nick', friends=[0, 2, 3, 4]),
     User(name='Lee', friends=[0, 1, 3, 4]),
@@ -27,23 +32,38 @@ allUsers = [
     User(name='Tim', friends=[0, 1, 2, 3]),
 ]
 
-userType = GraphQLObjectType(
+friend_connection: GraphQLObjectType
+user_connection: GraphQLObjectType
+
+user_type = GraphQLObjectType(
     'User',
     fields=lambda: {
         'name': GraphQLField(GraphQLString),
         'friends': GraphQLField(
-            friendConnection,
+            friend_connection,
             args=connection_args,
             resolve=lambda user, _info, **args:
-            connection_from_list(user.friends, args),
+            connection_from_array(user.friends, args),
+        ),
+        'friendsForward': GraphQLField(
+            user_connection,
+            args=forward_connection_args,
+            resolve=lambda user, _info, **args:
+            connection_from_array(user.friends, args),
+        ),
+        'friendsBackward': GraphQLField(
+            user_connection,
+            args=backward_connection_args,
+            resolve=lambda user, _info, **args:
+            connection_from_array(user.friends, args),
         ),
     },
 )
 
-friendEdge, friendConnection = connection_definitions(
-    'Friend',
-    userType,
-    resolve_node=lambda edge, _info: allUsers[edge.node],
+friend_connection = connection_definitions(
+    user_type,
+    name='Friend',
+    resolve_node=lambda edge, _info: all_users[edge.node],
     edge_fields=lambda: {
         'friendshipTime': GraphQLField(
             GraphQLString,
@@ -53,138 +73,145 @@ friendEdge, friendConnection = connection_definitions(
     connection_fields=lambda: {
         'totalCount': GraphQLField(
             GraphQLInt,
-            resolve=lambda _user, _info: len(allUsers) - 1
+            resolve=lambda _user, _info: len(all_users) - 1
         ),
     }
-)
+).connection_type
 
-queryType = GraphQLObjectType(
+
+user_connection = connection_definitions(
+    user_type,
+    resolve_node=lambda edge, _info: all_users[edge.node]
+).connection_type
+
+
+query_type = GraphQLObjectType(
     'Query',
     fields=lambda: {
         'user': GraphQLField(
-            userType,
-            resolve=lambda _root, _info: allUsers[0]
+            user_type,
+            resolve=lambda _root, _info: all_users[0]
         ),
     }
 )
 
-schema = GraphQLSchema(query=queryType)
+schema = GraphQLSchema(query=query_type)
 
 
-@mark.asyncio
-async def test_include_connections_and_edge_types():
-    query = '''
-      query FriendsQuery {
-        user {
-          friends(first: 2) {
-            totalCount
-            edges {
-              friendshipTime
-              node {
-                name
+def describe_connection_definition():
+
+    @mark.asyncio
+    async def includes_connection_and_edge_fields():
+        query = '''
+          query FriendsQuery {
+            user {
+              friends(first: 2) {
+                totalCount
+                edges {
+                  friendshipTime
+                  node {
+                    name
+                  }
+                }
               }
             }
           }
-        }
-      }
-    '''
-    expected = {
-        'user': {
-            'friends': {
-                'totalCount': 4,
-                'edges': [
-                    {
-                        'friendshipTime': 'Yesterday',
-                        'node': {
-                            'name': 'Nick'
-                        }
-                    },
-                    {
-                        'friendshipTime': 'Yesterday',
-                        'node': {
-                            'name': 'Lee'
-                        }
-                    },
-                ]
-            }
-        }
-    }
-    result = await graphql(schema, query)
-    assert not result.errors
-    assert result.data == expected
+        '''
+        assert await graphql(schema, query) == (
+            {
+                'user': {
+                    'friends': {
+                        'totalCount': 4,
+                        'edges': [
+                            {
+                                'friendshipTime': 'Yesterday',
+                                'node': {
+                                    'name': 'Nick'
+                                }
+                            },
+                            {
+                                'friendshipTime': 'Yesterday',
+                                'node': {
+                                    'name': 'Lee'
+                                }
+                            },
+                        ]
+                    }
+                }
+            },
+            None
+        )
 
-
-@mark.asyncio
-async def test_works_with_forward_connection_args():
-    query = '''
-      query FriendsQuery {
-        user {
-          friendsForward: friends(first: 2) {
-            edges {
-              node {
-                name
+    @mark.asyncio
+    async def works_with_forward_connection_args():
+        query = '''
+          query FriendsQuery {
+            user {
+              friendsForward(first: 2) {
+                edges {
+                  node {
+                    name
+                  }
+                }
               }
             }
           }
-        }
-      }
-    '''
-    expected = {
-        'user': {
-            'friendsForward': {
-                'edges': [
-                    {
-                        'node': {
-                            'name': 'Nick'
-                        }
-                    },
-                    {
-                        'node': {
-                            'name': 'Lee'
-                        }
-                    },
-                ]
-            }
-        }
-    }
-    result = await graphql(schema, query)
-    assert not result.errors
-    assert result.data == expected
+        '''
+        assert await graphql(schema, query) == (
+            {
+                'user': {
+                    'friendsForward': {
+                        'edges': [
+                            {
+                                'node': {
+                                    'name': 'Nick'
+                                }
+                            },
+                            {
+                                'node': {
+                                    'name': 'Lee'
+                                }
+                            },
+                        ]
+                    }
+                }
+            },
+            None
+        )
 
-
-@mark.asyncio
-async def test_works_with_backward_connection_args():
-    query = '''
-      query FriendsQuery {
-        user {
-          friendsBackward: friends(last: 2) {
-            edges {
-              node {
-                name
+    @mark.asyncio
+    async def works_with_backward_connection_args():
+        query = '''
+          query FriendsQuery {
+            user {
+              friendsBackward(last: 2) {
+                edges {
+                  node {
+                    name
+                  }
+                }
               }
             }
           }
-        }
-      }
-    '''
-    expected = {
-        'user': {
-            'friendsBackward': {
-                'edges': [
-                    {
-                        'node': {
-                            'name': 'Joe'
-                        }
-                    },
-                    {
-                        'node': {
-                            'name': 'Tim'
-                        }
-                    },
-                ]
-            }
-        }
-    }
-    result = await graphql(schema, query)
-    assert not result.errors
-    assert result.data == expected
+        '''
+        assert await graphql(schema, query) == (
+            {
+                'user': {
+                    'friendsBackward': {
+                        'edges': [
+                            {
+                                'node': {
+                                    'name': 'Joe'
+                                }
+                            },
+                            {
+                                'node': {
+                                    'name': 'Tim'
+                                }
+                            },
+                        ]
+                    }
+                }
+            },
+            None
+        )
