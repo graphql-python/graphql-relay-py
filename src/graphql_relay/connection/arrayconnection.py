@@ -1,6 +1,6 @@
 import binascii
 
-from ..utils import base64, unbase64
+from ..utils.base64 import base64, unbase64
 from .connectiontypes import Connection, PageInfo, Edge
 
 

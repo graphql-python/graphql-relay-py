@@ -1,4 +1,4 @@
-from graphql_relay.utils import base64, unbase64
+from graphql_relay.utils.base64 import base64, unbase64
 
 from graphql.type import (
     GraphQLArgument,
