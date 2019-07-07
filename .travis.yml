@@ -2,16 +2,16 @@ language: python
 dist: xenial
 
 python:
-  - 2.7
-  - 3.5
-  - 3.6
-  - 3.7
-  - pypy3
+  - "2.7"
+  - "3.5"
+  - "3.6"
+  - "3.7"
+  - "pypy3"
 install:
-  - pip install "pytest>=4.6,<5" "pytest-cov>=2.7,<3" "flake8>=3.7,<4"
   - pip install .
+  - pip install "flake8>=3.7,<4"
 script:
-  - pytest --cov=graphql_relay
+  - python setup.py test -a "--cov=graphql_relay"
   - flake8
 after_success:
   - pip install coveralls
