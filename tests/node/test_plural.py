@@ -49,109 +49,110 @@ class Context:
     lang = 'en'
 
 
-@mark.asyncio
-async def test_allows_fetching():
-    query = '''
-    {
-      usernames(usernames:["dschafer", "leebyron", "schrockn"]) {
-        username
-        url
-      }
-    }
-    '''
-    assert await graphql(schema, query, context_value=Context()) == (
+def describe_plural_identifying_root_field():
+
+    @mark.asyncio
+    async def allows_fetching():
+        query = '''
         {
-            'usernames': [
-                {
-                    'username': 'dschafer',
-                    'url': 'www.facebook.com/dschafer?lang=en'
-                },
-                {
-                    'username': 'leebyron',
-                    'url': 'www.facebook.com/leebyron?lang=en'
-                },
-                {
-                    'username': 'schrockn',
-                    'url': 'www.facebook.com/schrockn?lang=en'
-                },
-            ]
-        },
-        None
-    )
+          usernames(usernames:["dschafer", "leebyron", "schrockn"]) {
+            username
+            url
+          }
+        }
+        '''
+        assert await graphql(schema, query, context_value=Context()) == (
+            {
+                'usernames': [
+                    {
+                        'username': 'dschafer',
+                        'url': 'www.facebook.com/dschafer?lang=en'
+                    },
+                    {
+                        'username': 'leebyron',
+                        'url': 'www.facebook.com/leebyron?lang=en'
+                    },
+                    {
+                        'username': 'schrockn',
+                        'url': 'www.facebook.com/schrockn?lang=en'
+                    },
+                ]
+            },
+            None
+        )
 
-
-@mark.asyncio
-async def test_correctly_introspects():
-    query = '''
-    {
-      __schema {
-        queryType {
-          fields {
-            name
-            args {
-              name
-              type {
-                kind
-                ofType {
-                  kind
-                  ofType {
+    @mark.asyncio
+    async def correctly_introspects():
+        query = '''
+        {
+          __schema {
+            queryType {
+              fields {
+                name
+                args {
+                  name
+                  type {
                     kind
                     ofType {
-                      name
                       kind
+                      ofType {
+                        kind
+                        ofType {
+                          name
+                          kind
+                        }
+                      }
                     }
+                  }
+                }
+                type {
+                  kind
+                  ofType {
+                    name
+                    kind
                   }
                 }
               }
             }
-            type {
-              kind
-              ofType {
-                name
-                kind
-              }
-            }
           }
         }
-      }
-    }
-    '''
-    assert await graphql(schema, query) == (
-        {
-            '__schema': {
-                'queryType': {
-                    'fields': [
-                        {
-                            'name': 'usernames',
-                            'args': [
-                                {
-                                    'name': 'usernames',
-                                    'type': {
-                                        'kind': 'NON_NULL',
-                                        'ofType': {
-                                            'kind': 'LIST',
+        '''
+        assert await graphql(schema, query) == (
+            {
+                '__schema': {
+                    'queryType': {
+                        'fields': [
+                            {
+                                'name': 'usernames',
+                                'args': [
+                                    {
+                                        'name': 'usernames',
+                                        'type': {
+                                            'kind': 'NON_NULL',
                                             'ofType': {
-                                                'kind': 'NON_NULL',
+                                                'kind': 'LIST',
                                                 'ofType': {
-                                                    'name': 'String',
-                                                    'kind': 'SCALAR',
+                                                    'kind': 'NON_NULL',
+                                                    'ofType': {
+                                                        'name': 'String',
+                                                        'kind': 'SCALAR',
+                                                    }
                                                 }
                                             }
                                         }
                                     }
-                                }
-                            ],
-                            'type': {
-                                'kind': 'LIST',
-                                'ofType': {
-                                    'name': 'User',
-                                    'kind': 'OBJECT',
+                                ],
+                                'type': {
+                                    'kind': 'LIST',
+                                    'ofType': {
+                                        'name': 'User',
+                                        'kind': 'OBJECT',
+                                    }
                                 }
                             }
-                        }
-                    ]
+                        ]
+                    }
                 }
-            }
-        },
-        None,
-    )
+            },
+            None,
+        )

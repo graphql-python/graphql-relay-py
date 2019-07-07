@@ -1,7 +1,5 @@
 from typing import Any, NamedTuple, Union
 
-from pytest import mark
-
 from graphql import graphql_sync as graphql
 from graphql.type import (
     GraphQLField,
@@ -119,78 +117,79 @@ schema = GraphQLSchema(
 )
 
 
-def test_gives_different_ids():
-    query = '''
-    {
-      allObjects {
-        id
-      }
-    }
-    '''
-    assert graphql(schema, query) == (
+def describe_global_id_fields():
+
+    def gives_different_ids():
+        query = '''
         {
-            'allObjects': [
-                {
-                    'id': 'VXNlcjox'
+          allObjects {
+            id
+          }
+        }
+        '''
+        assert graphql(schema, query) == (
+            {
+                'allObjects': [
+                    {
+                        'id': 'VXNlcjox'
+                    },
+                    {
+                        'id': 'VXNlcjoy'
+                    },
+                    {
+                        'id': 'UGhvdG86MQ=='
+                    },
+                    {
+                        'id': 'UGhvdG86Mg=='
+                    },
+                    {
+                        'id': 'UG9zdDox',
+                    },
+                    {
+                        'id': 'UG9zdDoy',
+                    },
+                ]
+            },
+            None
+        )
+
+    def refetches_the_ids():
+        query = '''
+        {
+          user: node(id: "VXNlcjox") {
+            id
+            ... on User {
+              name
+            }
+          },
+          photo: node(id: "UGhvdG86MQ==") {
+            id
+            ... on Photo {
+              width
+            }
+          }
+          post: node(id: "UG9zdDox") {
+            id
+            ... on Post {
+              text
+            }
+          }
+        }
+        '''
+        assert graphql(schema, query) == (
+            {
+                'user': {
+                    'id': 'VXNlcjox',
+                    'name': 'John Doe'
                 },
-                {
-                    'id': 'VXNlcjoy'
+                'photo': {
+                    'id': 'UGhvdG86MQ==',
+                    'width': 300
                 },
-                {
-                    'id': 'UGhvdG86MQ=='
-                },
-                {
-                    'id': 'UGhvdG86Mg=='
-                },
-                {
+                'post': {
                     'id': 'UG9zdDox',
+                    'text': 'lorem',
                 },
-                {
-                    'id': 'UG9zdDoy',
-                },
-            ]
-        },
-        None
-    )
-
-
-def test_refetches_the_ids():
-    query = '''
-    {
-      user: node(id: "VXNlcjox") {
-        id
-        ... on User {
-          name
-        }
-      },
-      photo: node(id: "UGhvdG86MQ==") {
-        id
-        ... on Photo {
-          width
-        }
-      }
-      post: node(id: "UG9zdDox") {
-        id
-        ... on Post {
-          text
-        }
-      }
-    }
-    '''
-    assert graphql(schema, query) == (
-        {
-            'user': {
-                'id': 'VXNlcjox',
-                'name': 'John Doe'
             },
-            'photo': {
-                'id': 'UGhvdG86MQ==',
-                'width': 300
-            },
-            'post': {
-                'id': 'UG9zdDox',
-                'text': 'lorem',
-            },
-        },
-        None
-    )
+            None
+        )
