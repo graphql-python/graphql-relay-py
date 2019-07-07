@@ -127,7 +127,7 @@ def get_node_type(obj, _info, _type):
         return shipType
 
 
-node_interface, node_field = node_definitions(get_node, get_node_type)
+node_interface, node_field = node_definitions(get_node, get_node_type)[:2]
 
 
 # We define our basic ship type.

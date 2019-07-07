@@ -1,51 +1,77 @@
-from collections import namedtuple
+from typing import Any, NamedTuple, Union
 
 from pytest import mark
 
-from graphql import graphql
+from graphql import graphql_sync as graphql
 from graphql.type import (
-    GraphQLSchema,
-    GraphQLObjectType,
     GraphQLField,
     GraphQLList,
     GraphQLInt,
-
+    GraphQLObjectType,
+    GraphQLResolveInfo,
+    GraphQLSchema,
     GraphQLString)
 
 from graphql_relay import from_global_id, global_id_field, node_definitions
 
-User = namedtuple('User', ['id', 'name'])
-Photo = namedtuple('Photo', ['photoId', 'width'])
 
-userData = {
+class User(NamedTuple):
+    id: int
+    name: str
+
+
+class Photo(NamedTuple):
+    photo_id: int
+    width: int
+
+
+class Post(NamedTuple):
+    id: int
+    text: str
+
+
+user_data = {
     '1': User(id=1, name='John Doe'),
     '2': User(id=2, name='Jane Smith'),
 }
 
-photoData = {
-    '1': Photo(photoId=1, width=300),
-    '2': Photo(photoId=2, width=400),
+photo_data = {
+    '1': Photo(photo_id=1, width=300),
+    '2': Photo(photo_id=2, width=400),
+}
+
+post_data = {
+    '1': Post(id=1, text='lorem'),
+    '2': Post(id=2, text='ipsum'),
 }
 
 
-def get_node(global_id, _info):
-    _type, _id = from_global_id(global_id)
-    if _type == 'User':
-        return userData[_id]
-    else:
-        return photoData[_id]
+def get_node(global_id: str, info: GraphQLResolveInfo) -> Union[User, Photo, Post]:
+    assert info.schema is schema
+    type_, id_ = from_global_id(global_id)
+    if type_ == 'User':
+        return user_data[id_]
+    if type_ == 'Photo':
+        return photo_data[id_]
+    if type_ == 'Post':
+        return post_data[id_]
 
 
-def get_node_type(obj, _info, _type):
+def get_node_type(
+        obj: Union[User, Photo], info: GraphQLResolveInfo,
+        _type: Any) -> GraphQLObjectType:
+    assert info.schema is schema
     if isinstance(obj, User):
-        return userType
-    else:
-        return photoType
+        return user_type
+    if isinstance(obj, Photo):
+        return photo_type
+    if isinstance(obj, Post):
+        return post_type
 
 
-node_interface, node_field = node_definitions(get_node, get_node_type)
+node_interface, node_field = node_definitions(get_node, get_node_type)[:2]
 
-userType = GraphQLObjectType(
+user_type = GraphQLObjectType(
     'User',
     fields=lambda: {
         'id': global_id_field('User'),
@@ -54,35 +80,46 @@ userType = GraphQLObjectType(
     interfaces=[node_interface]
 )
 
-photoType = GraphQLObjectType(
+photo_type = GraphQLObjectType(
     'Photo',
     fields=lambda: {
-        'id': global_id_field('Photo', lambda obj, *_: obj.photoId),
+        'id': global_id_field('Photo', lambda obj, _info: obj.photo_id),
         'width': GraphQLField(GraphQLInt),
     },
     interfaces=[node_interface]
 )
 
-queryType = GraphQLObjectType(
+post_type = GraphQLObjectType(
+    'Post',
+    fields=lambda: {
+        'id': global_id_field(),
+        'text': GraphQLField(GraphQLString),
+    },
+    interfaces=[node_interface]
+)
+
+query_type = GraphQLObjectType(
     'Query',
     fields=lambda: {
         'node': node_field,
         'allObjects': GraphQLField(
             GraphQLList(node_interface),
-            resolve=lambda _root, _info:
-                [userData['1'], userData['2'], photoData['1'], photoData['2']]
+            resolve=lambda _root, _info: [
+                user_data['1'], user_data['2'],
+                photo_data['1'], photo_data['2'],
+                post_data['1'], post_data['2']
+            ]
         )
     }
 )
 
 schema = GraphQLSchema(
-    query=queryType,
-    types=[userType, photoType]
+    query=query_type,
+    types=[user_type, photo_type, post_type]
 )
 
 
-@mark.asyncio
-async def test_gives_different_ids():
+def test_gives_different_ids():
     query = '''
     {
       allObjects {
@@ -90,29 +127,34 @@ async def test_gives_different_ids():
       }
     }
     '''
-    expected = {
-        'allObjects': [
-            {
-                'id': 'VXNlcjox'
-            },
-            {
-                'id': 'VXNlcjoy'
-            },
-            {
-                'id': 'UGhvdG86MQ=='
-            },
-            {
-                'id': 'UGhvdG86Mg=='
-            },
-        ]
-    }
-    result = await graphql(schema, query)
-    assert not result.errors
-    assert result.data == expected
+    assert graphql(schema, query) == (
+        {
+            'allObjects': [
+                {
+                    'id': 'VXNlcjox'
+                },
+                {
+                    'id': 'VXNlcjoy'
+                },
+                {
+                    'id': 'UGhvdG86MQ=='
+                },
+                {
+                    'id': 'UGhvdG86Mg=='
+                },
+                {
+                    'id': 'UG9zdDox',
+                },
+                {
+                    'id': 'UG9zdDoy',
+                },
+            ]
+        },
+        None
+    )
 
 
-@mark.asyncio
-async def test_refetches_the_ids():
+def test_refetches_the_ids():
     query = '''
     {
       user: node(id: "VXNlcjox") {
@@ -127,18 +169,28 @@ async def test_refetches_the_ids():
           width
         }
       }
+      post: node(id: "UG9zdDox") {
+        id
+        ... on Post {
+          text
+        }
+      }
     }
     '''
-    expected = {
-        'user': {
-            'id': 'VXNlcjox',
-            'name': 'John Doe'
+    assert graphql(schema, query) == (
+        {
+            'user': {
+                'id': 'VXNlcjox',
+                'name': 'John Doe'
+            },
+            'photo': {
+                'id': 'UGhvdG86MQ==',
+                'width': 300
+            },
+            'post': {
+                'id': 'UG9zdDox',
+                'text': 'lorem',
+            },
         },
-        'photo': {
-            'id': 'UGhvdG86MQ==',
-            'width': 300
-        }
-    }
-    result = await graphql(schema, query)
-    assert not result.errors
-    assert result.data == expected
+        None
+    )

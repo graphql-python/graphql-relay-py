@@ -1,4 +1,4 @@
-from collections import namedtuple
+from typing import NamedTuple
 
 from pytest import mark
 
@@ -6,40 +6,46 @@ from graphql import graphql
 from graphql.type import (
     GraphQLField,
     GraphQLObjectType,
+    GraphQLResolveInfo,
     GraphQLSchema,
     GraphQLString)
 
 from graphql_relay import plural_identifying_root_field
 
-userType = GraphQLObjectType(
+user_type = GraphQLObjectType(
     'User',
     fields=lambda: {
         'username': GraphQLField(GraphQLString),
         'url': GraphQLField(GraphQLString),
     }
 )
-User = namedtuple('User', ['username', 'url'])
 
 
-def resolve_single_input(info, username):
+class User(NamedTuple):
+    username: str
+    url: str
+
+
+def resolve_single_input(info: GraphQLResolveInfo, username: str) -> User:
     assert info.schema is schema
-    url = f'www.facebook.com/{username}?lang={info.root_value.lang}'
+    lang = info.context.lang
+    url = f'www.facebook.com/{username}?lang={lang}'
     return User(username=username, url=url)
 
 
-queryType = GraphQLObjectType(
+query_type = GraphQLObjectType(
     'Query', lambda: {
         'usernames': plural_identifying_root_field(
             'usernames',
             description='Map from a username to the user',
             input_type=GraphQLString,
-            output_type=userType,
+            output_type=user_type,
             resolve_single_input=resolve_single_input)})
 
-schema = GraphQLSchema(query=queryType)
+schema = GraphQLSchema(query=query_type)
 
 
-class RootValue:
+class Context:
     lang = 'en'
 
 
@@ -53,25 +59,25 @@ async def test_allows_fetching():
       }
     }
     '''
-    expected = {
-        'usernames': [
-            {
-                'username': 'dschafer',
-                'url': 'www.facebook.com/dschafer?lang=en'
-            },
-            {
-                'username': 'leebyron',
-                'url': 'www.facebook.com/leebyron?lang=en'
-            },
-            {
-                'username': 'schrockn',
-                'url': 'www.facebook.com/schrockn?lang=en'
-            },
-        ]
-    }
-    result = await graphql(schema, query, root_value=RootValue())
-    assert not result.errors
-    assert result.data == expected
+    assert await graphql(schema, query, context_value=Context()) == (
+        {
+            'usernames': [
+                {
+                    'username': 'dschafer',
+                    'url': 'www.facebook.com/dschafer?lang=en'
+                },
+                {
+                    'username': 'leebyron',
+                    'url': 'www.facebook.com/leebyron?lang=en'
+                },
+                {
+                    'username': 'schrockn',
+                    'url': 'www.facebook.com/schrockn?lang=en'
+                },
+            ]
+        },
+        None
+    )
 
 
 @mark.asyncio
@@ -110,42 +116,42 @@ async def test_correctly_introspects():
       }
     }
     '''
-    expected = {
-        '__schema': {
-            'queryType': {
-                'fields': [
-                    {
-                        'name': 'usernames',
-                        'args': [
-                            {
-                                'name': 'usernames',
-                                'type': {
-                                    'kind': 'NON_NULL',
-                                    'ofType': {
-                                        'kind': 'LIST',
+    assert await graphql(schema, query) == (
+        {
+            '__schema': {
+                'queryType': {
+                    'fields': [
+                        {
+                            'name': 'usernames',
+                            'args': [
+                                {
+                                    'name': 'usernames',
+                                    'type': {
+                                        'kind': 'NON_NULL',
                                         'ofType': {
-                                            'kind': 'NON_NULL',
+                                            'kind': 'LIST',
                                             'ofType': {
-                                                'name': 'String',
-                                                'kind': 'SCALAR',
+                                                'kind': 'NON_NULL',
+                                                'ofType': {
+                                                    'name': 'String',
+                                                    'kind': 'SCALAR',
+                                                }
                                             }
                                         }
                                     }
                                 }
-                            }
-                        ],
-                        'type': {
-                            'kind': 'LIST',
-                            'ofType': {
-                                'name': 'User',
-                                'kind': 'OBJECT',
+                            ],
+                            'type': {
+                                'kind': 'LIST',
+                                'ofType': {
+                                    'name': 'User',
+                                    'kind': 'OBJECT',
+                                }
                             }
                         }
-                    }
-                ]
+                    ]
+                }
             }
-        }
-    }
-    result = await graphql(schema, query)
-    assert not result.errors
-    assert result.data == expected
+        },
+        None,
+    )

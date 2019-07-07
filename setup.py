@@ -32,5 +32,8 @@ setup(
     python_requires='>=3.6,<4',
     packages=find_packages('src'),
     package_dir={'': 'src'},
+    # PEP-561: https://www.python.org/dev/peps/pep-0561/
+    package_data={"graphql_relay": ["py.typed"]},
+    include_package_data=True,
     zip_safe=False,
 )
