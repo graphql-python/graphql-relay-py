@@ -1,5 +1,5 @@
 from inspect import isawaitable
-from typing import Any, Callable, Dict
+from typing import Any, Callable
 
 from graphql.error import GraphQLError
 from graphql.pyutils import AwaitableOrValue, inspect
@@ -17,7 +17,14 @@ from graphql.type import (
     Thunk
 )
 
-MutationFn = Callable[[Dict[str, Any], GraphQLResolveInfo], AwaitableOrValue[Any]]
+
+# Note: Contrary to the Javascript implementation of MutationFn,
+# the context is passed as part of the GraphQLResolveInfo and any arguments
+# are passed individually as keyword arguments.
+MutationFnWithoutArgs = Callable[[GraphQLResolveInfo], AwaitableOrValue[Any]]
+# Unfortunately there is currently no syntax to indicate optional or keyword
+# arguments in Python, so we also allow any other Callable as a workaround:
+MutationFn = Callable[..., AwaitableOrValue[Any]]
 
 
 def resolve_maybe_thunk(thing_or_thunk: Thunk) -> Any:
@@ -40,9 +47,10 @@ def mutation_with_client_mutation_id(
     An input object will be created containing the input fields, and an
     object will be created containing the output fields.
 
-    mutate_and_get_payload will receive a dict with a key for each input field,
-    and it should return an object (or a dict) with an attribute (or a key)
-    for each output field. It may return synchronously or asynchronously.
+    mutate_and_get_payload will receive a GraphQLResolveInfo as first argument,
+    and the input fields as keyword arguments, and it should return an object
+    (or a dict) with an attribute (or a key) for each output field.
+    It may return synchronously or asynchronously.
     """
     def augmented_input_fields() -> GraphQLInputFieldMap:
         return dict(
@@ -66,7 +74,7 @@ def mutation_with_client_mutation_id(
 
     # noinspection PyShadowingBuiltins
     async def resolve(_root, info, input):
-        payload = mutate_and_get_payload(input, info)
+        payload = mutate_and_get_payload(info, **input)
         if isawaitable(payload):
             payload = await payload
         try:

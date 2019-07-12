@@ -14,7 +14,7 @@ from graphql_relay.node.node import (
     from_global_id
 )
 from graphql_relay.connection.arrayconnection import (
-    connection_from_list
+    connection_from_array
 )
 from graphql_relay.connection.connection import (
     connection_args,
@@ -164,7 +164,7 @@ shipType = GraphQLObjectType(
 #     cursor: String!
 #     node: Ship
 #   }
-ship_edge, ship_connection = connection_definitions('Ship', shipType)
+ship_edge, ship_connection = connection_definitions(shipType, 'Ship')
 
 # We define our faction type, which implements the node interface.
 #
@@ -187,7 +187,7 @@ factionType = GraphQLObjectType(
             ship_connection,
             description='The ships used by the faction.',
             args=connection_args,
-            resolve=lambda faction, _info, **args: connection_from_list(
+            resolve=lambda faction, _info, **args: connection_from_array(
                 [getShip(ship) for ship in faction.ships], args),
         )
     },

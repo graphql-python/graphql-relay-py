@@ -35,7 +35,7 @@ class Connection(NamedTuple):
 """A type describing the arguments a connection field receives in GraphQL.
 
 The following kinds of arguments are expected (all optional):
- 
+
     before: ConnectionCursor
     after: ConnectionCursor
     first: int

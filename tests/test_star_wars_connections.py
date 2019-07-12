@@ -36,5 +36,4 @@ async def test_correct_fetch_first_ship_rebels():
         }
     }
     result = await graphql(StarWarsSchema, query)
-    assert not result.errors
-    assert result.data == expected
+    assert result == (expected, None)

@@ -41,4 +41,4 @@ async def test_correctly_mutates_dataset():
         }
     }
     result = await graphql(StarWarsSchema, query, variable_values=params)
-    assert result.data == expected
+    assert result == (expected, None)

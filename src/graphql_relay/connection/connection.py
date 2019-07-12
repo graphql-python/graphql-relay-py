@@ -59,7 +59,7 @@ def connection_definitions(
         resolve_cursor: GraphQLFieldResolver = None,
         edge_fields: Thunk[GraphQLFieldMap] = None,
         connection_fields: Thunk[GraphQLFieldMap] = None
-        ) -> GraphQLConnectionDefinitions:
+) -> GraphQLConnectionDefinitions:
     """Return GraphQLObjectTypes for a connection with the given name.
 
     The nodes of the returned object types will be of the specified type.

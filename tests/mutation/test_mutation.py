@@ -25,7 +25,7 @@ simple_mutation = mutation_with_client_mutation_id(
     output_fields={
         'result': GraphQLField(GraphQLInt)
     },
-    mutate_and_get_payload=lambda _obj, _info: Result(1)
+    mutate_and_get_payload=lambda _info, **_input: Result(1)
 )
 
 simple_mutation_with_description = mutation_with_client_mutation_id(
@@ -35,7 +35,7 @@ simple_mutation_with_description = mutation_with_client_mutation_id(
     output_fields={
         'result': GraphQLField(GraphQLInt)
     },
-    mutate_and_get_payload=lambda _obj, _info: Result(1)
+    mutate_and_get_payload=lambda _info, **_input: Result(1)
 )
 
 simple_mutation_with_deprecation_reason = mutation_with_client_mutation_id(
@@ -44,11 +44,11 @@ simple_mutation_with_deprecation_reason = mutation_with_client_mutation_id(
     output_fields={
         'result': GraphQLField(GraphQLInt)
     },
-    mutate_and_get_payload=lambda _obj, _info: Result(1),
+    mutate_and_get_payload=lambda _info, **_input: Result(1),
     deprecation_reason='Just because'
 )
 
-# noinspection PyShadowingBuiltins
+# noinspection PyPep8Naming
 simple_mutation_with_thunk_fields = mutation_with_client_mutation_id(
     'SimpleMutationWithThunkFields',
     input_fields=lambda: {
@@ -57,12 +57,12 @@ simple_mutation_with_thunk_fields = mutation_with_client_mutation_id(
     output_fields=lambda: {
         'result': GraphQLField(GraphQLInt)
     },
-    mutate_and_get_payload=lambda obj, _info: Result(obj['inputData'])
+    mutate_and_get_payload=lambda _info, inputData, **_input: Result(inputData)
 )
 
 
 # noinspection PyPep8Naming
-async def mutate_and_get_one_as_payload_async(_obj, _info):
+async def mutate_and_get_one_as_payload_async(_info, **_input):
     return Result(1)
 
 simple_async_mutation = mutation_with_client_mutation_id(
@@ -80,7 +80,7 @@ simple_root_value_mutation = mutation_with_client_mutation_id(
     output_fields={
         'result': GraphQLField(GraphQLInt)
     },
-    mutate_and_get_payload=lambda _obj, info: info.root_value
+    mutate_and_get_payload=lambda info, **_input: info.root_value
 )
 
 query_type: GraphQLObjectType = GraphQLObjectType(

@@ -1,3 +1,5 @@
+from typing import cast, Sequence
+
 from pytest import raises  # type: ignore
 
 from graphql_relay import (
@@ -361,6 +363,127 @@ def describe_connection_from_array():
             letter_f_cursor = cursor_for_object_in_connection(letters, 'F')
             assert letter_f_cursor is None
 
+        def describe_extended_functionality():
+            """Test functionality that is not part of graphql-relay-js."""
+
+            def returns_an_edges_cursor_given_an_array_without_index_method():
+                class LettersWithoutIndex:
+                    __getitem__ = letters.__getitem__
+
+                letters_without_index = LettersWithoutIndex()
+
+                with raises(AttributeError):
+                    cast(Sequence, letters_without_index).index('B')
+
+                letter_b_cursor = cursor_for_object_in_connection(
+                    cast(Sequence, letters_without_index), 'B')
+                assert letter_b_cursor == 'YXJyYXljb25uZWN0aW9uOjE='
+
+    def describe_extended_functionality():
+        """Test functionality that is not part of graphql-relay-js."""
+
+        def does_not_require_args():
+            c = connection_from_array(letters)
+            assert c == Connection(
+                edges=[
+                    Edge(node='A', cursor='YXJyYXljb25uZWN0aW9uOjA='),
+                    Edge(node='B', cursor='YXJyYXljb25uZWN0aW9uOjE='),
+                    Edge(node='C', cursor='YXJyYXljb25uZWN0aW9uOjI='),
+                    Edge(node='D', cursor='YXJyYXljb25uZWN0aW9uOjM='),
+                    Edge(node='E', cursor='YXJyYXljb25uZWN0aW9uOjQ='),
+                ],
+                pageInfo=PageInfo(
+                    startCursor='YXJyYXljb25uZWN0aW9uOjA=',
+                    endCursor='YXJyYXljb25uZWN0aW9uOjQ=',
+                    hasPreviousPage=False,
+                    hasNextPage=False,
+                )
+            )
+
+        def uses_default_connection_types():
+            connection = connection_from_array(letters[:1])
+            assert isinstance(connection, Connection)
+            edge = connection.edges[0]
+            assert isinstance(edge, Edge)
+            assert len(connection.edges) == 1
+            assert edge == Edge(node='A', cursor='YXJyYXljb25uZWN0aW9uOjA=')
+            page_info = connection.pageInfo
+            assert isinstance(page_info, PageInfo)
+            assert page_info == PageInfo(
+                startCursor='YXJyYXljb25uZWN0aW9uOjA=',
+                endCursor='YXJyYXljb25uZWN0aW9uOjA=',
+                hasPreviousPage=False,
+                hasNextPage=False)
+
+        def accepts_custom_connection_type():
+            class CustomConnection:
+                # noinspection PyPep8Naming
+                def __init__(self, edges, pageInfo):
+                    self.edges = edges
+                    self.page_info = pageInfo
+
+            connection = connection_from_array(
+                letters[:1], connection_type=CustomConnection)
+            assert isinstance(connection, CustomConnection)
+            edge = connection.edges[0]
+            assert isinstance(edge, Edge)
+            assert len(connection.edges) == 1
+            assert edge == Edge(node='A', cursor='YXJyYXljb25uZWN0aW9uOjA=')
+            page_info = connection.page_info
+            assert isinstance(page_info, PageInfo)
+            assert page_info == PageInfo(
+                startCursor='YXJyYXljb25uZWN0aW9uOjA=',
+                endCursor='YXJyYXljb25uZWN0aW9uOjA=',
+                hasPreviousPage=False,
+                hasNextPage=False)
+
+        def accepts_custom_edge_type():
+            class CustomEdge:
+                def __init__(self, node, cursor):
+                    self.node = node
+                    self.cursor = cursor
+
+            connection = connection_from_array(letters[:1], edge_type=CustomEdge)
+            assert isinstance(connection, Connection)
+            assert isinstance(connection.edges, list)
+            assert len(connection.edges) == 1
+            edge = connection.edges[0]
+            assert isinstance(edge, CustomEdge)
+            assert edge.node == 'A'
+            assert edge.cursor == 'YXJyYXljb25uZWN0aW9uOjA='
+            page_info = connection.pageInfo
+            assert isinstance(page_info, PageInfo)
+            assert page_info == PageInfo(
+                startCursor='YXJyYXljb25uZWN0aW9uOjA=',
+                endCursor='YXJyYXljb25uZWN0aW9uOjA=',
+                hasPreviousPage=False,
+                hasNextPage=False)
+
+        def accepts_custom_page_info_type():
+            class CustomPageInfo:
+                # noinspection PyPep8Naming
+                def __init__(
+                        self, startCursor, endCursor, hasPreviousPage, hasNextPage):
+                    self.startCursor = startCursor
+                    self.endCursor = endCursor
+                    self.hasPreviousPage = hasPreviousPage
+                    self.hasNextPage = hasNextPage
+
+            connection = connection_from_array(
+                letters[:1], page_info_type=CustomPageInfo)
+            assert isinstance(connection, Connection)
+            assert isinstance(connection.edges, list)
+            assert len(connection.edges) == 1
+            edge = connection.edges[0]
+            assert isinstance(edge, Edge)
+            assert edge == Edge(node='A', cursor='YXJyYXljb25uZWN0aW9uOjA=')
+            page_info = connection.pageInfo
+            assert isinstance(page_info, CustomPageInfo)
+            assert page_info.startCursor == 'YXJyYXljb25uZWN0aW9uOjA='
+            assert page_info.endCursor == 'YXJyYXljb25uZWN0aW9uOjA='
+            assert page_info.hasPreviousPage is False
+            assert page_info.hasNextPage is False
+
 
 def describe_connection_from_array_slice():
     letters = ['A', 'B', 'C', 'D', 'E']
@@ -515,3 +638,193 @@ def describe_connection_from_array_slice():
                 hasNextPage=True,
             )
         )
+
+    def describe_extended_functionality():
+        """Test functionality that is not part of graphql-relay-js."""
+
+        def does_not_require_args():
+            c = connection_from_array_slice(
+                letters, slice_start=0, array_length=5
+            )
+            assert c == Connection(
+                edges=[
+                    Edge(node='A', cursor='YXJyYXljb25uZWN0aW9uOjA='),
+                    Edge(node='B', cursor='YXJyYXljb25uZWN0aW9uOjE='),
+                    Edge(node='C', cursor='YXJyYXljb25uZWN0aW9uOjI='),
+                    Edge(node='D', cursor='YXJyYXljb25uZWN0aW9uOjM='),
+                    Edge(node='E', cursor='YXJyYXljb25uZWN0aW9uOjQ='),
+                ],
+                pageInfo=PageInfo(
+                    startCursor='YXJyYXljb25uZWN0aW9uOjA=',
+                    endCursor='YXJyYXljb25uZWN0aW9uOjQ=',
+                    hasPreviousPage=False,
+                    hasNextPage=False,
+                )
+            )
+
+        def uses_zero_as_default_for_slice_start():
+            c = connection_from_array_slice(
+                letters[:1], dict(first=1), array_length=5
+            )
+            assert c == Connection(
+                edges=[
+                    Edge(node='A', cursor='YXJyYXljb25uZWN0aW9uOjA='),
+                ],
+                pageInfo=PageInfo(
+                    startCursor='YXJyYXljb25uZWN0aW9uOjA=',
+                    endCursor='YXJyYXljb25uZWN0aW9uOjA=',
+                    hasPreviousPage=False,
+                    hasNextPage=True,
+                )
+            )
+
+        def uses_slice_end_as_default_for_array_length():
+            c = connection_from_array_slice(
+                letters[:1], dict(first=1), slice_start=0,
+            )
+            assert c == Connection(
+                edges=[
+                    Edge(node='A', cursor='YXJyYXljb25uZWN0aW9uOjA='),
+                ],
+                pageInfo=PageInfo(
+                    startCursor='YXJyYXljb25uZWN0aW9uOjA=',
+                    endCursor='YXJyYXljb25uZWN0aW9uOjA=',
+                    hasPreviousPage=False,
+                    hasNextPage=False,
+                )
+            )
+
+        def ignores_len_of_slice_if_array_slice_length_provided():
+            c = connection_from_array_slice(
+                letters[:2], dict(first=2),
+                array_length=2, array_slice_length=1,
+            )
+            assert c == Connection(
+                edges=[
+                    Edge(node='A', cursor='YXJyYXljb25uZWN0aW9uOjA='),
+                ],
+                pageInfo=PageInfo(
+                    startCursor='YXJyYXljb25uZWN0aW9uOjA=',
+                    endCursor='YXJyYXljb25uZWN0aW9uOjA=',
+                    hasPreviousPage=False,
+                    hasNextPage=True,
+                )
+            )
+
+        def uses_array_slice_length_instead_of_len_function():
+            class LettersWithoutLen:
+                __getitem__ = letters.__getitem__
+
+            letters_without_len = LettersWithoutLen()
+
+            with raises(TypeError):
+                len(cast(Sequence, letters_without_len))
+
+            with raises(TypeError):
+                connection_from_array_slice(letters_without_len)
+
+            c = connection_from_array_slice(letters_without_len, array_slice_length=5)
+            assert c == Connection(
+                edges=[
+                    Edge(node='A', cursor='YXJyYXljb25uZWN0aW9uOjA='),
+                    Edge(node='B', cursor='YXJyYXljb25uZWN0aW9uOjE='),
+                    Edge(node='C', cursor='YXJyYXljb25uZWN0aW9uOjI='),
+                    Edge(node='D', cursor='YXJyYXljb25uZWN0aW9uOjM='),
+                    Edge(node='E', cursor='YXJyYXljb25uZWN0aW9uOjQ='),
+                ],
+                pageInfo=PageInfo(
+                    startCursor='YXJyYXljb25uZWN0aW9uOjA=',
+                    endCursor='YXJyYXljb25uZWN0aW9uOjQ=',
+                    hasPreviousPage=False,
+                    hasNextPage=False,
+                )
+            )
+
+        def uses_default_connection_types():
+            connection = connection_from_array_slice(
+                letters[:1], slice_start=0, array_length=1)
+            assert isinstance(connection, Connection)
+            edge = connection.edges[0]
+            assert isinstance(edge, Edge)
+            assert len(connection.edges) == 1
+            assert edge == Edge(node='A', cursor='YXJyYXljb25uZWN0aW9uOjA=')
+            page_info = connection.pageInfo
+            assert isinstance(page_info, PageInfo)
+            assert page_info == PageInfo(
+                startCursor='YXJyYXljb25uZWN0aW9uOjA=',
+                endCursor='YXJyYXljb25uZWN0aW9uOjA=',
+                hasPreviousPage=False,
+                hasNextPage=False)
+
+        def accepts_custom_connection_type():
+            class CustomConnection:
+                # noinspection PyPep8Naming
+                def __init__(self, edges, pageInfo):
+                    self.edges = edges
+                    self.page_info = pageInfo
+
+            connection = connection_from_array_slice(
+                letters[:1], slice_start=0, array_length=1,
+                connection_type=CustomConnection)
+            assert isinstance(connection, CustomConnection)
+            edge = connection.edges[0]
+            assert isinstance(edge, Edge)
+            assert len(connection.edges) == 1
+            assert edge == Edge(node='A', cursor='YXJyYXljb25uZWN0aW9uOjA=')
+            page_info = connection.page_info
+            assert isinstance(page_info, PageInfo)
+            assert page_info == PageInfo(
+                startCursor='YXJyYXljb25uZWN0aW9uOjA=',
+                endCursor='YXJyYXljb25uZWN0aW9uOjA=',
+                hasPreviousPage=False,
+                hasNextPage=False)
+
+        def accepts_custom_edge_type():
+            class CustomEdge:
+                def __init__(self, node, cursor):
+                    self.node = node
+                    self.cursor = cursor
+
+            connection = connection_from_array_slice(
+                letters[:1], slice_start=0, array_length=1,
+                edge_type=CustomEdge)
+            assert isinstance(connection, Connection)
+            assert isinstance(connection.edges, list)
+            assert len(connection.edges) == 1
+            edge = connection.edges[0]
+            assert isinstance(edge, CustomEdge)
+            assert edge.node == 'A'
+            assert edge.cursor == 'YXJyYXljb25uZWN0aW9uOjA='
+            page_info = connection.pageInfo
+            assert isinstance(page_info, PageInfo)
+            assert page_info == PageInfo(
+                startCursor='YXJyYXljb25uZWN0aW9uOjA=',
+                endCursor='YXJyYXljb25uZWN0aW9uOjA=',
+                hasPreviousPage=False,
+                hasNextPage=False)
+
+        def accepts_custom_page_info_type():
+            class CustomPageInfo:
+                # noinspection PyPep8Naming
+                def __init__(
+                        self, startCursor, endCursor, hasPreviousPage, hasNextPage):
+                    self.startCursor = startCursor
+                    self.endCursor = endCursor
+                    self.hasPreviousPage = hasPreviousPage
+                    self.hasNextPage = hasNextPage
+
+            connection = connection_from_array_slice(
+                letters[:1], slice_start=0, array_length=1,
+                page_info_type=CustomPageInfo)
+            assert isinstance(connection, Connection)
+            assert isinstance(connection.edges, list)
+            assert len(connection.edges) == 1
+            edge = connection.edges[0]
+            assert isinstance(edge, Edge)
+            assert edge == Edge(node='A', cursor='YXJyYXljb25uZWN0aW9uOjA=')
+            page_info = connection.pageInfo
+            assert isinstance(page_info, CustomPageInfo)
+            assert page_info.startCursor == 'YXJyYXljb25uZWN0aW9uOjA='
+            assert page_info.endCursor == 'YXJyYXljb25uZWN0aW9uOjA='
+            assert page_info.hasPreviousPage is False
+            assert page_info.hasNextPage is False

@@ -62,12 +62,10 @@ returning those types.
 they return a connection type.
  - `connection_definitions` returns a `connection_type` and its associated
 `edgeType`, given a name and a node type.
- - `connection_from_list` is a helper method that takes an array and the
+ - `connection_from_array` is a helper method that takes an array and the
 arguments from `connection_args`, does pagination and filtering, and returns
 an object in the shape expected by a `connection_type`'s `resolver` function.
- - `connection_from_promised_list` is similar to `connection_from_list`, but
-it takes a promise that resolves to an array, and returns a promise that
-resolves to the expected shape by `connection_type`.
+
  - `cursor_for_object_in_connection` is a helper method that takes an array and a
 member object, and returns a cursor for use in the mutation payload.
 
@@ -89,7 +87,7 @@ factionType = GraphQLObjectType(
             ship_connection,
             description='The ships used by the faction.',
             args=connection_args,
-            resolve=lambda faction, _info, **args: connection_from_list(
+            resolve=lambda faction, _info, **args: connection_from_array(
                 [getShip(ship) for ship in faction.ships], args),
         )
     },
@@ -98,10 +96,10 @@ factionType = GraphQLObjectType(
 ```
 
 This shows adding a `ships` field to the `Faction` object that is a connection.
-It uses `connection_definitions({name: 'Ship', nodeType: shipType})` to create
-the connection type, adds `connection_args` as arguments on this function, and
-then implements the resolver function by passing the array of ships and the
-arguments to `connection_from_list`.
+It uses `connection_definitions('Ship', shipType)` to create the connection
+type, adds `connection_args` as arguments on this function, and then implements
+the resolver function by passing the array of ships and the arguments to
+`connection_from_array`.
 
 ### Object Identification
 
@@ -109,17 +107,17 @@ Helper functions are provided for both building the GraphQL types
 for nodes and for implementing global IDs around local IDs.
 
  - `node_definitions` returns the `Node` interface that objects can implement,
-and returns the `node` root field to include on the query type. To implement
-this, it takes a function to resolve an ID to an object, and to determine
-the type of a given object.
+    and returns the `node` root field to include on the query type.
+    To implement this, it takes a function to resolve an ID to an object,
+    and to determine the type of a given object.
  - `to_global_id` takes a type name and an ID specific to that type name,
-and returns a "global ID" that is unique among all types.
- - `from_global_id` takes the "global ID" created by `toGlobalID`, and returns
-the type name and ID used to create it.
+    and returns a "global ID" that is unique among all types.
+ - `from_global_id` takes the "global ID" created by `to_global_id`, and
+    returns the type name and ID used to create it.
  - `global_id_field` creates the configuration for an `id` field on a node.
  - `plural_identifying_root_field` creates a field that accepts a list of
-non-ID identifiers (like a username) and maps then to their corresponding
-objects.
+    non-ID identifiers (like a username) and maps then to their corresponding
+    objects.
 
 An example usage of these methods from the [test schema](tests/starwars/schema.py):
 
@@ -184,7 +182,7 @@ class IntroduceShipMutation:
         self.factionId = factionId
         self.clientMutationId = clientMutationId
 
-def mutate_and_get_payload(_info, shipName, factionId, **_input):
+def mutate_and_get_payload(_info, shipName, factionId):
     newShip = createShip(shipName, factionId)
     return IntroduceShipMutation(shipId=newShip.id, factionId=factionId)
 
@@ -221,9 +219,9 @@ mutationType = GraphQLObjectType(
 
 This code creates a mutation named `IntroduceShip`, which takes a faction
 ID and a ship name as input. It outputs the `Faction` and the `Ship` in
-question. `mutate_and_get_payload` then gets an object with a property for
-each input field, performs the mutation by constructing the new ship, then
-returns an object that will be resolved by the output fields.
+question. `mutate_and_get_payload` then gets each input field as keyword
+parameter, performs the mutation by constructing the new ship, then returns
+an object that will be resolved by the output fields.
 
 Our mutation type then creates the `introduceShip` field using the return
 value of `mutation_with_client_mutation_id`.

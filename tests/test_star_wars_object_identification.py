@@ -22,8 +22,7 @@ async def test_correctly_fetches_id_name_rebels():
         }
     }
     result = await graphql(StarWarsSchema, query)
-    assert not result.errors
-    assert result.data == expected
+    assert result == (expected, None)
 
 
 @mark.asyncio
@@ -45,8 +44,7 @@ async def test_correctly_refetches_rebels():
         }
     }
     result = await graphql(StarWarsSchema, query)
-    assert not result.errors
-    assert result.data == expected
+    assert result == (expected, None)
 
 
 @mark.asyncio
@@ -66,8 +64,7 @@ async def test_correctly_fetches_id_name_empire():
         }
     }
     result = await graphql(StarWarsSchema, query)
-    assert not result.errors
-    assert result.data == expected
+    assert result == (expected, None)
 
 
 @mark.asyncio
@@ -89,8 +86,7 @@ async def test_correctly_refetches_empire():
         }
     }
     result = await graphql(StarWarsSchema, query)
-    assert not result.errors
-    assert result.data == expected
+    assert result == (expected, None)
 
 
 @mark.asyncio
@@ -112,5 +108,4 @@ async def test_correctly_refetches_xwing():
         }
     }
     result = await graphql(StarWarsSchema, query)
-    assert not result.errors
-    assert result.data == expected
+    assert result == (expected, None)
