@@ -1,12 +1,15 @@
 from typing import cast, Sequence
 
-from pytest import raises  # type: ignore
+from pytest import deprecated_call, raises  # type: ignore
 
 from graphql_relay import (
     connection_from_array,
     connection_from_array_slice,
     cursor_for_object_in_connection,
     Connection, Edge, PageInfo)
+
+# noinspection PyProtectedMember
+from graphql_relay import connection_from_list, connection_from_list_slice
 
 
 def describe_connection_from_array():
@@ -484,6 +487,24 @@ def describe_connection_from_array():
             assert page_info.hasPreviousPage is False
             assert page_info.hasNextPage is False
 
+        def provides_deprecated_connection_from_list():
+            with deprecated_call():
+                # noinspection PyDeprecation
+                c = connection_from_list(
+                    letters[:1], args={}, connection_type=Connection,
+                    edge_type=Edge, pageinfo_type=PageInfo)
+            assert c == Connection(
+                edges=[
+                    Edge(node='A', cursor='YXJyYXljb25uZWN0aW9uOjA='),
+                ],
+                pageInfo=PageInfo(
+                    startCursor='YXJyYXljb25uZWN0aW9uOjA=',
+                    endCursor='YXJyYXljb25uZWN0aW9uOjA=',
+                    hasPreviousPage=False,
+                    hasNextPage=False,
+                )
+            )
+
 
 def describe_connection_from_array_slice():
     letters = ['A', 'B', 'C', 'D', 'E']
@@ -828,3 +849,22 @@ def describe_connection_from_array_slice():
             assert page_info.endCursor == 'YXJyYXljb25uZWN0aW9uOjA='
             assert page_info.hasPreviousPage is False
             assert page_info.hasNextPage is False
+
+        def provides_deprecated_connection_from_list_slice():
+            with deprecated_call():
+                # noinspection PyDeprecation
+                c = connection_from_list_slice(
+                    letters[:1], args={}, connection_type=Connection,
+                    edge_type=Edge, pageinfo_type=PageInfo,
+                    slice_start=0, list_length=1, list_slice_length=1)
+            assert c == Connection(
+                edges=[
+                    Edge(node='A', cursor='YXJyYXljb25uZWN0aW9uOjA='),
+                ],
+                pageInfo=PageInfo(
+                    startCursor='YXJyYXljb25uZWN0aW9uOjA=',
+                    endCursor='YXJyYXljb25uZWN0aW9uOjA=',
+                    hasPreviousPage=False,
+                    hasNextPage=False,
+                )
+            )

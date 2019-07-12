@@ -1,4 +1,5 @@
 import binascii
+import warnings
 from typing import Any, Optional, Sequence
 
 from ..utils.base64 import base64, unbase64
@@ -35,6 +36,25 @@ def connection_from_array(
         connection_type=connection_type,
         edge_type=edge_type, page_info_type=page_info_type,
     )
+
+
+def connection_from_list(
+        data: Sequence, args: ConnectionArguments = None,
+        connection_type: Any = Connection,
+        edge_type: Any = Edge, pageinfo_type: Any = PageInfo) -> Connection:
+    """Deprecated alias for connection_from_array.
+
+    We're now using the JavaScript terminology in Python as well, since list
+    is too narrow a type and there is no other really appropriate type name.
+    """
+    warnings.warn(
+        "connection_from_list() has been deprecated."
+        " Please use connection_from_array() instead.",
+        DeprecationWarning, stacklevel=2)
+    return connection_from_array_slice(
+        data, args,
+        connection_type=connection_type,
+        edge_type=edge_type, page_info_type=pageinfo_type)
 
 
 def connection_from_array_slice(
@@ -114,6 +134,28 @@ def connection_from_array_slice(
             hasNextPage=isinstance(first, int) and end_offset < upper_bound
         )
     )
+
+
+def connection_from_list_slice(
+        list_slice: Sequence, args: ConnectionArguments = None,
+        connection_type: Any = Connection,
+        edge_type: Any = Edge, pageinfo_type: Any = PageInfo,
+        slice_start=0, list_length=0, list_slice_length=None) -> Connection:
+    """Deprecated alias for connection_from_array_slice.
+
+    We're now using the JavaScript terminology in Python as well, since list
+    is too narrow a type and there is no other really appropriate type name.
+    """
+    warnings.warn(
+        "connection_from_list_slice() has been deprecated."
+        " Please use connection_from_array_slice() instead.",
+        DeprecationWarning, stacklevel=2)
+    return connection_from_array_slice(
+        list_slice, args,
+        slice_start=slice_start, array_length=list_length,
+        array_slice_length=list_slice_length,
+        connection_type=connection_type,
+        edge_type=edge_type, page_info_type=pageinfo_type)
 
 
 PREFIX = 'arrayconnection:'
