@@ -54,13 +54,13 @@ returning those types.
 they return a connection type.
  - `connection_definitions` returns a `connection_type` and its associated
 `edgeType`, given a name and a node type.
- - `connection_from_list` is a helper method that takes an array and the
+ - `connection_from_list` is a helper method that takes a list and the
 arguments from `connection_args`, does pagination and filtering, and returns
 an object in the shape expected by a `connection_type`'s `resolver` function.
  - `connection_from_promised_list` is similar to `connection_from_list`, but
 it takes a promise that resolves to an array, and returns a promise that
 resolves to the expected shape by `connection_type`.
- - `cursor_for_object_in_connection` is a helper method that takes an array and a
+ - `cursor_for_object_in_connection` is a helper method that takes a list and a
 member object, and returns a cursor for use in the mutation payload.
 
 An example usage of these methods from the [test schema](tests/starwars/schema.py):
@@ -93,7 +93,7 @@ factionType = GraphQLObjectType(
 This shows adding a `ships` field to the `Faction` object that is a connection.
 It uses `connection_definitions({name: 'Ship', nodeType: shipType})` to create
 the connection type, adds `connection_args` as arguments on this function, and
-then implements the resolver function by passing the array of ships and the
+then implements the resolver function by passing the list of ships and the
 arguments to `connection_from_list`.
 
 ### Object Identification
@@ -107,7 +107,7 @@ this, it takes a function to resolve an ID to an object, and to determine
 the type of a given object.
  - `to_global_id` takes a type name and an ID specific to that type name,
 and returns a "global ID" that is unique among all types.
- - `from_global_id` takes the "global ID" created by `toGlobalID`, and returns
+ - `from_global_id` takes the "global ID" created by `to_global_id`, and returns
 the type name and ID used to create it.
  - `global_id_field` creates the configuration for an `id` field on a node.
  - `plural_identifying_root_field` creates a field that accepts a list of
