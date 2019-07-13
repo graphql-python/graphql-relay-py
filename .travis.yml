@@ -16,3 +16,12 @@ script:
 after_success:
   - pip install coveralls
   - coveralls
+
+deploy:
+  provider: pypi
+  user: mvanlonden
+  on:
+    tags: true
+  password:
+    secure: lUjQFe6E6UM91o3Zm9diNUK+6V9a/2vWd2bqRUlvDaWR1meqnxbBPlMEH2yw/uWoBs7/cDzDtsy/cPpJxpeBDNbjFxhk5S1ztXQxnnN0p7CKkzdh2XpPWlrg8KL3eYXWvLXtcMFBxe6H3hKwGx9hNpTUAZVpl3WWE5QrzJMeCHJWQpB1aAuuc1LEGpW2/oPYmGOJuYhqwsqE1bheJxGu1coKWwKmV5qwXBBsK6nIgY38q013V1UUGDJ1O5Whv1A6Bt+SLIiyVVr3ZnPW2PBpLzmltnejUV7+FSca+gzlX5iuuEN7Zk+QR+GdXMqJAOYObiVC0ZQ+MFXlA53pnGjDeAGnUTh+nh9kAy5eC8ELTPo3T3OOC7jXotKIerCgCpw7uvf218Cf5K7rR5ebF4geZhFEp77xiAZ4HpjT35EGBiK2zsL3+C6C/rev5xvChbewxpgTUIhjAcy9HOa7ZUMnGT05BxPgXupSjSBlgPnxrYZX5w4VBVsYmagimqWlvV/1indqIDMzphjcCtKW9LwmWW18kghoXR5gl155nHYabBjMku+FapHFS6x8KYsmil836hbwP0Kwb45S1lUGEoYjXSSofwOPi3V9UUUcSMB9NR11HjiqFl1fVZ/Z0esunUafEbdiQ7QDp6q8TuKq4+rRhj6//S3TdcmY0go/iMaKLEI=
+  distributions: "sdist bdist_wheel"
