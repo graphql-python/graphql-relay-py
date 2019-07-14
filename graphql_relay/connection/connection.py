@@ -21,7 +21,9 @@ connection_args = OrderedDict((
 ))
 
 
-def connection_definitions(name, node_type, resolve_node=None, resolve_cursor=None, edge_fields=None, connection_fields=None):
+def connection_definitions(
+        name, node_type, resolve_node=None, resolve_cursor=None,
+        edge_fields=None, connection_fields=None):
     edge_fields = edge_fields or OrderedDict()
     connection_fields = connection_fields or OrderedDict()
     edge_type = GraphQLObjectType(

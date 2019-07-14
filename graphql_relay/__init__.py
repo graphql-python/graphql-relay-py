@@ -21,7 +21,8 @@ __all__ = [
     # Helpers for creating connection types in the schema
     'connection_args', 'connection_definitions',
     # Helpers for creating connections from arrays
-    'connection_from_list', 'connection_from_promised_list', 'cursor_for_object_in_connection',
+    'connection_from_list', 'connection_from_promised_list',
+    'cursor_for_object_in_connection',
     # Helper for creating node definitions
     'node_definitions',
     # Utilities for creating global IDs in systems that don't have them

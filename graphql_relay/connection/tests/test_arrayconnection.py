@@ -1,5 +1,5 @@
 from promise import Promise
-from pytest import raises
+
 from ..arrayconnection import (
     connection_from_list,
     connection_from_list_slice,
@@ -266,10 +266,9 @@ def test_pagination_respects_longlast_before():
 
 
 def test_first_after_before_few():
-    c = connection_from_list(letters, dict(first=2,
-                            after='YXJyYXljb25uZWN0aW9uOjA=',
-                            before='YXJyYXljb25uZWN0aW9uOjQ=',
-                            ))
+    c = connection_from_list(letters, dict(
+        first=2, after='YXJyYXljb25uZWN0aW9uOjA=', before='YXJyYXljb25uZWN0aW9uOjQ=',
+    ))
     expected = {
         'edges': [
             {
@@ -292,10 +291,9 @@ def test_first_after_before_few():
 
 
 def test_first_after_before_many():
-    c = connection_from_list(letters, dict(first=4,
-                            after='YXJyYXljb25uZWN0aW9uOjA=',
-                            before='YXJyYXljb25uZWN0aW9uOjQ=',
-                            ))
+    c = connection_from_list(letters, dict(
+        first=4, after='YXJyYXljb25uZWN0aW9uOjA=', before='YXJyYXljb25uZWN0aW9uOjQ=',
+    ))
     expected = {
         'edges': [
             {
@@ -322,10 +320,9 @@ def test_first_after_before_many():
 
 
 def test_first_after_before_exact():
-    c = connection_from_list(letters, dict(first=3,
-                            after='YXJyYXljb25uZWN0aW9uOjA=',
-                            before='YXJyYXljb25uZWN0aW9uOjQ=',
-                            ))
+    c = connection_from_list(letters, dict(
+        first=3, after='YXJyYXljb25uZWN0aW9uOjA=', before='YXJyYXljb25uZWN0aW9uOjQ=',
+    ))
     expected = {
         'edges': [
             {
@@ -352,10 +349,9 @@ def test_first_after_before_exact():
 
 
 def test_last_after_before_few():
-    c = connection_from_list(letters, dict(last=2,
-                            after='YXJyYXljb25uZWN0aW9uOjA=',
-                            before='YXJyYXljb25uZWN0aW9uOjQ=',
-                            ))
+    c = connection_from_list(letters, dict(
+        last=2, after='YXJyYXljb25uZWN0aW9uOjA=', before='YXJyYXljb25uZWN0aW9uOjQ=',
+    ))
     expected = {
         'edges': [
             {
@@ -378,10 +374,9 @@ def test_last_after_before_few():
 
 
 def test_last_after_before_many():
-    c = connection_from_list(letters, dict(last=4,
-                            after='YXJyYXljb25uZWN0aW9uOjA=',
-                            before='YXJyYXljb25uZWN0aW9uOjQ=',
-                            ))
+    c = connection_from_list(letters, dict(
+        last=4, after='YXJyYXljb25uZWN0aW9uOjA=', before='YXJyYXljb25uZWN0aW9uOjQ=',
+    ))
     expected = {
         'edges': [
             {
@@ -408,10 +403,9 @@ def test_last_after_before_many():
 
 
 def test_last_after_before_exact():
-    c = connection_from_list(letters, dict(last=3,
-                            after='YXJyYXljb25uZWN0aW9uOjA=',
-                            before='YXJyYXljb25uZWN0aW9uOjQ=',
-                            ))
+    c = connection_from_list(letters, dict(
+        last=3, after='YXJyYXljb25uZWN0aW9uOjA=', before='YXJyYXljb25uZWN0aW9uOjQ=',
+    ))
     expected = {
         'edges': [
             {
@@ -489,8 +483,8 @@ def test_all_elements_invalid_cursors():
 
 def test_all_elements_cursor_outside():
     c = connection_from_list(letters, dict(
-                            before='YXJyYXljb25uZWN0aW9uOjYK',
-                            after='YXJyYXljb25uZWN0aW9uOi0xCg=='))
+        before='YXJyYXljb25uZWN0aW9uOjYK', after='YXJyYXljb25uZWN0aW9uOi0xCg=='
+    ))
     expected = {
         'edges': [
             {
@@ -526,8 +520,8 @@ def test_all_elements_cursor_outside():
 
 def test_no_elements_cursors_cross():
     c = connection_from_list(letters, dict(
-                            before='YXJyYXljb25uZWN0aW9uOjI=',
-                            after='YXJyYXljb25uZWN0aW9uOjQ='))
+        before='YXJyYXljb25uZWN0aW9uOjI=', after='YXJyYXljb25uZWN0aW9uOjQ='
+    ))
     expected = {
         'edges': [
         ],
@@ -542,13 +536,13 @@ def test_no_elements_cursors_cross():
 
 
 def test_cursor_for_object_in_connection_member_object():
-    letterBCursor = cursor_for_object_in_connection(letters, 'B')
-    assert letterBCursor == 'YXJyYXljb25uZWN0aW9uOjE='
+    letter_b_cursor = cursor_for_object_in_connection(letters, 'B')
+    assert letter_b_cursor == 'YXJyYXljb25uZWN0aW9uOjE='
 
 
 def test_cursor_for_object_in_connection_non_member_object():
-    letterBCursor = cursor_for_object_in_connection(letters, 'F')
-    assert letterBCursor is None
+    letter_b_cursor = cursor_for_object_in_connection(letters, 'F')
+    assert letter_b_cursor is None
 
 
 def test_promised_list_returns_all_elements_without_filters():
