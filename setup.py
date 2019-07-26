@@ -28,7 +28,7 @@ setup(
         'Programming Language :: Python :: 3.7',
         'Programming Language :: Python :: Implementation :: PyPy',
     ],
-    install_requires=['graphql-core-next>=1.0.5'],
+    install_requires=['graphql-core>=3.0.0a0'],
     python_requires='>=3.6,<4',
     packages=find_packages('src'),
     package_dir={'': 'src'},
