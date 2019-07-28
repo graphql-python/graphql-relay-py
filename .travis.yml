@@ -25,6 +25,7 @@ after_success:
 deploy:
   provider: pypi
   username: "mvanlonden"
+  skip_existing: true
   on:
     tags: true
     branch: next
