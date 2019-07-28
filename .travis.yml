@@ -24,6 +24,7 @@ after_success:
   - codecov
 deploy:
   provider: pypi
+  username: "mvanlonden"
   on:
     tags: true
     branch: next
