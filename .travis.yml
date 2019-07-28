@@ -24,9 +24,6 @@ after_success:
   - codecov
 deploy:
   provider: pypi
-  user: mvanlonden
   on:
     tags: true
     branch: next
-  password:
-    secure: x8SEE82kg36BOmPjTA/3W49OgPYip/n5UqNFvsEtBBZo90lerTrw4/0WsrOo8xMqCL0NGxpzCsWu/GyRW4FBHfcQmpzz5Itn4HYFduGHAYpfPDir54lG06/dD7r90w8Kn1q943C8zzYLWGEYw5WPE5YhBwmrrmnso6PpNzhRzYtl7Gzcekw4sxEaQZguRnh/YjrtkAz0pxR6SvI47HbeTdjxPL2vWqmGwkuGBotZE1wpEtPNyNreRPRgBgk2WLaeraicywIPW+44bJUgs6xE7stNC6ozO3U3IwXxN7Z8jGPP++2gfkQs7lrgDVBeV0YQt3va7yT9B+v+kLWbv2hmRXxONarG+RhHoEeWTfpkNTgvtKEsrDbjobMB4ZIQCQbHp10ilEEsPXv7mzYEYlCl8m+VjodeIKPZvkPgEHwKtD+o9QNUv/6s5q/PlxF+Y13UzjPgShe11EtjdO+BlMjYqBDYc7eLLv6flvGOIZMQ4McpNbc224KspZJXad3EikmilWja0cziJtEiOizqhToizmizcaGRuo2Pnza6tou8UXvcaiSBacmLT/VzvkNq1oG9KbZsByInz0yj3//tYx/oUE7PQk6FeWZHDYr/1YseXMNRwUI9hbYUlxRRdQXbzgPxWTi5hjGNbrGsa/GVBMjZkOofIBC7Qz8yYmGpnpHjLxQ=
