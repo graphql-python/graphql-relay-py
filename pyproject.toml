@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "graphql-relay"
-version = "3.0.0a0"
+version = "3.0.0a1"
 description = """
 Relay library for graphql-core-next"""
 licese="MIT"
@@ -28,7 +28,7 @@ packages = [
 
 [tool.poetry.dependencies]
 python = "^3.6"
-graphql-core-next = "^1.0.5"
+graphql-core = "^3.0.0a0"
 
 [tool.poetry.dev-dependencies]
 pytest = "^5"
@@ -38,9 +38,10 @@ pytest-describe = ">=0.12"
 pyyaml = "^5.1"
 black = ">=19.3b0"
 flake8 = "^3.7"
-mypy = ">=0.711"
+mypy = ">=0.720"
 codecov = "^2"
 check-manifest = ">=0.39"
+bump2version = ">=0.5"
 tox = "^3.13"
 
 [tool.black]
