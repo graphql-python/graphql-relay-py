@@ -7,7 +7,7 @@ from .star_wars_schema import StarWarsSchema
 
 @mark.asyncio
 async def test_correct_fetch_first_ship_rebels():
-    query = '''
+    query = """
     query RebelsShipsQuery {
       rebels {
         name,
@@ -20,19 +20,11 @@ async def test_correct_fetch_first_ship_rebels():
         }
       }
     }
-    '''
+    """
     expected = {
-        'rebels': {
-            'name': 'Alliance to Restore the Republic',
-            'ships': {
-                'edges': [
-                    {
-                        'node': {
-                            'name': 'X-Wing'
-                        }
-                    }
-                ]
-            }
+        "rebels": {
+            "name": "Alliance to Restore the Republic",
+            "ships": {"edges": [{"node": {"name": "X-Wing"}}]},
         }
     }
     result = await graphql(StarWarsSchema, query)

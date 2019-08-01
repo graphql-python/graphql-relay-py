@@ -7,19 +7,16 @@ from .star_wars_schema import StarWarsSchema
 
 @mark.asyncio
 async def test_correctly_fetches_id_name_rebels():
-    query = '''
+    query = """
       query RebelsQuery {
         rebels {
           id
           name
         }
       }
-    '''
+    """
     expected = {
-        'rebels': {
-            'id': 'RmFjdGlvbjox',
-            'name': 'Alliance to Restore the Republic'
-        }
+        "rebels": {"id": "RmFjdGlvbjox", "name": "Alliance to Restore the Republic"}
     }
     result = await graphql(StarWarsSchema, query)
     assert result == (expected, None)
@@ -27,7 +24,7 @@ async def test_correctly_fetches_id_name_rebels():
 
 @mark.asyncio
 async def test_correctly_refetches_rebels():
-    query = '''
+    query = """
       query RebelsRefetchQuery {
         node(id: "RmFjdGlvbjox") {
           id
@@ -36,12 +33,9 @@ async def test_correctly_refetches_rebels():
           }
         }
       }
-    '''
+    """
     expected = {
-        'node': {
-            'id': 'RmFjdGlvbjox',
-            'name': 'Alliance to Restore the Republic'
-        }
+        "node": {"id": "RmFjdGlvbjox", "name": "Alliance to Restore the Republic"}
     }
     result = await graphql(StarWarsSchema, query)
     assert result == (expected, None)
@@ -49,27 +43,22 @@ async def test_correctly_refetches_rebels():
 
 @mark.asyncio
 async def test_correctly_fetches_id_name_empire():
-    query = '''
+    query = """
       query EmpireQuery {
         empire {
           id
           name
         }
       }
-    '''
-    expected = {
-        'empire': {
-            'id': 'RmFjdGlvbjoy',
-            'name': 'Galactic Empire'
-        }
-    }
+    """
+    expected = {"empire": {"id": "RmFjdGlvbjoy", "name": "Galactic Empire"}}
     result = await graphql(StarWarsSchema, query)
     assert result == (expected, None)
 
 
 @mark.asyncio
 async def test_correctly_refetches_empire():
-    query = '''
+    query = """
       query EmpireRefetchQuery {
         node(id: "RmFjdGlvbjoy") {
           id
@@ -78,20 +67,15 @@ async def test_correctly_refetches_empire():
           }
         }
       }
-    '''
-    expected = {
-        'node': {
-            'id': 'RmFjdGlvbjoy',
-            'name': 'Galactic Empire'
-        }
-    }
+    """
+    expected = {"node": {"id": "RmFjdGlvbjoy", "name": "Galactic Empire"}}
     result = await graphql(StarWarsSchema, query)
     assert result == (expected, None)
 
 
 @mark.asyncio
 async def test_correctly_refetches_xwing():
-    query = '''
+    query = """
       query XWingRefetchQuery {
         node(id: "U2hpcDox") {
           id
@@ -100,12 +84,7 @@ async def test_correctly_refetches_xwing():
           }
         }
       }
-    '''
-    expected = {
-        'node': {
-            'id': 'U2hpcDox',
-            'name': 'X-Wing'
-        }
-    }
+    """
+    expected = {"node": {"id": "U2hpcDox", "name": "X-Wing"}}
     result = await graphql(StarWarsSchema, query)
     assert result == (expected, None)

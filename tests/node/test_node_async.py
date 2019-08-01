@@ -9,7 +9,8 @@ from graphql.type import (
     GraphQLNonNull,
     GraphQLObjectType,
     GraphQLSchema,
-    GraphQLString)
+    GraphQLString,
+)
 
 from graphql_relay import node_definitions
 
@@ -19,58 +20,44 @@ class User(NamedTuple):
     name: str
 
 
-user_data = {
-    '1': User(id='1', name='John Doe'),
-    '2': User(id='2', name='Jane Smith'),
-}
+user_data = {"1": User(id="1", name="John Doe"), "2": User(id="2", name="Jane Smith")}
 
 user_type: GraphQLObjectType
 
 node_interface, node_field = node_definitions(
-    lambda id_, _info: user_data[id_], lambda _obj, _info, _type: user_type)[:2]
+    lambda id_, _info: user_data[id_], lambda _obj, _info, _type: user_type
+)[:2]
 
 
 user_type = GraphQLObjectType(
-    'User', lambda: {
-        'id': GraphQLField(GraphQLNonNull(GraphQLID)),
-        'name': GraphQLField(GraphQLString),
+    "User",
+    lambda: {
+        "id": GraphQLField(GraphQLNonNull(GraphQLID)),
+        "name": GraphQLField(GraphQLString),
     },
-    interfaces=[node_interface]
+    interfaces=[node_interface],
 )
 
-query_type = GraphQLObjectType(
-    'Query', lambda: {
-        'node': node_field
-    }
-)
+query_type = GraphQLObjectType("Query", lambda: {"node": node_field})
 
-schema = GraphQLSchema(
-    query=query_type,
-    types=[user_type]
-)
+schema = GraphQLSchema(query=query_type, types=[user_type])
 
 
 def describe_node_interface_and_fields_with_async_object_fetcher():
-
     @mark.asyncio
     async def gets_the_correct_id_for_users():
-        query = '''
+        query = """
           {
             node(id: "1") {
               id
             }
           }
-        '''
-        assert await graphql(schema, query) == (
-            {
-                'node': {'id': '1'}
-            },
-            None
-        )
+        """
+        assert await graphql(schema, query) == ({"node": {"id": "1"}}, None)
 
     @mark.asyncio
     async def gets_the_correct_name_for_users():
-        query = '''
+        query = """
           {
             node(id: "1") {
               id
@@ -79,10 +66,8 @@ def describe_node_interface_and_fields_with_async_object_fetcher():
               }
             }
           }
-        '''
+        """
         assert await graphql(schema, query) == (
-            {
-                'node': {'id': '1', 'name': 'John Doe'}
-            },
-            None
+            {"node": {"id": "1", "name": "John Doe"}},
+            None,
         )

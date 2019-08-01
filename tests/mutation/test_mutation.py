@@ -6,7 +6,8 @@ from graphql.type import (
     GraphQLInputField,
     GraphQLInt,
     GraphQLObjectType,
-    GraphQLSchema)
+    GraphQLSchema,
+)
 
 from graphql_relay import mutation_with_client_mutation_id
 
@@ -20,44 +21,34 @@ class Result:
 
 
 simple_mutation = mutation_with_client_mutation_id(
-    'SimpleMutation',
+    "SimpleMutation",
     input_fields={},
-    output_fields={
-        'result': GraphQLField(GraphQLInt)
-    },
-    mutate_and_get_payload=lambda _info, **_input: Result(1)
+    output_fields={"result": GraphQLField(GraphQLInt)},
+    mutate_and_get_payload=lambda _info, **_input: Result(1),
 )
 
 simple_mutation_with_description = mutation_with_client_mutation_id(
-    'SimpleMutationWithDescription',
-    description='Simple Mutation Description',
+    "SimpleMutationWithDescription",
+    description="Simple Mutation Description",
     input_fields={},
-    output_fields={
-        'result': GraphQLField(GraphQLInt)
-    },
-    mutate_and_get_payload=lambda _info, **_input: Result(1)
+    output_fields={"result": GraphQLField(GraphQLInt)},
+    mutate_and_get_payload=lambda _info, **_input: Result(1),
 )
 
 simple_mutation_with_deprecation_reason = mutation_with_client_mutation_id(
-    'SimpleMutationWithDeprecationReason',
+    "SimpleMutationWithDeprecationReason",
     input_fields={},
-    output_fields={
-        'result': GraphQLField(GraphQLInt)
-    },
+    output_fields={"result": GraphQLField(GraphQLInt)},
     mutate_and_get_payload=lambda _info, **_input: Result(1),
-    deprecation_reason='Just because'
+    deprecation_reason="Just because",
 )
 
 # noinspection PyPep8Naming
 simple_mutation_with_thunk_fields = mutation_with_client_mutation_id(
-    'SimpleMutationWithThunkFields',
-    input_fields=lambda: {
-        'inputData': GraphQLInputField(GraphQLInt)
-    },
-    output_fields=lambda: {
-        'result': GraphQLField(GraphQLInt)
-    },
-    mutate_and_get_payload=lambda _info, inputData, **_input: Result(inputData)
+    "SimpleMutationWithThunkFields",
+    input_fields=lambda: {"inputData": GraphQLInputField(GraphQLInt)},
+    output_fields=lambda: {"result": GraphQLField(GraphQLInt)},
+    mutate_and_get_payload=lambda _info, inputData, **_input: Result(inputData),
 )
 
 
@@ -65,94 +56,80 @@ simple_mutation_with_thunk_fields = mutation_with_client_mutation_id(
 async def mutate_and_get_one_as_payload_async(_info, **_input):
     return Result(1)
 
+
 simple_async_mutation = mutation_with_client_mutation_id(
-    'SimpleAsyncMutation',
+    "SimpleAsyncMutation",
     input_fields={},
-    output_fields={
-        'result': GraphQLField(GraphQLInt)
-    },
-    mutate_and_get_payload=mutate_and_get_one_as_payload_async
+    output_fields={"result": GraphQLField(GraphQLInt)},
+    mutate_and_get_payload=mutate_and_get_one_as_payload_async,
 )
 
 simple_root_value_mutation = mutation_with_client_mutation_id(
-    'SimpleRootValueMutation',
+    "SimpleRootValueMutation",
     input_fields={},
-    output_fields={
-        'result': GraphQLField(GraphQLInt)
-    },
-    mutate_and_get_payload=lambda info, **_input: info.root_value
+    output_fields={"result": GraphQLField(GraphQLInt)},
+    mutate_and_get_payload=lambda info, **_input: info.root_value,
 )
 
 query_type: GraphQLObjectType = GraphQLObjectType(
-    'Query', lambda: {
-        'query': GraphQLField(query_type)
-    }
+    "Query", lambda: {"query": GraphQLField(query_type)}
 )
 
 mutation_type = GraphQLObjectType(
-    'Mutation',
+    "Mutation",
     fields={
-        'simpleMutation': simple_mutation,
-        'simpleMutationWithDescription': simple_mutation_with_description,
-        'simpleMutationWithDeprecationReason': simple_mutation_with_deprecation_reason,
-        'simpleMutationWithThunkFields': simple_mutation_with_thunk_fields,
-        'simpleAsyncMutation': simple_async_mutation,
-        'simpleRootValueMutation': simple_root_value_mutation
-    }
+        "simpleMutation": simple_mutation,
+        "simpleMutationWithDescription": simple_mutation_with_description,
+        "simpleMutationWithDeprecationReason": simple_mutation_with_deprecation_reason,
+        "simpleMutationWithThunkFields": simple_mutation_with_thunk_fields,
+        "simpleAsyncMutation": simple_async_mutation,
+        "simpleRootValueMutation": simple_root_value_mutation,
+    },
 )
 
-schema = GraphQLSchema(
-    query=query_type,
-    mutation=mutation_type
-)
+schema = GraphQLSchema(query=query_type, mutation=mutation_type)
 
 
 def describe_mutation_with_client_mutation_id():
-
     @mark.asyncio
     async def requires_an_argument():
-        query = '''
+        query = """
           mutation M {
             simpleMutation {
               result
             }
           }
-        '''
+        """
         assert await graphql(schema, query) == (
-            None, [
+            None,
+            [
                 {
-                    'message':
-                        "Field 'simpleMutation' argument 'input'"
-                        " of type 'SimpleMutationInput!' is required,"
-                        " but it was not provided.",
-                    'locations': [(3, 13)]
+                    "message": "Field 'simpleMutation' argument 'input'"
+                    " of type 'SimpleMutationInput!' is required,"
+                    " but it was not provided.",
+                    "locations": [(3, 13)],
                 }
-            ]
+            ],
         )
 
     @mark.asyncio
     async def returns_the_same_client_mutation_id():
-        query = '''
+        query = """
           mutation M {
             simpleMutation(input: {clientMutationId: "abc"}) {
               result
               clientMutationId
             }
           }
-        '''
+        """
         assert await graphql(schema, query) == (
-            {
-                'simpleMutation': {
-                    'result': 1,
-                    'clientMutationId': 'abc'
-                }
-            },
-            None
+            {"simpleMutation": {"result": 1, "clientMutationId": "abc"}},
+            None,
         )
 
     @mark.asyncio
     async def supports_thunks_as_input_and_output_fields():
-        query = '''
+        query = """
           mutation M {
             simpleMutationWithThunkFields(
                 input: {inputData: 1234, clientMutationId: "abc"}) {
@@ -160,62 +137,51 @@ def describe_mutation_with_client_mutation_id():
               clientMutationId
             }
           }
-        '''
+        """
         assert await graphql(schema, query) == (
             {
-                'simpleMutationWithThunkFields': {
-                    'result': 1234,
-                    'clientMutationId': 'abc'
+                "simpleMutationWithThunkFields": {
+                    "result": 1234,
+                    "clientMutationId": "abc",
                 }
             },
-            None
+            None,
         )
 
     @mark.asyncio
     async def supports_async_mutations():
-        query = '''
+        query = """
           mutation M {
             simpleAsyncMutation(input: {clientMutationId: "abc"}) {
               result
               clientMutationId
             }
           }
-        '''
+        """
         assert await graphql(schema, query) == (
-            {
-                'simpleAsyncMutation': {
-                    'result': 1,
-                    'clientMutationId': 'abc'
-                }
-            },
-            None
+            {"simpleAsyncMutation": {"result": 1, "clientMutationId": "abc"}},
+            None,
         )
 
     @mark.asyncio
     async def can_access_root_value():
-        query = '''
+        query = """
           mutation M {
             simpleRootValueMutation(input: {clientMutationId: "abc"}) {
               result
               clientMutationId
             }
           }
-        '''
+        """
         assert await graphql(schema, query, root_value=Result(1)) == (
-            {
-                'simpleRootValueMutation': {
-                    'result': 1,
-                    'clientMutationId': 'abc'
-                }
-            },
-            None
+            {"simpleRootValueMutation": {"result": 1, "clientMutationId": "abc"}},
+            None,
         )
 
     def describe_introspection():
-
         @mark.asyncio
         async def contains_correct_input():
-            query = '''
+            query = """
               {
                 __type(name: "SimpleMutationInput") {
                   name
@@ -229,29 +195,26 @@ def describe_mutation_with_client_mutation_id():
                   }
                 }
               }
-            '''
+            """
             assert await graphql(schema, query) == (
                 {
-                    '__type': {
-                        'name': 'SimpleMutationInput',
-                        'kind': 'INPUT_OBJECT',
-                        'inputFields': [
+                    "__type": {
+                        "name": "SimpleMutationInput",
+                        "kind": "INPUT_OBJECT",
+                        "inputFields": [
                             {
-                                'name': 'clientMutationId',
-                                'type': {
-                                    'name': None,
-                                    'kind': 'NON_NULL',
-                                }
+                                "name": "clientMutationId",
+                                "type": {"name": None, "kind": "NON_NULL"},
                             }
-                        ]
+                        ],
                     }
                 },
-                None
+                None,
             )
 
         @mark.asyncio
         async def contains_correct_payload():
-            query = '''
+            query = """
               {
                 __type(name: "SimpleMutationPayload") {
                   name
@@ -265,36 +228,30 @@ def describe_mutation_with_client_mutation_id():
                   }
                 }
               }
-            '''
+            """
             assert await graphql(schema, query) == (
                 {
-                    '__type': {
-                        'name': 'SimpleMutationPayload',
-                        'kind': 'OBJECT',
-                        'fields': [
+                    "__type": {
+                        "name": "SimpleMutationPayload",
+                        "kind": "OBJECT",
+                        "fields": [
                             {
-                                'name': 'result',
-                                'type': {
-                                    'name': 'Int',
-                                    'kind': 'SCALAR',
-                                }
+                                "name": "result",
+                                "type": {"name": "Int", "kind": "SCALAR"},
                             },
                             {
-                                'name': 'clientMutationId',
-                                'type': {
-                                    'name': None,
-                                    'kind': 'NON_NULL',
-                                }
+                                "name": "clientMutationId",
+                                "type": {"name": None, "kind": "NON_NULL"},
                             },
-                        ]
+                        ],
                     }
                 },
-                None
+                None,
             )
 
         @mark.asyncio
         async def contains_correct_field():
-            query = '''
+            query = """
               {
                 __schema {
                   mutationType {
@@ -319,125 +276,124 @@ def describe_mutation_with_client_mutation_id():
                   }
                 }
               }
-            '''
+            """
             assert await graphql(schema, query) == (
                 {
-                    '__schema': {
-                        'mutationType': {
-                            'fields': [
+                    "__schema": {
+                        "mutationType": {
+                            "fields": [
                                 {
-                                    'name': 'simpleMutation',
-                                    'args': [
+                                    "name": "simpleMutation",
+                                    "args": [
                                         {
-                                            'name': 'input',
-                                            'type': {
-                                                'name': None,
-                                                'kind': 'NON_NULL',
-                                                'ofType': {
-                                                    'name': 'SimpleMutationInput',
-                                                    'kind': 'INPUT_OBJECT'
-                                                }
+                                            "name": "input",
+                                            "type": {
+                                                "name": None,
+                                                "kind": "NON_NULL",
+                                                "ofType": {
+                                                    "name": "SimpleMutationInput",
+                                                    "kind": "INPUT_OBJECT",
+                                                },
                                             },
                                         }
                                     ],
-                                    'type': {
-                                        'name': 'SimpleMutationPayload',
-                                        'kind': 'OBJECT',
-                                    }
-                                },
-                                {
-                                    'name': 'simpleMutationWithDescription',
-                                    'args': [
-                                        {
-                                            'name': 'input',
-                                            'type': {
-                                                'name': None,
-                                                'kind': 'NON_NULL',
-                                                'ofType': {
-                                                    'name': 'SimpleMutation'
-                                                        'WithDescriptionInput',
-                                                    'kind': 'INPUT_OBJECT',
-                                                },
-                                            },
-                                        },
-                                    ],
-                                    'type': {
-                                        'name': 'SimpleMutationWithDescriptionPayload',
-                                        'kind': 'OBJECT',
+                                    "type": {
+                                        "name": "SimpleMutationPayload",
+                                        "kind": "OBJECT",
                                     },
                                 },
                                 {
-                                    'name': 'simpleMutationWithThunkFields',
-                                    'args': [
+                                    "name": "simpleMutationWithDescription",
+                                    "args": [
                                         {
-                                            'name': 'input',
-                                            'type': {
-                                                'name': None,
-                                                'kind': 'NON_NULL',
-                                                'ofType': {
-                                                    'name': 'SimpleMutation'
-                                                        'WithThunkFieldsInput',
-                                                    'kind': 'INPUT_OBJECT'
-                                                }
+                                            "name": "input",
+                                            "type": {
+                                                "name": None,
+                                                "kind": "NON_NULL",
+                                                "ofType": {
+                                                    "name": "SimpleMutation"
+                                                    "WithDescriptionInput",
+                                                    "kind": "INPUT_OBJECT",
+                                                },
                                             },
                                         }
                                     ],
-                                    'type': {
-                                        'name': 'SimpleMutationWithThunkFieldsPayload',
-                                        'kind': 'OBJECT',
-                                    }
+                                    "type": {
+                                        "name": "SimpleMutationWithDescriptionPayload",
+                                        "kind": "OBJECT",
+                                    },
                                 },
                                 {
-                                    'name': 'simpleAsyncMutation',
-                                    'args': [
+                                    "name": "simpleMutationWithThunkFields",
+                                    "args": [
                                         {
-                                            'name': 'input',
-                                            'type': {
-                                                'name': None,
-                                                'kind': 'NON_NULL',
-                                                'ofType': {
-                                                    'name': 'SimpleAsyncMutationInput',
-                                                    'kind': 'INPUT_OBJECT'
-                                                }
+                                            "name": "input",
+                                            "type": {
+                                                "name": None,
+                                                "kind": "NON_NULL",
+                                                "ofType": {
+                                                    "name": "SimpleMutation"
+                                                    "WithThunkFieldsInput",
+                                                    "kind": "INPUT_OBJECT",
+                                                },
                                             },
                                         }
                                     ],
-                                    'type': {
-                                        'name': 'SimpleAsyncMutationPayload',
-                                        'kind': 'OBJECT',
-                                    }
+                                    "type": {
+                                        "name": "SimpleMutationWithThunkFieldsPayload",
+                                        "kind": "OBJECT",
+                                    },
                                 },
                                 {
-                                    'name': 'simpleRootValueMutation',
-                                    'args': [
+                                    "name": "simpleAsyncMutation",
+                                    "args": [
                                         {
-                                            'name': 'input',
-                                            'type': {
-                                                'name': None,
-                                                'kind': 'NON_NULL',
-                                                'ofType': {
-                                                    'name':
-                                                        'SimpleRootValueMutationInput',
-                                                    'kind': 'INPUT_OBJECT'
-                                                }
+                                            "name": "input",
+                                            "type": {
+                                                "name": None,
+                                                "kind": "NON_NULL",
+                                                "ofType": {
+                                                    "name": "SimpleAsyncMutationInput",
+                                                    "kind": "INPUT_OBJECT",
+                                                },
                                             },
                                         }
                                     ],
-                                    'type': {
-                                        'name': 'SimpleRootValueMutationPayload',
-                                        'kind': 'OBJECT',
-                                    }
+                                    "type": {
+                                        "name": "SimpleAsyncMutationPayload",
+                                        "kind": "OBJECT",
+                                    },
+                                },
+                                {
+                                    "name": "simpleRootValueMutation",
+                                    "args": [
+                                        {
+                                            "name": "input",
+                                            "type": {
+                                                "name": None,
+                                                "kind": "NON_NULL",
+                                                "ofType": {
+                                                    "name": "SimpleRootValueMutationInput",  # noqa: E501
+                                                    "kind": "INPUT_OBJECT",
+                                                },
+                                            },
+                                        }
+                                    ],
+                                    "type": {
+                                        "name": "SimpleRootValueMutationPayload",
+                                        "kind": "OBJECT",
+                                    },
                                 },
                             ]
                         }
                     }
                 },
-                None
+                None,
             )
 
         @mark.asyncio
         async def contains_correct_descriptions():
-            query = '''
+            query = """
               {
                 __schema {
                   mutationType {
@@ -448,42 +404,36 @@ def describe_mutation_with_client_mutation_id():
                   }
                 }
               }
-            '''
+            """
             assert await graphql(schema, query) == (
                 {
-                    '__schema': {
-                        'mutationType': {
-                            'fields': [
+                    "__schema": {
+                        "mutationType": {
+                            "fields": [
+                                {"name": "simpleMutation", "description": None},
                                 {
-                                    'name': 'simpleMutation',
-                                    'description': None,
+                                    "name": "simpleMutationWithDescription",
+                                    "description": "Simple Mutation Description",
                                 },
                                 {
-                                    'name': 'simpleMutationWithDescription',
-                                    'description': 'Simple Mutation Description',
+                                    "name": "simpleMutationWithThunkFields",
+                                    "description": None,
                                 },
+                                {"name": "simpleAsyncMutation", "description": None},
                                 {
-                                    'name': 'simpleMutationWithThunkFields',
-                                    'description': None,
-                                },
-                                {
-                                    'name': 'simpleAsyncMutation',
-                                    'description': None,
-                                },
-                                {
-                                    'name': 'simpleRootValueMutation',
-                                    'description': None,
+                                    "name": "simpleRootValueMutation",
+                                    "description": None,
                                 },
                             ]
                         }
                     }
                 },
-                None
+                None,
             )
 
         @mark.asyncio
         async def contains_correct_deprecation_reason():
-            query = '''
+            query = """
               {
                 __schema {
                   mutationType {
@@ -495,45 +445,45 @@ def describe_mutation_with_client_mutation_id():
                   }
                 }
               }
-            '''
+            """
             assert await graphql(schema, query) == (
                 {
-                    '__schema': {
-                        'mutationType': {
-                            'fields': [
+                    "__schema": {
+                        "mutationType": {
+                            "fields": [
                                 {
-                                    'name': 'simpleMutation',
-                                    'isDeprecated': False,
-                                    'deprecationReason': None,
+                                    "name": "simpleMutation",
+                                    "isDeprecated": False,
+                                    "deprecationReason": None,
                                 },
                                 {
-                                    'name': 'simpleMutationWithDescription',
-                                    'isDeprecated': False,
-                                    'deprecationReason': None,
+                                    "name": "simpleMutationWithDescription",
+                                    "isDeprecated": False,
+                                    "deprecationReason": None,
                                 },
                                 {
-                                    'name': 'simpleMutationWithDeprecationReason',
-                                    'isDeprecated': True,
-                                    'deprecationReason': 'Just because',
+                                    "name": "simpleMutationWithDeprecationReason",
+                                    "isDeprecated": True,
+                                    "deprecationReason": "Just because",
                                 },
                                 {
-                                    'name': 'simpleMutationWithThunkFields',
-                                    'isDeprecated': False,
-                                    'deprecationReason': None,
+                                    "name": "simpleMutationWithThunkFields",
+                                    "isDeprecated": False,
+                                    "deprecationReason": None,
                                 },
                                 {
-                                    'name': 'simpleAsyncMutation',
-                                    'isDeprecated': False,
-                                    'deprecationReason': None,
+                                    "name": "simpleAsyncMutation",
+                                    "isDeprecated": False,
+                                    "deprecationReason": None,
                                 },
                                 {
-                                    'name': 'simpleRootValueMutation',
-                                    'isDeprecated': False,
-                                    'deprecationReason': None,
+                                    "name": "simpleRootValueMutation",
+                                    "isDeprecated": False,
+                                    "deprecationReason": None,
                                 },
                             ]
                         }
                     }
                 },
-                None
+                None,
             )

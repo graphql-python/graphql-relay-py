@@ -7,96 +7,63 @@ JSON objects in a more complex demo.
 
 from collections import namedtuple
 
-Ship = namedtuple('Ship', ['id', 'name'])
-Faction = namedtuple('Faction', ['id', 'name', 'ships'])
+Ship = namedtuple("Ship", ["id", "name"])
+Faction = namedtuple("Faction", ["id", "name", "ships"])
 
-xwing = Ship(
-    id='1',
-    name='X-Wing',
-)
+xwing = Ship(id="1", name="X-Wing")
 
-ywing = Ship(
-    id='2',
-    name='Y-Wing',
-)
+ywing = Ship(id="2", name="Y-Wing")
 
-awing = Ship(
-    id='3',
-    name='A-Wing',
-)
+awing = Ship(id="3", name="A-Wing")
 
 # Yeah, technically it's Corellian. But it flew in the service of the rebels,
 # so for the purposes of this demo it's a rebel ship.
-falcon = Ship(
-    id='4',
-    name='Millenium Falcon',
-)
+falcon = Ship(id="4", name="Millenium Falcon")
 
-homeOne = Ship(
-    id='5',
-    name='Home One',
-)
+homeOne = Ship(id="5", name="Home One")
 
-tieFighter = Ship(
-    id='6',
-    name='TIE Fighter',
-)
+tieFighter = Ship(id="6", name="TIE Fighter")
 
-tieInterceptor = Ship(
-    id='7',
-    name='TIE Interceptor',
-)
+tieInterceptor = Ship(id="7", name="TIE Interceptor")
 
-executor = Ship(
-    id='8',
-    name='Executor',
-)
+executor = Ship(id="8", name="Executor")
 
 rebels = Faction(
-    id='1',
-    name='Alliance to Restore the Republic',
-    ships=['1', '2', '3', '4', '5']
+    id="1", name="Alliance to Restore the Republic", ships=["1", "2", "3", "4", "5"]
 )
 
-empire = Faction(
-    id='2',
-    name='Galactic Empire',
-    ships=['6', '7', '8']
-)
+empire = Faction(id="2", name="Galactic Empire", ships=["6", "7", "8"])
 
 data = {
-    'Faction': {
-        '1': rebels,
-        '2': empire
+    "Faction": {"1": rebels, "2": empire},
+    "Ship": {
+        "1": xwing,
+        "2": ywing,
+        "3": awing,
+        "4": falcon,
+        "5": homeOne,
+        "6": tieFighter,
+        "7": tieInterceptor,
+        "8": executor,
     },
-    'Ship': {
-        '1': xwing,
-        '2': ywing,
-        '3': awing,
-        '4': falcon,
-        '5': homeOne,
-        '6': tieFighter,
-        '7': tieInterceptor,
-        '8': executor
-    }
 }
 
 
 # noinspection PyPep8Naming
 def createShip(shipName, factionId):
-    nextShip = len(data['Ship']) + 1
+    nextShip = len(data["Ship"]) + 1
     newShip = Ship(id=str(nextShip), name=shipName)
-    data['Ship'][newShip.id] = newShip
-    data['Faction'][factionId].ships.append(newShip.id)
+    data["Ship"][newShip.id] = newShip
+    data["Faction"][factionId].ships.append(newShip.id)
     return newShip
 
 
 def getShip(id_):
-    return data['Ship'][id_]
+    return data["Ship"][id_]
 
 
 def getFaction(id_):
-    return data['Faction'][id_]
+    return data["Faction"][id_]
 
 
 def getRebels():

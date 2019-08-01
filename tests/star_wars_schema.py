@@ -5,24 +5,13 @@ from graphql.type import (
     GraphQLInputField,
     GraphQLSchema,
     GraphQLString,
-    GraphQLField
+    GraphQLField,
 )
 
-from graphql_relay.node.node import (
-    node_definitions,
-    global_id_field,
-    from_global_id
-)
-from graphql_relay.connection.arrayconnection import (
-    connection_from_array
-)
-from graphql_relay.connection.connection import (
-    connection_args,
-    connection_definitions
-)
-from graphql_relay.mutation.mutation import (
-    mutation_with_client_mutation_id
-)
+from graphql_relay.node.node import node_definitions, global_id_field, from_global_id
+from graphql_relay.connection.arrayconnection import connection_from_array
+from graphql_relay.connection.connection import connection_args, connection_definitions
+from graphql_relay.mutation.mutation import mutation_with_client_mutation_id
 
 from .star_wars_data import (
     Faction,
@@ -112,9 +101,9 @@ from .star_wars_data import (
 
 def get_node(global_id, _info):
     type_, id_ = from_global_id(global_id)
-    if type_ == 'Faction':
+    if type_ == "Faction":
         return getFaction(id_)
-    elif type_ == 'Ship':
+    elif type_ == "Ship":
         return getShip(id_)
     else:
         return None
@@ -138,16 +127,13 @@ node_interface, node_field = node_definitions(get_node, get_node_type)[:2]
 #     name: String
 #   }
 shipType = GraphQLObjectType(
-    name='Ship',
-    description='A ship in the Star Wars saga',
+    name="Ship",
+    description="A ship in the Star Wars saga",
     fields=lambda: {
-        'id': global_id_field('Ship'),
-        'name': GraphQLField(
-            GraphQLString,
-            description='The name of the ship.',
-        )
+        "id": global_id_field("Ship"),
+        "name": GraphQLField(GraphQLString, description="The name of the ship."),
     },
-    interfaces=[node_interface]
+    interfaces=[node_interface],
 )
 
 # We define a connection between a faction and its ships.
@@ -164,7 +150,7 @@ shipType = GraphQLObjectType(
 #     cursor: String!
 #     node: Ship
 #   }
-ship_edge, ship_connection = connection_definitions(shipType, 'Ship')
+ship_edge, ship_connection = connection_definitions(shipType, "Ship")
 
 # We define our faction type, which implements the node interface.
 #
@@ -175,23 +161,21 @@ ship_edge, ship_connection = connection_definitions(shipType, 'Ship')
 #     ships: ShipConnection
 #   }
 factionType = GraphQLObjectType(
-    name='Faction',
-    description='A faction in the Star Wars saga',
+    name="Faction",
+    description="A faction in the Star Wars saga",
     fields=lambda: {
-        'id': global_id_field('Faction'),
-        'name': GraphQLField(
-            GraphQLString,
-            description='The name of the faction.',
-        ),
-        'ships': GraphQLField(
+        "id": global_id_field("Faction"),
+        "name": GraphQLField(GraphQLString, description="The name of the faction."),
+        "ships": GraphQLField(
             ship_connection,
-            description='The ships used by the faction.',
+            description="The ships used by the faction.",
             args=connection_args,
             resolve=lambda faction, _info, **args: connection_from_array(
-                [getShip(ship) for ship in faction.ships], args),
-        )
+                [getShip(ship) for ship in faction.ships], args
+            ),
+        ),
     },
-    interfaces=[node_interface]
+    interfaces=[node_interface],
 )
 
 # This is the type that will be the root of our query, and the
@@ -204,18 +188,12 @@ factionType = GraphQLObjectType(
 #     node(id: String!): Node
 #   }
 queryType = GraphQLObjectType(
-    name='Query',
+    name="Query",
     fields=lambda: {
-        'rebels': GraphQLField(
-            factionType,
-            resolve=lambda _obj, _info: getRebels(),
-        ),
-        'empire': GraphQLField(
-            factionType,
-            resolve=lambda _obj, _info: getEmpire(),
-        ),
-        'node': node_field
-    }
+        "rebels": GraphQLField(factionType, resolve=lambda _obj, _info: getRebels()),
+        "empire": GraphQLField(factionType, resolve=lambda _obj, _info: getEmpire()),
+        "node": node_field,
+    },
 )
 
 # This will return a GraphQLFieldConfig for our ship
@@ -251,26 +229,20 @@ def mutate_and_get_payload(_info, shipName, factionId, **_input):
 
 
 shipMutation = mutation_with_client_mutation_id(
-    'IntroduceShip',
+    "IntroduceShip",
     input_fields={
-        'shipName': GraphQLInputField(
-            GraphQLNonNull(GraphQLString)
-        ),
-        'factionId': GraphQLInputField(
-            GraphQLNonNull(GraphQLID)
-        )
+        "shipName": GraphQLInputField(GraphQLNonNull(GraphQLString)),
+        "factionId": GraphQLInputField(GraphQLNonNull(GraphQLID)),
     },
     output_fields={
-        'ship': GraphQLField(
-            shipType,
-            resolve=lambda payload, _info: getShip(payload.shipId)
+        "ship": GraphQLField(
+            shipType, resolve=lambda payload, _info: getShip(payload.shipId)
         ),
-        'faction': GraphQLField(
-            factionType,
-            resolve=lambda payload, _info: getFaction(payload.factionId)
-        )
+        "faction": GraphQLField(
+            factionType, resolve=lambda payload, _info: getFaction(payload.factionId)
+        ),
     },
-    mutate_and_get_payload=mutate_and_get_payload
+    mutate_and_get_payload=mutate_and_get_payload,
 )
 
 # This is the type that will be the root of our mutations, and the
@@ -281,15 +253,9 @@ shipMutation = mutation_with_client_mutation_id(
 #     introduceShip(input IntroduceShipInput!): IntroduceShipPayload
 #   }
 mutationType = GraphQLObjectType(
-    'Mutation',
-    fields=lambda: {
-        'introduceShip': shipMutation
-    }
+    "Mutation", fields=lambda: {"introduceShip": shipMutation}
 )
 
 # Finally, we construct our schema (whose starting query type is the query
 # type we defined above) and export it.
-StarWarsSchema = GraphQLSchema(
-    query=queryType,
-    mutation=mutationType
-)
+StarWarsSchema = GraphQLSchema(query=queryType, mutation=mutationType)

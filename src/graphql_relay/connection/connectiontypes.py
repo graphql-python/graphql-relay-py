@@ -1,8 +1,6 @@
 from typing import Any, Dict, List, NamedTuple, Optional
 
-__all__ = [
-    'Connection', 'ConnectionArguments', 'ConnectionCursor', 'Edge', 'PageInfo'
-]
+__all__ = ["Connection", "ConnectionArguments", "ConnectionCursor", "Edge", "PageInfo"]
 
 
 """A type alias for cursors in this implementation."""

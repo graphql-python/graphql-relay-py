@@ -16,7 +16,8 @@ from graphql_relay import (
     connection_args,
     connection_definitions,
     connection_from_array,
-    forward_connection_args)
+    forward_connection_args,
+)
 
 
 class User(NamedTuple):
@@ -25,84 +26,80 @@ class User(NamedTuple):
 
 
 all_users = [
-    User(name='Dan', friends=[1, 2, 3, 4]),
-    User(name='Nick', friends=[0, 2, 3, 4]),
-    User(name='Lee', friends=[0, 1, 3, 4]),
-    User(name='Joe', friends=[0, 1, 2, 4]),
-    User(name='Tim', friends=[0, 1, 2, 3]),
+    User(name="Dan", friends=[1, 2, 3, 4]),
+    User(name="Nick", friends=[0, 2, 3, 4]),
+    User(name="Lee", friends=[0, 1, 3, 4]),
+    User(name="Joe", friends=[0, 1, 2, 4]),
+    User(name="Tim", friends=[0, 1, 2, 3]),
 ]
 
 friend_connection: GraphQLObjectType
 user_connection: GraphQLObjectType
 
 user_type = GraphQLObjectType(
-    'User',
+    "User",
     fields=lambda: {
-        'name': GraphQLField(GraphQLString),
-        'friends': GraphQLField(
+        "name": GraphQLField(GraphQLString),
+        "friends": GraphQLField(
             friend_connection,
             args=connection_args,
-            resolve=lambda user, _info, **args:
-            connection_from_array(user.friends, args),
+            resolve=lambda user, _info, **args: connection_from_array(
+                user.friends, args
+            ),
         ),
-        'friendsForward': GraphQLField(
+        "friendsForward": GraphQLField(
             user_connection,
             args=forward_connection_args,
-            resolve=lambda user, _info, **args:
-            connection_from_array(user.friends, args),
+            resolve=lambda user, _info, **args: connection_from_array(
+                user.friends, args
+            ),
         ),
-        'friendsBackward': GraphQLField(
+        "friendsBackward": GraphQLField(
             user_connection,
             args=backward_connection_args,
-            resolve=lambda user, _info, **args:
-            connection_from_array(user.friends, args),
+            resolve=lambda user, _info, **args: connection_from_array(
+                user.friends, args
+            ),
         ),
     },
 )
 
 friend_connection = connection_definitions(
     user_type,
-    name='Friend',
+    name="Friend",
     resolve_node=lambda edge, _info: all_users[edge.node],
     edge_fields=lambda: {
-        'friendshipTime': GraphQLField(
-            GraphQLString,
-            resolve=lambda user_, info_: 'Yesterday'
-        ),
+        "friendshipTime": GraphQLField(
+            GraphQLString, resolve=lambda user_, info_: "Yesterday"
+        )
     },
     connection_fields=lambda: {
-        'totalCount': GraphQLField(
-            GraphQLInt,
-            resolve=lambda _user, _info: len(all_users) - 1
-        ),
-    }
+        "totalCount": GraphQLField(
+            GraphQLInt, resolve=lambda _user, _info: len(all_users) - 1
+        )
+    },
 ).connection_type
 
 
 user_connection = connection_definitions(
-    user_type,
-    resolve_node=lambda edge, _info: all_users[edge.node]
+    user_type, resolve_node=lambda edge, _info: all_users[edge.node]
 ).connection_type
 
 
 query_type = GraphQLObjectType(
-    'Query',
+    "Query",
     fields=lambda: {
-        'user': GraphQLField(
-            user_type,
-            resolve=lambda _root, _info: all_users[0]
-        ),
-    }
+        "user": GraphQLField(user_type, resolve=lambda _root, _info: all_users[0])
+    },
 )
 
 schema = GraphQLSchema(query=query_type)
 
 
 def describe_connection_definition():
-
     @mark.asyncio
     async def includes_connection_and_edge_fields():
-        query = '''
+        query = """
           query FriendsQuery {
             user {
               friends(first: 2) {
@@ -116,35 +113,25 @@ def describe_connection_definition():
               }
             }
           }
-        '''
+        """
         assert await graphql(schema, query) == (
             {
-                'user': {
-                    'friends': {
-                        'totalCount': 4,
-                        'edges': [
-                            {
-                                'friendshipTime': 'Yesterday',
-                                'node': {
-                                    'name': 'Nick'
-                                }
-                            },
-                            {
-                                'friendshipTime': 'Yesterday',
-                                'node': {
-                                    'name': 'Lee'
-                                }
-                            },
-                        ]
+                "user": {
+                    "friends": {
+                        "totalCount": 4,
+                        "edges": [
+                            {"friendshipTime": "Yesterday", "node": {"name": "Nick"}},
+                            {"friendshipTime": "Yesterday", "node": {"name": "Lee"}},
+                        ],
                     }
                 }
             },
-            None
+            None,
         )
 
     @mark.asyncio
     async def works_with_forward_connection_args():
-        query = '''
+        query = """
           query FriendsQuery {
             user {
               friendsForward(first: 2) {
@@ -156,32 +143,21 @@ def describe_connection_definition():
               }
             }
           }
-        '''
+        """
         assert await graphql(schema, query) == (
             {
-                'user': {
-                    'friendsForward': {
-                        'edges': [
-                            {
-                                'node': {
-                                    'name': 'Nick'
-                                }
-                            },
-                            {
-                                'node': {
-                                    'name': 'Lee'
-                                }
-                            },
-                        ]
+                "user": {
+                    "friendsForward": {
+                        "edges": [{"node": {"name": "Nick"}}, {"node": {"name": "Lee"}}]
                     }
                 }
             },
-            None
+            None,
         )
 
     @mark.asyncio
     async def works_with_backward_connection_args():
-        query = '''
+        query = """
           query FriendsQuery {
             user {
               friendsBackward(last: 2) {
@@ -193,25 +169,14 @@ def describe_connection_definition():
               }
             }
           }
-        '''
+        """
         assert await graphql(schema, query) == (
             {
-                'user': {
-                    'friendsBackward': {
-                        'edges': [
-                            {
-                                'node': {
-                                    'name': 'Joe'
-                                }
-                            },
-                            {
-                                'node': {
-                                    'name': 'Tim'
-                                }
-                            },
-                        ]
+                "user": {
+                    "friendsBackward": {
+                        "edges": [{"node": {"name": "Joe"}}, {"node": {"name": "Tim"}}]
                     }
                 }
             },
-            None
+            None,
         )

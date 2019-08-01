@@ -14,7 +14,7 @@ from graphql.type import (
     GraphQLObjectType,
     GraphQLResolveInfo,
     GraphQLString,
-    Thunk
+    Thunk,
 )
 
 
@@ -32,12 +32,13 @@ def resolve_maybe_thunk(thing_or_thunk: Thunk) -> Any:
 
 
 def mutation_with_client_mutation_id(
-        name: str,
-        input_fields: Thunk[GraphQLInputFieldMap],
-        output_fields: Thunk[GraphQLFieldMap],
-        mutate_and_get_payload: MutationFn,
-        description: str = None,
-        deprecation_reason: str = None) -> GraphQLField:
+    name: str,
+    input_fields: Thunk[GraphQLInputFieldMap],
+    output_fields: Thunk[GraphQLFieldMap],
+    mutate_and_get_payload: MutationFn,
+    description: str = None,
+    deprecation_reason: str = None,
+) -> GraphQLField:
     """
     Returns a GraphQLFieldConfig for the specified mutation.
 
@@ -52,25 +53,22 @@ def mutation_with_client_mutation_id(
     (or a dict) with an attribute (or a key) for each output field.
     It may return synchronously or asynchronously.
     """
+
     def augmented_input_fields() -> GraphQLInputFieldMap:
         return dict(
             resolve_maybe_thunk(input_fields),
-            clientMutationId=GraphQLInputField(
-                GraphQLNonNull(GraphQLString)))
+            clientMutationId=GraphQLInputField(GraphQLNonNull(GraphQLString)),
+        )
 
     def augmented_output_fields() -> GraphQLFieldMap:
         return dict(
             resolve_maybe_thunk(output_fields),
-            clientMutationId=GraphQLField(
-                GraphQLNonNull(GraphQLString)))
+            clientMutationId=GraphQLField(GraphQLNonNull(GraphQLString)),
+        )
 
-    output_type = GraphQLObjectType(
-        name + 'Payload',
-        fields=augmented_output_fields)
+    output_type = GraphQLObjectType(name + "Payload", fields=augmented_output_fields)
 
-    input_type = GraphQLInputObjectType(
-        name + 'Input',
-        fields=augmented_input_fields)
+    input_type = GraphQLInputObjectType(name + "Input", fields=augmented_input_fields)
 
     # noinspection PyShadowingBuiltins
     async def resolve(_root, info, input):
@@ -78,16 +76,18 @@ def mutation_with_client_mutation_id(
         if isawaitable(payload):
             payload = await payload
         try:
-            payload.clientMutationId = input['clientMutationId']
+            payload.clientMutationId = input["clientMutationId"]
         except KeyError:
             raise GraphQLError(
-                'Cannot set clientMutationId'
-                f' in the payload object {inspect(payload)}.')
+                "Cannot set clientMutationId"
+                f" in the payload object {inspect(payload)}."
+            )
         return payload
 
     return GraphQLField(
         output_type,
         description=description,
         deprecation_reason=deprecation_reason,
-        args={'input': GraphQLArgument(GraphQLNonNull(input_type))},
-        resolve=resolve)
+        args={"input": GraphQLArgument(GraphQLNonNull(input_type))},
+        resolve=resolve,
+    )

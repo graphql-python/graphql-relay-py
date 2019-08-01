@@ -4,19 +4,30 @@ from typing import Any, Optional, Sequence
 
 from ..utils.base64 import base64, unbase64
 from .connectiontypes import (
-    Connection, ConnectionArguments, ConnectionCursor, Edge, PageInfo)
+    Connection,
+    ConnectionArguments,
+    ConnectionCursor,
+    Edge,
+    PageInfo,
+)
 
 __all__ = [
-    'connection_from_array', 'connection_from_array_slice',
-    'cursor_for_object_in_connection', 'cursor_to_offset',
-    'get_offset_with_default', 'offset_to_cursor'
+    "connection_from_array",
+    "connection_from_array_slice",
+    "cursor_for_object_in_connection",
+    "cursor_to_offset",
+    "get_offset_with_default",
+    "offset_to_cursor",
 ]
 
 
 def connection_from_array(
-        data: Sequence, args: ConnectionArguments = None,
-        connection_type: Any = Connection,
-        edge_type: Any = Edge, page_info_type: Any = PageInfo) -> Connection:
+    data: Sequence,
+    args: ConnectionArguments = None,
+    connection_type: Any = Connection,
+    edge_type: Any = Edge,
+    page_info_type: Any = PageInfo,
+) -> Connection:
     """Create a connection object from a sequence of objects.
 
     Note that different from its JavaScript counterpart which expects an array,
@@ -30,18 +41,23 @@ def connection_from_array(
     if you don't pass custom types as arguments.
     """
     return connection_from_array_slice(
-        data, args,
+        data,
+        args,
         slice_start=0,
         array_length=len(data),
         connection_type=connection_type,
-        edge_type=edge_type, page_info_type=page_info_type,
+        edge_type=edge_type,
+        page_info_type=page_info_type,
     )
 
 
 def connection_from_list(
-        data: Sequence, args: ConnectionArguments = None,
-        connection_type: Any = Connection,
-        edge_type: Any = Edge, pageinfo_type: Any = PageInfo) -> Connection:
+    data: Sequence,
+    args: ConnectionArguments = None,
+    connection_type: Any = Connection,
+    edge_type: Any = Edge,
+    pageinfo_type: Any = PageInfo,
+) -> Connection:
     """Deprecated alias for connection_from_array.
 
     We're now using the JavaScript terminology in Python as well, since list
@@ -50,18 +66,28 @@ def connection_from_list(
     warnings.warn(
         "connection_from_list() has been deprecated."
         " Please use connection_from_array() instead.",
-        DeprecationWarning, stacklevel=2)
+        DeprecationWarning,
+        stacklevel=2,
+    )
     return connection_from_array_slice(
-        data, args,
+        data,
+        args,
         connection_type=connection_type,
-        edge_type=edge_type, page_info_type=pageinfo_type)
+        edge_type=edge_type,
+        page_info_type=pageinfo_type,
+    )
 
 
 def connection_from_array_slice(
-        array_slice: Sequence, args: ConnectionArguments = None,
-        slice_start: int = 0, array_length: int = None, array_slice_length: int = None,
-        connection_type: Any = Connection,
-        edge_type: Any = Edge, page_info_type: Any = PageInfo) -> Connection:
+    array_slice: Sequence,
+    args: ConnectionArguments = None,
+    slice_start: int = 0,
+    array_length: int = None,
+    array_slice_length: int = None,
+    connection_type: Any = Connection,
+    edge_type: Any = Edge,
+    page_info_type: Any = PageInfo,
+) -> Connection:
     """Create a connection object from a slice of the result set.
 
     Note that different from its JavaScript counterpart which expects an array,
@@ -81,10 +107,10 @@ def connection_from_array_slice(
     we assume that the slice ends at the end of the result set.
     """
     args = args or {}
-    before = args.get('before')
-    after = args.get('after')
-    first = args.get('first')
-    last = args.get('last')
+    before = args.get("before")
+    after = args.get("after")
+    first = args.get("first")
+    last = args.get("last")
     if array_slice_length is None:
         array_slice_length = len(array_slice)
     slice_end = slice_start + array_slice_length
@@ -109,14 +135,11 @@ def connection_from_array_slice(
 
     # If supplied slice is too large, trim it down before mapping over it.
     trimmed_slice = array_slice[
-        start_offset - slice_start:array_slice_length - (slice_end - end_offset)
+        start_offset - slice_start : array_slice_length - (slice_end - end_offset)
     ]
 
     edges = [
-        edge_type(
-            node=value,
-            cursor=offset_to_cursor(start_offset + index)
-        )
+        edge_type(node=value, cursor=offset_to_cursor(start_offset + index))
         for index, value in enumerate(trimmed_slice)
     ]
 
@@ -131,16 +154,21 @@ def connection_from_array_slice(
             startCursor=first_edge_cursor,
             endCursor=last_edge_cursor,
             hasPreviousPage=isinstance(last, int) and start_offset > lower_bound,
-            hasNextPage=isinstance(first, int) and end_offset < upper_bound
-        )
+            hasNextPage=isinstance(first, int) and end_offset < upper_bound,
+        ),
     )
 
 
 def connection_from_list_slice(
-        list_slice: Sequence, args: ConnectionArguments = None,
-        connection_type: Any = Connection,
-        edge_type: Any = Edge, pageinfo_type: Any = PageInfo,
-        slice_start=0, list_length=0, list_slice_length=None) -> Connection:
+    list_slice: Sequence,
+    args: ConnectionArguments = None,
+    connection_type: Any = Connection,
+    edge_type: Any = Edge,
+    pageinfo_type: Any = PageInfo,
+    slice_start=0,
+    list_length=0,
+    list_slice_length=None,
+) -> Connection:
     """Deprecated alias for connection_from_array_slice.
 
     We're now using the JavaScript terminology in Python as well, since list
@@ -149,16 +177,22 @@ def connection_from_list_slice(
     warnings.warn(
         "connection_from_list_slice() has been deprecated."
         " Please use connection_from_array_slice() instead.",
-        DeprecationWarning, stacklevel=2)
+        DeprecationWarning,
+        stacklevel=2,
+    )
     return connection_from_array_slice(
-        list_slice, args,
-        slice_start=slice_start, array_length=list_length,
+        list_slice,
+        args,
+        slice_start=slice_start,
+        array_length=list_length,
         array_slice_length=list_slice_length,
         connection_type=connection_type,
-        edge_type=edge_type, page_info_type=pageinfo_type)
+        edge_type=edge_type,
+        page_info_type=pageinfo_type,
+    )
 
 
-PREFIX = 'arrayconnection:'
+PREFIX = "arrayconnection:"
 
 
 def offset_to_cursor(offset: int) -> ConnectionCursor:
@@ -169,13 +203,14 @@ def offset_to_cursor(offset: int) -> ConnectionCursor:
 def cursor_to_offset(cursor: ConnectionCursor) -> Optional[int]:
     """Rederive the offset from the cursor string."""
     try:
-        return int(unbase64(cursor)[len(PREFIX):])
+        return int(unbase64(cursor)[len(PREFIX) :])
     except binascii.Error:
         return None
 
 
 def cursor_for_object_in_connection(
-        data: Sequence, obj: Any) -> Optional[ConnectionCursor]:
+    data: Sequence, obj: Any
+) -> Optional[ConnectionCursor]:
     """Return the cursor associated with an object in a sequence.
 
     This function uses the `index` method of the sequence if it exists,
