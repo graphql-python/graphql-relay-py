@@ -3,16 +3,16 @@ name = "graphql-relay"
 version = "3.0.0a1"
 description = """
 Relay library for graphql-core-next"""
-licese="MIT"
+license="MIT"
 authors = [
     "Syrus Akbary <me@syrusakbary.com>",
     "Christoph Zwerschke <cito@online.de>"
 ]
-readme="README.md"
-homepage="https://github.com/graphql-python/graphql-relay-py"
-repository="https://github.com/graphql-python/graphql-relay-py"
-documentation="https://github.com/graphql-python/graphql-relay-py"
-keywords="graphql relay api"
+readme = "README.md"
+homepage = "https://github.com/graphql-python/graphql-relay-py"
+repository = "https://github.com/graphql-python/graphql-relay-py"
+documentation = "https://github.com/graphql-python/graphql-relay-py"
+keywords = ["graphql", "relay", "api"]
 classifiers = [
     "Development Status :: 5 - Production/Stable",
     "Intended Audience :: Developers",
@@ -24,6 +24,7 @@ classifiers = [
 ]
 packages = [
     { include = "graphql_relay", from = "src" },
+    { include = "docs", format = "sdist" },
 ]
 
 [tool.poetry.dependencies]
@@ -47,5 +48,5 @@ tox = "^3.13"
 [tool.black]
 target-version = ['py36', 'py37', 'py38']
 [build-system]
-requires = ["poetry>=0.12.16"]
+requires = ["poetry>=1.0.0a5"]
 build-backend = "poetry.masonry.api"
