@@ -193,7 +193,7 @@ def connection_from_list_slice_lazy(list_slice, args=None, connection_type=None,
         extra_item = list_slice[end_offset]
         has_next_page = True
 
-    except IndexError, TypeError:
+    except (IndexError, TypeError):
         has_next_page = False
 
     if extra_item is None:
