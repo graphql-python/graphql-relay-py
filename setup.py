@@ -23,7 +23,7 @@ class PyTest(TestCommand):
 
 setup(
     name='graphql-relay',
-    version='2.0.0',
+    version='2.0.1',
 
     description='Relay implementation for Python',
     long_description=open('README.md').read(),
@@ -48,6 +48,7 @@ setup(
         'Programming Language :: Python :: 3.5',
         'Programming Language :: Python :: 3.6',
         'Programming Language :: Python :: 3.7',
+        'Programming Language :: Python :: 3.8',
         'Programming Language :: Python :: Implementation :: PyPy',
     ],
 
