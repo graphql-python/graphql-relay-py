@@ -179,7 +179,7 @@ def test_pagination_respects_first_after():
         'pageInfo': {
             'startCursor': 'YXJyYXljb25uZWN0aW9uOjI=',
             'endCursor': 'YXJyYXljb25uZWN0aW9uOjM=',
-            'hasPreviousPage': False,
+            'hasPreviousPage': True,
             'hasNextPage': True,
         }
     }
@@ -207,7 +207,7 @@ def test_pagination_respects_longfirst_after():
         'pageInfo': {
             'startCursor': 'YXJyYXljb25uZWN0aW9uOjI=',
             'endCursor': 'YXJyYXljb25uZWN0aW9uOjQ=',
-            'hasPreviousPage': False,
+            'hasPreviousPage': True,
             'hasNextPage': False,
         }
     }
@@ -231,7 +231,7 @@ def test_pagination_respects_last_before():
             'startCursor': 'YXJyYXljb25uZWN0aW9uOjE=',
             'endCursor': 'YXJyYXljb25uZWN0aW9uOjI=',
             'hasPreviousPage': True,
-            'hasNextPage': False,
+            'hasNextPage': True,
         }
     }
     assert c.to_dict() == expected
@@ -259,7 +259,7 @@ def test_pagination_respects_longlast_before():
             'startCursor': 'YXJyYXljb25uZWN0aW9uOjA=',
             'endCursor': 'YXJyYXljb25uZWN0aW9uOjI=',
             'hasPreviousPage': False,
-            'hasNextPage': False,
+            'hasNextPage': True,
         }
     }
     assert c.to_dict() == expected
@@ -283,7 +283,7 @@ def test_first_after_before_few():
         'pageInfo': {
             'startCursor': 'YXJyYXljb25uZWN0aW9uOjE=',
             'endCursor': 'YXJyYXljb25uZWN0aW9uOjI=',
-            'hasPreviousPage': False,
+            'hasPreviousPage': True,
             'hasNextPage': True,
         }
     }
@@ -312,8 +312,8 @@ def test_first_after_before_many():
         'pageInfo': {
             'startCursor': 'YXJyYXljb25uZWN0aW9uOjE=',
             'endCursor': 'YXJyYXljb25uZWN0aW9uOjM=',
-            'hasPreviousPage': False,
-            'hasNextPage': False,
+            'hasPreviousPage': True,
+            'hasNextPage': True,
         }
     }
     assert c.to_dict() == expected
@@ -341,8 +341,8 @@ def test_first_after_before_exact():
         'pageInfo': {
             'startCursor': 'YXJyYXljb25uZWN0aW9uOjE=',
             'endCursor': 'YXJyYXljb25uZWN0aW9uOjM=',
-            'hasPreviousPage': False,
-            'hasNextPage': False,
+            'hasPreviousPage': True,
+            'hasNextPage': True,
         }
     }
     assert c.to_dict() == expected
@@ -367,7 +367,7 @@ def test_last_after_before_few():
             'startCursor': 'YXJyYXljb25uZWN0aW9uOjI=',
             'endCursor': 'YXJyYXljb25uZWN0aW9uOjM=',
             'hasPreviousPage': True,
-            'hasNextPage': False,
+            'hasNextPage': True,
         }
     }
     assert c.to_dict() == expected
@@ -395,8 +395,8 @@ def test_last_after_before_many():
         'pageInfo': {
             'startCursor': 'YXJyYXljb25uZWN0aW9uOjE=',
             'endCursor': 'YXJyYXljb25uZWN0aW9uOjM=',
-            'hasPreviousPage': False,
-            'hasNextPage': False,
+            'hasPreviousPage': True,
+            'hasNextPage': True,
         }
     }
     assert c.to_dict() == expected
@@ -424,8 +424,8 @@ def test_last_after_before_exact():
         'pageInfo': {
             'startCursor': 'YXJyYXljb25uZWN0aW9uOjE=',
             'endCursor': 'YXJyYXljb25uZWN0aW9uOjM=',
-            'hasPreviousPage': False,
-            'hasNextPage': False,
+            'hasPreviousPage': True,
+            'hasNextPage': True,
         }
     }
     assert c.to_dict() == expected
@@ -528,8 +528,8 @@ def test_no_elements_cursors_cross():
         'pageInfo': {
             'startCursor': None,
             'endCursor': None,
-            'hasPreviousPage': False,
-            'hasNextPage': False,
+            'hasPreviousPage': True,
+            'hasNextPage': True,
         }
     }
     assert c.to_dict() == expected
@@ -627,7 +627,7 @@ def test_list_slice_works_with_a_just_right_array_slice():
         'pageInfo': {
             'startCursor': 'YXJyYXljb25uZWN0aW9uOjE=',
             'endCursor': 'YXJyYXljb25uZWN0aW9uOjI=',
-            'hasPreviousPage': False,
+            'hasPreviousPage': True,
             'hasNextPage': True,
         }
     }
@@ -658,7 +658,7 @@ def test_list_slice_works_with_an_oversized_array_slice_left_side():
         'pageInfo': {
             'startCursor': 'YXJyYXljb25uZWN0aW9uOjE=',
             'endCursor': 'YXJyYXljb25uZWN0aW9uOjI=',
-            'hasPreviousPage': False,
+            'hasPreviousPage': True,
             'hasNextPage': True,
         }
     }
@@ -685,7 +685,7 @@ def test_list_slice_works_with_an_oversized_array_slice_right_side():
         'pageInfo': {
             'startCursor': 'YXJyYXljb25uZWN0aW9uOjI=',
             'endCursor': 'YXJyYXljb25uZWN0aW9uOjI=',
-            'hasPreviousPage': False,
+            'hasPreviousPage': True,
             'hasNextPage': True,
         }
     }
@@ -712,7 +712,7 @@ def test_list_slice_works_with_an_oversized_array_slice_both_sides():
         'pageInfo': {
             'startCursor': 'YXJyYXljb25uZWN0aW9uOjI=',
             'endCursor': 'YXJyYXljb25uZWN0aW9uOjI=',
-            'hasPreviousPage': False,
+            'hasPreviousPage': True,
             'hasNextPage': True,
         }
     }
@@ -743,7 +743,7 @@ def test_list_slice_works_with_an_undersized_array_slice_left_side():
         'pageInfo': {
             'startCursor': 'YXJyYXljb25uZWN0aW9uOjM=',
             'endCursor': 'YXJyYXljb25uZWN0aW9uOjQ=',
-            'hasPreviousPage': False,
+            'hasPreviousPage': True,
             'hasNextPage': False,
         }
     }
@@ -774,7 +774,7 @@ def test_list_slice_works_with_an_undersized_array_slice_right_side():
         'pageInfo': {
             'startCursor': 'YXJyYXljb25uZWN0aW9uOjI=',
             'endCursor': 'YXJyYXljb25uZWN0aW9uOjM=',
-            'hasPreviousPage': False,
+            'hasPreviousPage': True,
             'hasNextPage': True,
         }
     }
@@ -801,7 +801,7 @@ def test_list_slice_works_with_an_undersized_array_slice_both_sides():
         'pageInfo': {
             'startCursor': 'YXJyYXljb25uZWN0aW9uOjM=',
             'endCursor': 'YXJyYXljb25uZWN0aW9uOjM=',
-            'hasPreviousPage': False,
+            'hasPreviousPage': True,
             'hasNextPage': True,
         }
     }
