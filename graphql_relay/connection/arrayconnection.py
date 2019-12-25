@@ -104,6 +104,115 @@ def connection_from_list_slice(list_slice, args=None, connection_type=None,
     )
 
 
+def connection_from_list_slice_lazy(list_slice, args=None, connection_type=None,
+                                    edge_type=None, pageinfo_type=None,
+                                    slice_start=0, list_length=0, list_slice_length=None):
+    '''
+    Given an iterator it consumes the needed amount based on the pagination
+    params, and also tries to figure out if there are more results to be
+    consumed. We do so by trying to fetch one more element than the specified
+    amount, if we were able to fetch n+1 it means there are more to be consumed.
+
+    This spares the caller passing the total count of results, which
+    usually means making an extra query just to find out that number.
+    '''
+    connection_type = connection_type or Connection
+    edge_type = edge_type or Edge
+    pageinfo_type = pageinfo_type or PageInfo
+
+    args = args or {}
+
+    before = args.get('before')
+    after = args.get('after')
+    first = args.get('first')
+    last = args.get('last')
+
+    first_is_negative = type(first) == int and first < 0
+    last_is_negative = type(last) == int and last < 0
+
+    start_offset = slice_start
+    end_offset = None
+
+    # Validations
+    if first_is_negative or last_is_negative:
+        raise ValidationException("first and last can't be negative values")
+
+    if first and last:
+        raise ValidationException(
+            "Including a value for both first and last is strongly discouraged,"
+            " as it is likely to lead to confusing queries and results"
+        )
+
+    if before and last is None:
+        raise ValidationException(
+            "before without last is not supported"
+        )
+
+    if after and first is None:
+        raise ValidationException(
+            "after without first is not supported"
+        )
+
+    if before and after:
+        raise ValidationException(
+            "Mixing before and after is not supported"
+        )
+
+    if type(first) == int:
+        after_offset = get_offset_with_default(after, -1)
+        start_offset = after_offset + 1
+        end_offset = start_offset + first
+
+    elif type(last) == int:
+        if before:
+            before_offset = get_offset_with_default(before)
+        else:
+            try:
+                before_offset = int(list_slice.count())
+            except (TypeError, AttributeError):
+                before_offset = len(list_slice)
+        end_offset = before_offset
+        start_offset = before_offset - last if before_offset - last > 0 else 0
+
+    _slice = list_slice[start_offset:end_offset]
+
+    edges = [
+        edge_type(
+            node=node,
+            cursor=offset_to_cursor(start_offset + index)
+        )
+        for index, node in enumerate(_slice)
+    ]
+
+    # To know if there are more pages we just check if there is n+1 element
+    # In this case it would just be the end_offset element because array indexes
+    # start from zero
+    extra_item = None
+
+    try:
+        extra_item = list_slice[end_offset]
+        has_next_page = True
+
+    except (IndexError, TypeError):
+        has_next_page = False
+
+    if extra_item is None:
+        has_next_page = False
+
+    has_previous_page = start_offset > 0
+    first_edge_cursor = edges[0].cursor if edges else None
+    last_edge_cursor = edges[-1].cursor if edges else None
+
+    return connection_type(
+        edges=edges,
+        page_info=pageinfo_type(
+            start_cursor=first_edge_cursor,
+            end_cursor=last_edge_cursor,
+            has_previous_page=has_previous_page,
+            has_next_page=has_next_page
+        )
+    )
+
 PREFIX = 'arrayconnection:'
 
 
