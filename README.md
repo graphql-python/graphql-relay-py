@@ -27,7 +27,7 @@ An overview of GraphQL in general is available in the
 [README](https://github.com/graphql-python/graphql-core/blob/master/README.md) for the
 [Specification for GraphQL](https://github.com/graphql-python/graphql-core).
 
-This library is designed to work with the 
+This library is designed to work with the
 the [GraphQL-Core](https://github.com/graphql-python/graphql-core)
 Python reference implementation of a GraphQL server.
 
@@ -52,7 +52,7 @@ When building a schema for [GraphQL](https://github.com/graphql-python/graphql-c
 the provided library functions can be used to simplify the creation of Relay
 patterns.
 
-### Connections 
+### Connections
 
 Helper functions are provided for both building the GraphQL types
 for connections and for implementing the `resolver` method for fields
@@ -261,5 +261,5 @@ Python versions and perform all additional source code checks.
 You can also restrict tox to an individual environment, like this:
 
 ```sh
-petry run tox -e py37
+poetry run tox -e py37
 ```
