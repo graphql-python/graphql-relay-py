@@ -25,7 +25,7 @@ classifiers = [
 ]
 packages = [
     { include = "graphql_relay", from = "src" },
-    { include = "docs", format = "sdist" },
+    { include = "tests", format = "sdist" },
 ]
 
 [tool.poetry.dependencies]
