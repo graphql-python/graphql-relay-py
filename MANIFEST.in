@@ -1,4 +1,22 @@
-global-exclude tests/*
-recursive-exclude tests *
-recursive-exclude tests_py35 *
+include MANIFEST.in
+
+include CODEOWNERS
 include LICENSE
+include README.md
+
+include .bumpversion.cfg
+include .coveragerc
+include .editorconfig
+include .flake8
+
+include codecov.yml
+include mypy.ini
+include tox.ini
+
+include poetry.lock
+include pyproject.toml
+
+graft src/graphql_relay
+graft tests
+
+global-exclude *.py[co] __pycache__

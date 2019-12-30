@@ -1,66 +1,39 @@
-import sys
-
+from re import search
 from setuptools import setup, find_packages
-from setuptools.command.test import test as TestCommand
 
+with open("src/graphql_relay/version.py") as version_file:
+    version = search('version = "(.*)"', version_file.read()).group(1)
 
-class PyTest(TestCommand):
-    user_options = [('pytest-args=', 'a', "Arguments to pass to py.test")]
-
-    def initialize_options(self):
-        TestCommand.initialize_options(self)
-        self.pytest_args = []
-
-    def finalize_options(self):
-        TestCommand.finalize_options(self)
-        self.test_args = []
-        self.test_suite = True
-
-    def run_tests(self):
-        # import here, cause outside the eggs aren't loaded
-        import pytest
-        errno = pytest.main(self.pytest_args)
-        sys.exit(errno)
+with open("README.md") as readme_file:
+    readme = readme_file.read()
 
 setup(
-    name='graphql-relay',
-    version='0.4.5',
-
-    description='Relay implementation for Python',
-    long_description=open('README.rst').read(),
-
-    url='https://github.com/graphql-python/graphql-relay-py',
-
-    author='Syrus Akbary',
-    author_email='me@syrusakbary.com',
-
-    license='MIT',
-
+    name="graphql-relay",
+    version=version,
+    description="Relay library for graphql-core-next",
+    long_description=readme,
+    long_description_content_type="text/markdown",
+    keywords="graphql relay api",
+    url="https://github.com/graphql-python/graphql-relay-py",
+    author="Syrus Akbary",
+    author_email="me@syrusakbary.com",
+    license="MIT",
     classifiers=[
-        'Development Status :: 3 - Alpha',
-        'Intended Audience :: Developers',
-        'Topic :: Software Development :: Libraries',
-        'Programming Language :: Python :: 2',
-        'Programming Language :: Python :: 2.7',
-        'Programming Language :: Python :: 3',
-        'Programming Language :: Python :: 3.3',
-        'Programming Language :: Python :: 3.4',
-        'Programming Language :: Python :: 3.5',
-        'Programming Language :: Python :: Implementation :: PyPy',
+        "Development Status :: 5 - Production/Stable",
+        "Intended Audience :: Developers",
+        "Topic :: Software Development :: Libraries",
+        "License :: OSI Approved :: MIT License",
+        "Programming Language :: Python :: 3",
+        "Programming Language :: Python :: 3.6",
+        "Programming Language :: Python :: 3.7",
+        "Programming Language :: Python :: Implementation :: PyPy",
     ],
-
-    keywords='api graphql protocol rest relay',
-
-    packages=find_packages(exclude=['tests']),
-
-    install_requires=[
-        'six>=1.10.0',
-        'graphql-core>=0.5.0,<2',
-        'promise>=0.4.0'
-    ],
-    tests_require=['pytest>=2.7.2'],
-    extras_require={
-    },
-
-    cmdclass={'test': PyTest},
+    install_requires=["graphql-core>=3.0.0a0"],
+    python_requires=">=3.6,<4",
+    packages=find_packages("src"),
+    package_dir={"": "src"},
+    # PEP-561: https://www.python.org/dev/peps/pep-0561/
+    package_data={"graphql_relay": ["py.typed"]},
+    include_package_data=True,
+    zip_safe=False,
 )
