@@ -1,5 +1,6 @@
-from promise import Promise
+from collections import OrderedDict
 
+from promise import Promise
 from graphql import graphql
 from graphql.type import (
     GraphQLSchema,
@@ -9,7 +10,9 @@ from graphql.type import (
     GraphQLInputObjectField
 )
 
-from ..mutation import mutation_with_client_mutation_id
+from graphql_relay.mutation.mutation import (
+    mutation_with_client_mutation_id,
+)
 
 
 class Result(object):
@@ -18,14 +21,13 @@ class Result(object):
         self.clientMutationId = clientMutationId
         self.result = result
 
-
 simpleMutation = mutation_with_client_mutation_id(
     'SimpleMutation',
     input_fields={},
     output_fields={
         'result': GraphQLField(GraphQLInt)
     },
-    mutate_and_get_payload=lambda _info, **_input: Result(result=1)
+    mutate_and_get_payload=lambda *_: Result(result=1)
 )
 
 simpleMutationWithThunkFields = mutation_with_client_mutation_id(
@@ -36,7 +38,7 @@ simpleMutationWithThunkFields = mutation_with_client_mutation_id(
     output_fields=lambda: {
         'result': GraphQLField(GraphQLInt)
     },
-    mutate_and_get_payload=lambda _info, **input_: Result(result=input_['inputData'])
+    mutate_and_get_payload=lambda args, *_: Result(result=args.get('inputData'))
 )
 
 simplePromiseMutation = mutation_with_client_mutation_id(
@@ -45,7 +47,7 @@ simplePromiseMutation = mutation_with_client_mutation_id(
     output_fields={
         'result': GraphQLField(GraphQLInt)
     },
-    mutate_and_get_payload=lambda _info, **_input: Promise.resolve(Result(result=1))
+    mutate_and_get_payload=lambda *_: Promise.resolve(Result(result=1))
 )
 
 simpleRootValueMutation = mutation_with_client_mutation_id(
@@ -54,7 +56,7 @@ simpleRootValueMutation = mutation_with_client_mutation_id(
     output_fields={
         'result': GraphQLField(GraphQLInt)
     },
-    mutate_and_get_payload=lambda info, **_input: info.root_value
+    mutate_and_get_payload=lambda params, context, info: info.root_value
 )
 
 mutation = GraphQLObjectType(
@@ -108,8 +110,7 @@ def test_returns_the_same_client_mutation_id():
 def test_supports_thunks_as_input_and_output_fields():
     query = '''
       mutation M {
-        simpleMutationWithThunkFields(
-            input: {inputData: 1234, clientMutationId: "abc"}) {
+        simpleMutationWithThunkFields(input: {inputData: 1234, clientMutationId: "abc"}) {
           result
           clientMutationId
         }
@@ -161,7 +162,7 @@ def test_can_access_root_value():
             'clientMutationId': 'abc'
         }
     }
-    result = graphql(schema, query, root=Result(result=1))
+    result = graphql(schema, query, root_value=Result(result=1))
     assert not result.errors
     assert result.data == expected
 
@@ -318,90 +319,90 @@ def test_contains_correct_field():
     '''
     expected = {
         '__schema': {
-            'mutationType': {
-                'fields': [
-                    {
-                        'name': 'simplePromiseMutation',
-                        'args': [
-                            {
-                                'name': 'input',
-                                'type': {
-                                    'name': None,
-                                    'kind': 'NON_NULL',
-                                    'ofType': {
-                                        'name': 'SimplePromiseMutationInput',
-                                        'kind': 'INPUT_OBJECT'
-                                    }
-                                },
-                            }
-                        ],
-                        'type': {
-                            'name': 'SimplePromiseMutationPayload',
-                            'kind': 'OBJECT',
-                        }
+          'mutationType': {
+            'fields': [
+              {
+                'name': 'simplePromiseMutation',
+                'args': [
+                  {
+                    'name': 'input',
+                    'type': {
+                      'name': None,
+                      'kind': 'NON_NULL',
+                      'ofType': {
+                        'name': 'SimplePromiseMutationInput',
+                        'kind': 'INPUT_OBJECT'
+                      }
                     },
-                    {
-                        'name': 'simpleRootValueMutation',
-                        'args': [
-                            {
-                                'name': 'input',
-                                'type': {
-                                    'name': None,
-                                    'kind': 'NON_NULL',
-                                    'ofType': {
-                                        'name': 'SimpleRootValueMutationInput',
-                                        'kind': 'INPUT_OBJECT'
-                                    }
-                                },
-                            }
-                        ],
-                        'type': {
-                            'name': 'SimpleRootValueMutationPayload',
-                            'kind': 'OBJECT',
-                        }
+                  }
+                ],
+                'type': {
+                  'name': 'SimplePromiseMutationPayload',
+                  'kind': 'OBJECT',
+                }
+              },
+              {
+                'name': 'simpleRootValueMutation',
+                'args': [
+                  {
+                    'name': 'input',
+                    'type': {
+                      'name': None,
+                      'kind': 'NON_NULL',
+                      'ofType': {
+                        'name': 'SimpleRootValueMutationInput',
+                        'kind': 'INPUT_OBJECT'
+                      }
                     },
-                    {
-                        'name': 'simpleMutation',
-                        'args': [
-                            {
-                                'name': 'input',
-                                'type': {
-                                    'name': None,
-                                    'kind': 'NON_NULL',
-                                    'ofType': {
-                                        'name': 'SimpleMutationInput',
-                                        'kind': 'INPUT_OBJECT'
-                                    }
-                                },
-                            }
-                        ],
-                        'type': {
-                            'name': 'SimpleMutationPayload',
-                            'kind': 'OBJECT',
-                        }
+                  }
+                ],
+                'type': {
+                  'name': 'SimpleRootValueMutationPayload',
+                  'kind': 'OBJECT',
+                }
+              },
+              {
+                'name': 'simpleMutation',
+                'args': [
+                  {
+                    'name': 'input',
+                    'type': {
+                      'name': None,
+                      'kind': 'NON_NULL',
+                      'ofType': {
+                        'name': 'SimpleMutationInput',
+                        'kind': 'INPUT_OBJECT'
+                      }
                     },
-                    {
-                        'name': 'simpleMutationWithThunkFields',
-                        'args': [
-                            {
-                                'name': 'input',
-                                'type': {
-                                    'name': None,
-                                    'kind': 'NON_NULL',
-                                    'ofType': {
-                                        'name': 'SimpleMutationWithThunkFieldsInput',
-                                        'kind': 'INPUT_OBJECT'
-                                    }
-                                },
-                            }
-                        ],
-                        'type': {
-                            'name': 'SimpleMutationWithThunkFieldsPayload',
-                            'kind': 'OBJECT',
-                        }
+                  }
+                ],
+                'type': {
+                  'name': 'SimpleMutationPayload',
+                  'kind': 'OBJECT',
+                }
+              },
+              {
+                'name': 'simpleMutationWithThunkFields',
+                'args': [
+                  {
+                    'name': 'input',
+                    'type': {
+                      'name': None,
+                      'kind': 'NON_NULL',
+                      'ofType': {
+                        'name': 'SimpleMutationWithThunkFieldsInput',
+                        'kind': 'INPUT_OBJECT'
+                      }
                     },
-                ]
-            }
+                  }
+                ],
+                'type': {
+                  'name': 'SimpleMutationWithThunkFieldsPayload',
+                  'kind': 'OBJECT',
+                }
+              },
+            ]
+          }
         }
     }
     result = graphql(schema, query)

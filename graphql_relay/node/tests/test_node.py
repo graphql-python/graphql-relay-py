@@ -1,3 +1,6 @@
+#!/usr/bin/env python
+# -*- coding: utf-8 -*-
+
 from collections import namedtuple
 from graphql import graphql
 from graphql.type import (
@@ -26,7 +29,7 @@ photoData = {
 }
 
 
-def get_node(id, info):
+def get_node(id, context, info):
     assert info.schema == schema
     if id in userData:
         return userData.get(id)
@@ -34,12 +37,11 @@ def get_node(id, info):
         return photoData.get(id)
 
 
-def get_node_type(obj, _info):
+def get_node_type(obj, context, info):
     if obj.id in userData:
         return userType
     else:
         return photoType
-
 
 node_interface, node_field = node_definitions(get_node, get_node_type)
 
@@ -252,20 +254,20 @@ def test_have_correct_node_interface():
     '''
     expected = {
         '__type': {
-            'name': 'Node',
-            'kind': 'INTERFACE',
-            'fields': [
-                {
-                    'name': 'id',
-                    'type': {
-                        'kind': 'NON_NULL',
-                        'ofType': {
-                            'name': 'ID',
-                            'kind': 'SCALAR'
-                        }
-                    }
+          'name': 'Node',
+          'kind': 'INTERFACE',
+          'fields': [
+            {
+              'name': 'id',
+              'type': {
+                'kind': 'NON_NULL',
+                'ofType': {
+                  'name': 'ID',
+                  'kind': 'SCALAR'
                 }
-            ]
+              }
+            }
+          ]
         }
     }
     result = graphql(schema, query)
@@ -301,29 +303,29 @@ def test_has_correct_node_root_field():
     '''
     expected = {
         '__schema': {
-            'queryType': {
-                'fields': [
-                    {
-                        'name': 'node',
-                        'type': {
-                            'name': 'Node',
-                            'kind': 'INTERFACE'
-                        },
-                        'args': [
-                            {
-                                'name': 'id',
-                                'type': {
-                                    'kind': 'NON_NULL',
-                                    'ofType': {
-                                        'name': 'ID',
-                                        'kind': 'SCALAR'
-                                    }
-                                }
-                            }
-                        ]
+          'queryType': {
+            'fields': [
+              {
+                'name': 'node',
+                'type': {
+                  'name': 'Node',
+                  'kind': 'INTERFACE'
+                },
+                'args': [
+                  {
+                    'name': 'id',
+                    'type': {
+                      'kind': 'NON_NULL',
+                      'ofType': {
+                        'name': 'ID',
+                        'kind': 'SCALAR'
+                      }
                     }
+                  }
                 ]
-            }
+              }
+            ]
+          }
         }
     }
     result = graphql(schema, query)
@@ -332,7 +334,7 @@ def test_has_correct_node_root_field():
 
 
 def test_to_global_id_converts_unicode_strings_correctly():
-    my_unicode_id = u'\xfb\xf1\xf6'
+    my_unicode_id = u'ûñö'
     g_id = to_global_id('MyType', my_unicode_id)
     assert g_id == 'TXlUeXBlOsO7w7HDtg=='
 
@@ -342,7 +344,7 @@ def test_to_global_id_converts_unicode_strings_correctly():
 
 
 def test_from_global_id_converts_unicode_strings_correctly():
-    my_unicode_id = u'\xfb\xf1\xf6'
+    my_unicode_id = u'ûñö'
     my_type, my_id = from_global_id('TXlUeXBlOsO7w7HDtg==')
     assert my_type == 'MyType'
     assert my_id == my_unicode_id

@@ -1,12 +1,17 @@
 from collections import namedtuple
-
+from pytest import raises
 from graphql import graphql
 from graphql.type import (
     GraphQLSchema,
     GraphQLObjectType,
     GraphQLField,
+    GraphQLArgument,
+    GraphQLList,
+    GraphQLNonNull,
     GraphQLInt,
     GraphQLString,
+    GraphQLBoolean,
+    GraphQLID,
 )
 
 from ..arrayconnection import connection_from_list
@@ -32,8 +37,8 @@ userType = GraphQLObjectType(
         'friends': GraphQLField(
             friendConnection,
             args=connection_args,
-            resolver=lambda user, _info, **args:
-            connection_from_list(user.friends, args),
+            resolver=lambda user, args, *
+            _: connection_from_list(user.friends, args),
         ),
     },
 )
@@ -41,17 +46,17 @@ userType = GraphQLObjectType(
 friendEdge, friendConnection = connection_definitions(
     'Friend',
     userType,
-    resolve_node=lambda edge, _info: allUsers[edge.node],
+    resolve_node=lambda edge, *_: allUsers[edge.node],
     edge_fields=lambda: {
         'friendshipTime': GraphQLField(
             GraphQLString,
-            resolver=lambda _user, _info: 'Yesterday'
+            resolver=lambda *_: 'Yesterday'
         ),
     },
     connection_fields=lambda: {
         'totalCount': GraphQLField(
             GraphQLInt,
-            resolver=lambda _user, _info: len(allUsers) - 1
+            resolver=lambda *_: len(allUsers) - 1
         ),
     }
 )
@@ -61,7 +66,7 @@ queryType = GraphQLObjectType(
     fields=lambda: {
         'user': GraphQLField(
             userType,
-            resolver=lambda _root, _info: allUsers[0]
+            resolver=lambda *_: allUsers[0]
         ),
     }
 )

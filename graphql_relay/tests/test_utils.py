@@ -1,10 +1,13 @@
+#!/usr/bin/env python
+# -*- coding: utf-8 -*-
+
 import base64
 
 from .. import utils
 
 
 def test_base64_encode_unicode_strings_correctly():
-    my_unicode = u'\xfb\xf1\xf6'
+    my_unicode = u'ûñö'
     my_base64 = utils.base64(my_unicode)
     assert my_base64 == base64.b64encode(my_unicode.encode('utf-8')).decode('utf-8')
 
@@ -20,7 +23,7 @@ def test_base64_encode_strings_correctly():
 
 
 def test_unbase64_decodes_unicode_strings_correctly():
-    my_unicode = u'\xfb\xf1\xf6'
+    my_unicode = u'ûñö'
     my_converted_unicode = utils.unbase64(utils.base64(my_unicode))
     assert my_unicode == my_converted_unicode
 

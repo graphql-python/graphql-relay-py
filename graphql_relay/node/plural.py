@@ -1,7 +1,5 @@
 from collections import OrderedDict
-
 from promise import Promise
-
 from graphql.type import (
     GraphQLArgument,
     GraphQLList,
@@ -10,8 +8,7 @@ from graphql.type import (
 )
 
 
-def plural_identifying_root_field(
-        arg_name, input_type, output_type, resolve_single_input, description=None):
+def plural_identifying_root_field(arg_name, input_type, output_type, resolve_single_input, description=None):
     input_args = OrderedDict()
     input_args[arg_name] = GraphQLArgument(
         GraphQLNonNull(
@@ -21,10 +18,11 @@ def plural_identifying_root_field(
         )
     )
 
-    def resolver(_obj, info, **args):
+    def resolver(obj, args, context, info):
         inputs = args[arg_name]
         return Promise.all([
-            resolve_single_input(info, input_) for input_ in inputs
+            resolve_single_input(input, context, info)
+            for input in inputs
         ])
 
     return GraphQLField(

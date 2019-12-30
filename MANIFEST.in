@@ -1,13 +1,4 @@
-include MANIFEST.in
-
+global-exclude tests/*
+recursive-exclude tests *
+recursive-exclude tests_py35 *
 include LICENSE
-include README.md
-
-include .flake8
-
-include tox.ini
-
-graft src/graphql_relay
-graft tests
-
-global-exclude *.py[co] __pycache__
