@@ -39,12 +39,12 @@ as [tests](tests) in this repository.
 A good way to get started with this repository is to walk through that documentation
 and the corresponding tests in this library together.
 
-## Using Relay Library for GraphQL Python (graphql-core-next)
+## Using Relay Library for GraphQL Python (graphql-core)
 
 Install Relay Library for GraphQL Python
 
 ```sh
-pip install graphql-core-next
+pip install graphql-core
 pip install graphql-relay
 ```
 

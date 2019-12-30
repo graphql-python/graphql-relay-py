@@ -504,7 +504,7 @@ docs = ["sphinx", "jaraco.packaging (>=3.2)", "rst.linker (>=1.9)"]
 testing = ["pathlib2", "contextlib2", "unittest2"]
 
 [metadata]
-content-hash = "33fcad3e4636841322b0cab282216911b5b55bfd3769e1e81f25dffdf4167fa2"
+content-hash = "c7c0734dfa2dae9e252196d8c075b53c970ce4ee220fddad9ea4fbc309cd6f48"
 python-versions = "^3.6"
 
 [metadata.files]

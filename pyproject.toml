@@ -2,7 +2,7 @@
 name = "graphql-relay"
 version = "3.0.0"
 description = """
-Relay library for graphql-core-next"""
+Relay library for graphql-core"""
 license="MIT"
 authors = [
     "Syrus Akbary <me@syrusakbary.com>",
