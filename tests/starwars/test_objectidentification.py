@@ -1,4 +1,3 @@
-from pytest import raises
 from graphql import graphql
 
 from .schema import StarWarsSchema

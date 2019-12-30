@@ -1,5 +1,3 @@
-from collections import namedtuple
-
 from graphql.type import (
     GraphQLID,
     GraphQLNonNull,
@@ -31,7 +29,7 @@ from graphql_relay.mutation.mutation import (
 
 from .data import (
     Faction,
-    Ship,
+    # Ship,
     getFaction,
     getShip,
     getRebels,
@@ -54,7 +52,7 @@ from .data import (
 # Wars trilogy.
 
 # Using our shorthand to describe type systems, the type system for our
-# example will be the followng:
+# example will be the following:
 #
 # interface Node {
 #   id: ID!
@@ -132,8 +130,8 @@ def get_node_type(obj, context, info):
     else:
         return shipType
 
-node_interface, node_field = node_definitions(get_node, get_node_type)
 
+node_interface, node_field = node_definitions(get_node, get_node_type)
 
 # We define our basic ship type.
 #
@@ -258,6 +256,7 @@ def mutate_and_get_payload(data, *_):
         shipId=newShip.id,
         factionId=factionId,
     )
+
 
 shipMutation = mutation_with_client_mutation_id(
     'IntroduceShip',

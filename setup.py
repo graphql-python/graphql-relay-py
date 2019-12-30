@@ -22,9 +22,10 @@ class PyTest(TestCommand):
         errno = pytest.main(self.pytest_args)
         sys.exit(errno)
 
+
 setup(
     name='graphql-relay',
-    version='0.4.5',
+    version='0.5.0',
 
     description='Relay implementation for Python',
     long_description=open('README.rst').read(),
@@ -43,9 +44,10 @@ setup(
         'Programming Language :: Python :: 2',
         'Programming Language :: Python :: 2.7',
         'Programming Language :: Python :: 3',
-        'Programming Language :: Python :: 3.3',
-        'Programming Language :: Python :: 3.4',
         'Programming Language :: Python :: 3.5',
+        'Programming Language :: Python :: 3.6',
+        'Programming Language :: Python :: 3.7',
+        'Programming Language :: Python :: 3.8',
         'Programming Language :: Python :: Implementation :: PyPy',
     ],
 
@@ -58,7 +60,7 @@ setup(
         'graphql-core>=0.5.0,<2',
         'promise>=0.4.0'
     ],
-    tests_require=['pytest>=2.7.2'],
+    tests_require=['pytest>=3,<4'],
     extras_require={
     },
 
