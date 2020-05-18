@@ -1,6 +1,10 @@
 import binascii
 import warnings
-from typing import Any, Optional, Sequence
+from typing import Any, Iterator, Optional, Sequence
+try:
+    from typing import Protocol
+except ImportError:
+    from typing_extensions import Protocol  # type: ignore
 
 from ..utils.base64 import base64, unbase64
 from .connectiontypes import (
@@ -25,8 +29,14 @@ __all__ = [
 ]
 
 
+class SizedSliceable(Protocol):
+    def __getitem__(self, index: slice) -> Any: ...
+    def __iter__(self) -> Iterator: ...
+    def __len__(self) -> int: ...
+
+
 def connection_from_array(
-    data: Sequence,
+    data: SizedSliceable,
     args: ConnectionArguments = None,
     connection_type: ConnectionConstructor = Connection,
     edge_type: EdgeConstructor = Edge,
@@ -83,7 +93,7 @@ def connection_from_list(
 
 
 def connection_from_array_slice(
-    array_slice: Sequence,
+    array_slice: SizedSliceable,
     args: ConnectionArguments = None,
     slice_start: int = 0,
     array_length: int = None,
