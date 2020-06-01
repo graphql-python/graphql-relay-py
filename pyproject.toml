@@ -31,6 +31,7 @@ packages = [
 [tool.poetry.dependencies]
 python = "^3.6"
 graphql-core = "^3.0"
+typing-extensions = { version = "^3.6.2", python = "<3.8" }
 
 [tool.poetry.dev-dependencies]
 pytest = "^5.3"

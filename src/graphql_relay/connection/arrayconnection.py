@@ -6,9 +6,13 @@ from ..utils.base64 import base64, unbase64
 from .connectiontypes import (
     Connection,
     ConnectionArguments,
+    ConnectionConstructor,
     ConnectionCursor,
+    ConnectionType,
     Edge,
+    EdgeConstructor,
     PageInfo,
+    PageInfoConstructor,
 )
 
 __all__ = [
@@ -24,10 +28,10 @@ __all__ = [
 def connection_from_array(
     data: Sequence,
     args: ConnectionArguments = None,
-    connection_type: Any = Connection,
-    edge_type: Any = Edge,
-    page_info_type: Any = PageInfo,
-) -> Connection:
+    connection_type: ConnectionConstructor = Connection,
+    edge_type: EdgeConstructor = Edge,
+    page_info_type: PageInfoConstructor = PageInfo,
+) -> ConnectionType:
     """Create a connection object from a sequence of objects.
 
     Note that different from its JavaScript counterpart which expects an array,
@@ -54,10 +58,10 @@ def connection_from_array(
 def connection_from_list(
     data: Sequence,
     args: ConnectionArguments = None,
-    connection_type: Any = Connection,
-    edge_type: Any = Edge,
-    pageinfo_type: Any = PageInfo,
-) -> Connection:
+    connection_type: ConnectionConstructor = Connection,
+    edge_type: EdgeConstructor = Edge,
+    pageinfo_type: PageInfoConstructor = PageInfo,
+) -> ConnectionType:
     """Deprecated alias for connection_from_array.
 
     We're now using the JavaScript terminology in Python as well, since list
@@ -84,10 +88,10 @@ def connection_from_array_slice(
     slice_start: int = 0,
     array_length: int = None,
     array_slice_length: int = None,
-    connection_type: Any = Connection,
-    edge_type: Any = Edge,
-    page_info_type: Any = PageInfo,
-) -> Connection:
+    connection_type: ConnectionConstructor = Connection,
+    edge_type: EdgeConstructor = Edge,
+    page_info_type: PageInfoConstructor = PageInfo,
+) -> ConnectionType:
     """Create a connection object from a slice of the result set.
 
     Note that different from its JavaScript counterpart which expects an array,
@@ -162,13 +166,13 @@ def connection_from_array_slice(
 def connection_from_list_slice(
     list_slice: Sequence,
     args: ConnectionArguments = None,
-    connection_type: Any = Connection,
-    edge_type: Any = Edge,
-    pageinfo_type: Any = PageInfo,
+    connection_type: ConnectionConstructor = Connection,
+    edge_type: EdgeConstructor = Edge,
+    pageinfo_type: PageInfoConstructor = PageInfo,
     slice_start=0,
     list_length=0,
     list_slice_length=None,
-) -> Connection:
+) -> ConnectionType:
     """Deprecated alias for connection_from_array_slice.
 
     We're now using the JavaScript terminology in Python as well, since list
