@@ -135,26 +135,26 @@ def connection_from_list_slice_lazy(list_slice, args=None, connection_type=None,
 
     # Validations
     if first_is_negative or last_is_negative:
-        raise ValidationException("first and last can't be negative values")
+        raise ValueError("first and last can't be negative values")
 
     if first and last:
-        raise ValidationException(
+        raise ValueError(
             "Including a value for both first and last is strongly discouraged,"
             " as it is likely to lead to confusing queries and results"
         )
 
     if before and last is None:
-        raise ValidationException(
+        raise ValueError(
             "before without last is not supported"
         )
 
     if after and first is None:
-        raise ValidationException(
+        raise ValueError(
             "after without first is not supported"
         )
 
     if before and after:
-        raise ValidationException(
+        raise ValueError(
             "Mixing before and after is not supported"
         )
 
@@ -174,7 +174,13 @@ def connection_from_list_slice_lazy(list_slice, args=None, connection_type=None,
         end_offset = before_offset
         start_offset = before_offset - last if before_offset - last > 0 else 0
 
-    _slice = list_slice[start_offset:end_offset]
+    # Slice with an extra item to figure out if there's a next page
+    _slice = list_slice[start_offset : end_offset + 1]
+    has_next_page = False
+
+    if (first and len(_slice) > first) or (last and len(_slice) > last):
+        has_next_page = True
+        del _slice[-1]
 
     edges = [
         edge_type(
