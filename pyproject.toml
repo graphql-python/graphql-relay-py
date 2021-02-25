@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "graphql-relay"
-version = "3.0.0"
+version = "3.1.0"
 description = """
 Relay library for graphql-core"""
 license="MIT"
@@ -42,7 +42,7 @@ packages = [
 
 [tool.poetry.dependencies]
 python = "^3.6"
-graphql-core = "^3.0"
+graphql-core = "^3.1"
 typing-extensions = { version = "^3.6.2", python = "<3.8" }
 
 [tool.poetry.dev-dependencies]
