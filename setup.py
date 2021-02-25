@@ -31,7 +31,7 @@ setup(
     ],
     install_requires=[
         "graphql-core>=3.0.0",
-        "typing-extensions>=3.6.2,<4; python_version < '3.8'",
+        "typing-extensions>=3.7,<4; python_version < '3.8'",
     ],
     python_requires=">=3.6,<4",
     packages=find_packages("src"),

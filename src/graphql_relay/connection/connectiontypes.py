@@ -1,4 +1,5 @@
 from typing import Any, Dict, List, NamedTuple, Optional
+
 try:
     from typing import Protocol
 except ImportError:
@@ -13,10 +14,17 @@ ConnectionCursor = str
 
 class PageInfoType(Protocol):
     @property
-    def startCursor(self) -> Optional[ConnectionCursor]: ...
-    def endCursor(self) -> Optional[ConnectionCursor]: ...
-    def hasPreviousPage(self) -> Optional[bool]: ...
-    def hasNextPage(self) -> Optional[bool]: ...
+    def startCursor(self) -> Optional[ConnectionCursor]:
+        ...
+
+    def endCursor(self) -> Optional[ConnectionCursor]:
+        ...
+
+    def hasPreviousPage(self) -> Optional[bool]:
+        ...
+
+    def hasNextPage(self) -> Optional[bool]:
+        ...
 
 
 class PageInfoConstructor(Protocol):
@@ -27,7 +35,8 @@ class PageInfoConstructor(Protocol):
         endCursor: Optional[ConnectionCursor],
         hasPreviousPage: Optional[bool],
         hasNextPage: Optional[bool],
-    ) -> PageInfoType: ...
+    ) -> PageInfoType:
+        ...
 
 
 class PageInfo(NamedTuple):
@@ -41,13 +50,17 @@ class PageInfo(NamedTuple):
 
 class EdgeType(Protocol):
     @property
-    def node(self) -> Any: ...
+    def node(self) -> Any:
+        ...
+
     @property
-    def cursor(self) -> ConnectionCursor: ...
+    def cursor(self) -> ConnectionCursor:
+        ...
 
 
 class EdgeConstructor(Protocol):
-    def __call__(self, *, node: Any, cursor: ConnectionCursor) -> EdgeType: ...
+    def __call__(self, *, node: Any, cursor: ConnectionCursor) -> EdgeType:
+        ...
 
 
 class Edge(NamedTuple):
@@ -59,9 +72,12 @@ class Edge(NamedTuple):
 
 class ConnectionType(Protocol):
     @property
-    def edges(self): List[EdgeType]: ...
+    def edges(self):
+        List[EdgeType]: ...
+
     @property
-    def pageInfo(self): PageInfoType: ...
+    def pageInfo(self):
+        PageInfoType: ...
 
 
 class ConnectionConstructor(Protocol):
@@ -70,7 +86,8 @@ class ConnectionConstructor(Protocol):
         *,
         edges: List[EdgeType],
         pageInfo: PageInfoType,
-    ) -> ConnectionType: ...
+    ) -> ConnectionType:
+        ...
 
 
 class Connection(NamedTuple):

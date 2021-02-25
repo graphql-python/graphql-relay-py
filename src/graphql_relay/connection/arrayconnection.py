@@ -1,6 +1,7 @@
 import binascii
 import warnings
 from typing import Any, Iterator, Optional, Sequence
+
 try:
     from typing import Protocol
 except ImportError:
@@ -30,9 +31,14 @@ __all__ = [
 
 
 class SizedSliceable(Protocol):
-    def __getitem__(self, index: slice) -> Any: ...
-    def __iter__(self) -> Iterator: ...
-    def __len__(self) -> int: ...
+    def __getitem__(self, index: slice) -> Any:
+        ...
+
+    def __iter__(self) -> Iterator:
+        ...
+
+    def __len__(self) -> int:
+        ...
 
 
 def connection_from_array(
