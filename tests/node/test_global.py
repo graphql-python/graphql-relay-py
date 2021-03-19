@@ -16,41 +16,40 @@ from graphql.type import (
 from graphql_relay import from_global_id, global_id_field, node_definitions
 
 
+class User(NamedTuple):
+    id: int
+    name: str
+
+
+class Photo(NamedTuple):
+    photo_id: int
+    width: int
+
+
+class Post(NamedTuple):
+    id: int
+    text: str
+
+
 @fixture(scope="module", params=["object_access", "dict_access"])
 def schema(request):
     """Run each test with object access and dict access."""
     use_dicts = request.param == "dict_access"
 
-    if use_dicts:
+    user_cls = dict if use_dicts else User
+    user_data = {
+        "1": user_cls(id=1, name="John Doe"),
+        "2": user_cls(id=2, name="Jane Smith"),
+    }
 
-        class User(dict):
-            pass
+    photo_cls = dict if use_dicts else Photo
+    photo_data = {
+        "1": photo_cls(photo_id=1, width=300),
+        "2": photo_cls(photo_id=2, width=400),
+    }
 
-        class Photo(dict):
-            pass
-
-        class Post(dict):
-            pass
-
-    else:
-
-        class User(NamedTuple):
-            id: int
-            name: str
-
-        class Photo(NamedTuple):
-            photo_id: int
-            width: int
-
-        class Post(NamedTuple):
-            id: int
-            text: str
-
-    user_data = {"1": User(id=1, name="John Doe"), "2": User(id=2, name="Jane Smith")}
-
-    photo_data = {"1": Photo(photo_id=1, width=300), "2": Photo(photo_id=2, width=400)}
-
-    post_data = {"1": Post(id=1, text="lorem"), "2": Post(id=2, text="ipsum")}
+    post_cls = dict if use_dicts else Post
+    post_data = {"1": post_cls(id=1, text="lorem"), "2": post_cls(id=2, text="ipsum")}
 
     def get_node(
         global_id: str, info: GraphQLResolveInfo
