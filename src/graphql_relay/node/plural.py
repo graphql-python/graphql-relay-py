@@ -8,6 +8,7 @@ from graphql.type import (
     GraphQLList,
     GraphQLNonNull,
     GraphQLResolveInfo,
+    is_non_null_type,
 )
 
 
@@ -18,7 +19,7 @@ def plural_identifying_root_field(
     resolve_single_input: Callable[[GraphQLResolveInfo, str], Any],
     description: str = None,
 ) -> GraphQLField:
-    if isinstance(input_type, GraphQLNonNull):
+    if is_non_null_type(input_type):
         input_type = input_type.of_type
     input_args = {
         arg_name: GraphQLArgument(
