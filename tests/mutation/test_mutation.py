@@ -20,11 +20,15 @@ class Result:
         self.result = result
 
 
+def dummy_resolve(_info, **_input):
+    return Result(1)
+
+
 simple_mutation = mutation_with_client_mutation_id(
     "SimpleMutation",
     input_fields={},
     output_fields={"result": GraphQLField(GraphQLInt)},
-    mutate_and_get_payload=lambda _info, **_input: Result(1),
+    mutate_and_get_payload=dummy_resolve,
 )
 
 simple_mutation_with_description = mutation_with_client_mutation_id(
@@ -32,14 +36,14 @@ simple_mutation_with_description = mutation_with_client_mutation_id(
     description="Simple Mutation Description",
     input_fields={},
     output_fields={"result": GraphQLField(GraphQLInt)},
-    mutate_and_get_payload=lambda _info, **_input: Result(1),
+    mutate_and_get_payload=dummy_resolve,
 )
 
 simple_mutation_with_deprecation_reason = mutation_with_client_mutation_id(
     "SimpleMutationWithDeprecationReason",
     input_fields={},
     output_fields={"result": GraphQLField(GraphQLInt)},
-    mutate_and_get_payload=lambda _info, **_input: Result(1),
+    mutate_and_get_payload=dummy_resolve,
     deprecation_reason="Just because",
 )
 
