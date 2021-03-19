@@ -1,4 +1,4 @@
-from typing import Any, Dict, NamedTuple, Optional, Union
+from typing import Any, NamedTuple, Optional
 
 from pytest import fixture  # type: ignore
 
@@ -17,17 +17,17 @@ from graphql_relay import from_global_id, global_id_field, node_definitions
 
 
 class User(NamedTuple):
-    id: int
+    id: str
     name: str
 
 
 class Photo(NamedTuple):
-    photo_id: int
+    photo_id: str
     width: int
 
 
 class Post(NamedTuple):
-    id: int
+    id: str
     text: str
 
 
@@ -37,44 +37,71 @@ def schema(request):
     use_dicts = request.param == "dict_access"
 
     user_cls = dict if use_dicts else User
-    user_data = {
-        "1": user_cls(id=1, name="John Doe"),
-        "2": user_cls(id=2, name="Jane Smith"),
-    }
+    user_data = [
+        user_cls(id="1", name="John Doe"),
+        user_cls(id="2", name="Jane Smith"),
+    ]
 
     photo_cls = dict if use_dicts else Photo
-    photo_data = {
-        "1": photo_cls(photo_id=1, width=300),
-        "2": photo_cls(photo_id=2, width=400),
-    }
+    photo_data = [
+        photo_cls(photo_id="1", width=300),
+        photo_cls(photo_id="2", width=400),
+    ]
 
     post_cls = dict if use_dicts else Post
-    post_data = {"1": post_cls(id=1, text="lorem"), "2": post_cls(id=2, text="ipsum")}
+    post_data = [post_cls(id="1", text="lorem"), post_cls(id="2", text="ipsum")]
 
-    def get_node(
-        global_id: str, info: GraphQLResolveInfo
-    ) -> Optional[Union[User, Photo, Post, Dict]]:
-        assert info.schema is schema
-        type_, id_ = from_global_id(global_id)
-        if type_ == "User":
-            return user_data[id_]
-        if type_ == "Photo":
-            return photo_data[id_]
-        if type_ == "Post":
-            return post_data[id_]
-        return None
+    if use_dicts:
 
-    def get_node_type(
-        obj: Union[User, Photo], info: GraphQLResolveInfo, _type: Any
-    ) -> Optional[GraphQLObjectType]:
-        assert info.schema is schema
-        if "name" in obj if use_dicts else isinstance(obj, User):
-            return user_type
-        if "photo_id" in obj if use_dicts else isinstance(obj, Photo):
-            return photo_type
-        if "text" in obj if use_dicts else isinstance(obj, Post):
-            return post_type
-        return None
+        def get_node(global_id: str, info: GraphQLResolveInfo) -> Any:
+            assert info.schema is schema
+            type_, id_ = from_global_id(global_id)
+            if type_ == "User":
+                return next(filter(lambda obj: obj["id"] == id_, user_data), None)
+            if type_ == "Photo":
+                return next(
+                    filter(lambda obj: obj["photo_id"] == id_, photo_data), None
+                )
+            if type_ == "Post":
+                return next(filter(lambda obj: obj["id"] == id_, post_data), None)
+            return None
+
+        def get_node_type(
+            obj: Any, info: GraphQLResolveInfo, _type: Any
+        ) -> Optional[GraphQLObjectType]:
+            assert info.schema is schema
+            if "name" in obj:
+                return user_type
+            if "photo_id" in obj:
+                return photo_type
+            if "text" in obj:
+                return post_type
+            return None
+
+    else:
+
+        def get_node(global_id: str, info: GraphQLResolveInfo) -> Any:
+            assert info.schema is schema
+            type_, id_ = from_global_id(global_id)
+            if type_ == "User":
+                return next(filter(lambda obj: obj.id == id_, user_data), None)
+            if type_ == "Photo":
+                return next(filter(lambda obj: obj.photo_id == id_, photo_data), None)
+            if type_ == "Post":
+                return next(filter(lambda obj: obj.id == id_, post_data), None)
+            return None
+
+        def get_node_type(
+            obj: Any, info: GraphQLResolveInfo, _type: Any
+        ) -> Optional[GraphQLObjectType]:
+            assert info.schema is schema
+            if isinstance(obj, User):
+                return user_type
+            if isinstance(obj, Photo):
+                return photo_type
+            if isinstance(obj, Post):
+                return post_type
+            return None
 
     node_interface, node_field = node_definitions(get_node, get_node_type)[:2]
 
@@ -111,14 +138,7 @@ def schema(request):
             "node": node_field,
             "allObjects": GraphQLField(
                 GraphQLList(node_interface),
-                resolve=lambda _root, _info: [
-                    user_data["1"],
-                    user_data["2"],
-                    photo_data["1"],
-                    photo_data["2"],
-                    post_data["1"],
-                    post_data["2"],
-                ],
+                resolve=lambda _root, _info: [*user_data, *photo_data, *post_data],
             ),
         },
     )

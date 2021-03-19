@@ -1,3 +1,4 @@
+from itertools import chain
 from typing import Any, NamedTuple, Optional, Union
 
 from graphql import graphql_sync
@@ -25,27 +26,29 @@ class Photo(NamedTuple):
     width: int
 
 
-user_data = {"1": User(id="1", name="John Doe"), "2": User(id="2", name="Jane Smith")}
+user_data = [User(id="1", name="John Doe"), User(id="2", name="Jane Smith")]
 
-photo_data = {"3": Photo(id="3", width=300), "4": Photo(id="4", width=400)}
+photo_data = [Photo(id="3", width=300), Photo(id="4", width=400)]
 
 
 def get_node(id_: str, info: GraphQLResolveInfo) -> Optional[Union[User, Photo]]:
     assert info.schema is schema
-    if id_ in user_data:
-        return user_data[id_]
-    if id_ in photo_data:
-        return photo_data[id_]
-    return None
+    return next(
+        filter(
+            lambda obj: obj.id == id_,  # type: ignore
+            chain(user_data, photo_data),
+        ),
+        None,
+    )
 
 
 def get_node_type(
     obj: Union[User, Photo], info: GraphQLResolveInfo, _type: Any
 ) -> Optional[GraphQLObjectType]:
     assert info.schema is schema
-    if obj.id in user_data:
+    if obj in user_data:
         return user_type
-    if obj.id in photo_data:
+    if obj in photo_data:
         return photo_type
     return None
 

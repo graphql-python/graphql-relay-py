@@ -4,7 +4,7 @@ from typing import Any, Iterator, Optional, Sequence
 
 try:
     from typing import Protocol
-except ImportError:
+except ImportError:  # Python < 3.8
     from typing_extensions import Protocol  # type: ignore
 
 from ..utils.base64 import base64, unbase64

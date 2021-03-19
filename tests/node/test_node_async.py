@@ -20,12 +20,13 @@ class User(NamedTuple):
     name: str
 
 
-user_data = {"1": User(id="1", name="John Doe"), "2": User(id="2", name="Jane Smith")}
+user_data = [User(id="1", name="John Doe"), User(id="2", name="Jane Smith")]
 
 user_type: GraphQLObjectType
 
 node_interface, node_field = node_definitions(
-    lambda id_, _info: user_data[id_], lambda _obj, _info, _type: user_type
+    lambda id_, _info: next(filter(lambda obj: obj.id == id_, user_data), None),
+    lambda _obj, _info, _type: user_type,
 )[:2]
 
 

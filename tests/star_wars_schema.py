@@ -15,11 +15,11 @@ from graphql_relay.mutation.mutation import mutation_with_client_mutation_id
 
 from .star_wars_data import (
     Faction,
-    getFaction,
-    getShip,
-    getRebels,
-    getEmpire,
-    createShip,
+    get_faction,
+    get_ship,
+    get_rebels,
+    get_empire,
+    create_ship,
 )
 
 # This is a basic end-to-end test, designed to demonstrate the various
@@ -102,9 +102,9 @@ from .star_wars_data import (
 def get_node(global_id, _info):
     type_, id_ = from_global_id(global_id)
     if type_ == "Faction":
-        return getFaction(id_)
+        return get_faction(id_)
     elif type_ == "Ship":
-        return getShip(id_)
+        return get_ship(id_)
     else:
         return None
 
@@ -171,7 +171,7 @@ factionType = GraphQLObjectType(
             description="The ships used by the faction.",
             args=connection_args,
             resolve=lambda faction, _info, **args: connection_from_array(
-                [getShip(ship) for ship in faction.ships], args
+                [get_ship(ship) for ship in faction.ships], args
             ),
         ),
     },
@@ -190,8 +190,8 @@ factionType = GraphQLObjectType(
 queryType = GraphQLObjectType(
     name="Query",
     fields=lambda: {
-        "rebels": GraphQLField(factionType, resolve=lambda _obj, _info: getRebels()),
-        "empire": GraphQLField(factionType, resolve=lambda _obj, _info: getEmpire()),
+        "rebels": GraphQLField(factionType, resolve=lambda _obj, _info: get_rebels()),
+        "empire": GraphQLField(factionType, resolve=lambda _obj, _info: get_empire()),
         "node": node_field,
     },
 )
@@ -224,8 +224,8 @@ class IntroduceShipMutation:
 
 # noinspection PyPep8Naming
 def mutate_and_get_payload(_info, shipName, factionId, **_input):
-    newShip = createShip(shipName, factionId)
-    return IntroduceShipMutation(shipId=newShip.id, factionId=factionId)
+    new_ship = create_ship(shipName, factionId)
+    return IntroduceShipMutation(shipId=new_ship.id, factionId=factionId)
 
 
 shipMutation = mutation_with_client_mutation_id(
@@ -236,10 +236,10 @@ shipMutation = mutation_with_client_mutation_id(
     },
     output_fields={
         "ship": GraphQLField(
-            shipType, resolve=lambda payload, _info: getShip(payload.shipId)
+            shipType, resolve=lambda payload, _info: get_ship(payload.shipId)
         ),
         "faction": GraphQLField(
-            factionType, resolve=lambda payload, _info: getFaction(payload.factionId)
+            factionType, resolve=lambda payload, _info: get_faction(payload.factionId)
         ),
     },
     mutate_and_get_payload=mutate_and_get_payload,

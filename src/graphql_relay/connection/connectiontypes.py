@@ -2,7 +2,7 @@ from typing import Any, Dict, List, NamedTuple, Optional
 
 try:
     from typing import Protocol
-except ImportError:
+except ImportError:  # Python < 3.8
     from typing_extensions import Protocol  # type: ignore
 
 __all__ = ["Connection", "ConnectionArguments", "ConnectionCursor", "Edge", "PageInfo"]
