@@ -1,6 +1,6 @@
 from typing import Any, NamedTuple, Optional, Union
 
-from graphql import graphql_sync as graphql
+from graphql import graphql_sync
 from graphql.type import (
     GraphQLField,
     GraphQLID,
@@ -88,7 +88,7 @@ def describe_node_interface_and_fields():
                 }
               }
             """
-            assert graphql(schema, query) == ({"node": {"id": "1"}}, None)
+            assert graphql_sync(schema, query) == ({"node": {"id": "1"}}, None)
 
         def gets_the_correct_name_for_users():
             query = """
@@ -101,7 +101,7 @@ def describe_node_interface_and_fields():
                 }
               }
             """
-            assert graphql(schema, query) == (
+            assert graphql_sync(schema, query) == (
                 {"node": {"id": "1", "name": "John Doe"}},
                 None,
             )
@@ -117,7 +117,10 @@ def describe_node_interface_and_fields():
                 }
               }
             """
-            assert graphql(schema, query) == ({"node": {"id": "4", "width": 400}}, None)
+            assert graphql_sync(schema, query) == (
+                {"node": {"id": "4", "width": 400}},
+                None,
+            )
 
         def gets_the_correct_typename_for_users():
             query = """
@@ -128,7 +131,7 @@ def describe_node_interface_and_fields():
                 }
               }
             """
-            assert graphql(schema, query) == (
+            assert graphql_sync(schema, query) == (
                 {"node": {"id": "1", "__typename": "User"}},
                 None,
             )
@@ -142,7 +145,7 @@ def describe_node_interface_and_fields():
                 }
               }
             """
-            assert graphql(schema, query) == (
+            assert graphql_sync(schema, query) == (
                 {"node": {"id": "4", "__typename": "Photo"}},
                 None,
             )
@@ -158,7 +161,7 @@ def describe_node_interface_and_fields():
                 }
               }
             """
-            assert graphql(schema, query) == ({"node": {"id": "1"}}, None)
+            assert graphql_sync(schema, query) == ({"node": {"id": "1"}}, None)
 
         def returns_null_for_bad_ids():
             query = """
@@ -168,7 +171,7 @@ def describe_node_interface_and_fields():
                 }
               }
             """
-            assert graphql(schema, query) == ({"node": None}, None)
+            assert graphql_sync(schema, query) == ({"node": None}, None)
 
         def returns_nulls_for_bad_ids():
             query = """
@@ -178,7 +181,7 @@ def describe_node_interface_and_fields():
                 }
               }
             """
-            assert graphql(schema, query) == ({"nodes": [{"id": "3"}, None]}, None)
+            assert graphql_sync(schema, query) == ({"nodes": [{"id": "3"}, None]}, None)
 
     def describe_introspection():
         def has_correct_node_interface():
@@ -200,7 +203,7 @@ def describe_node_interface_and_fields():
                 }
               }
             """
-            assert graphql(schema, query) == (
+            assert graphql_sync(schema, query) == (
                 {
                     "__type": {
                         "name": "Node",
@@ -245,7 +248,7 @@ def describe_node_interface_and_fields():
                 }
               }
             """
-            assert graphql(schema, query) == (
+            assert graphql_sync(schema, query) == (
                 {
                     "__schema": {
                         "queryType": {

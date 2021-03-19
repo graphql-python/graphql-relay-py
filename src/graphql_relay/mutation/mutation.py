@@ -1,4 +1,4 @@
-from inspect import isawaitable
+from inspect import iscoroutinefunction
 from typing import Any, Callable
 
 from graphql.error import GraphQLError
@@ -75,23 +75,40 @@ def mutation_with_client_mutation_id(
 
     input_type = GraphQLInputObjectType(name + "Input", fields=augmented_input_fields)
 
-    # noinspection PyShadowingBuiltins
-    async def resolve(_root, info, input):
-        payload = mutate_and_get_payload(info, **input)
-        if isawaitable(payload):
-            payload = await payload
-        try:
-            clientMutationId = input["clientMutationId"]
-        except KeyError:
-            raise GraphQLError(
-                "Cannot set clientMutationId"
-                f" in the payload object {inspect(payload)}."
-            )
-        if payload is None:
-            payload = NullResult(clientMutationId)
-        else:
-            payload.clientMutationId = clientMutationId
-        return payload
+    if iscoroutinefunction(mutate_and_get_payload):
+
+        # noinspection PyShadowingBuiltins
+        async def resolve(_root, info, input):
+            payload = await mutate_and_get_payload(info, **input)
+            try:
+                clientMutationId = input["clientMutationId"]
+            except KeyError:
+                raise GraphQLError(
+                    "Cannot set clientMutationId"
+                    f" in the payload object {inspect(payload)}."
+                )
+            if payload is None:
+                payload = NullResult(clientMutationId)
+            else:
+                payload.clientMutationId = clientMutationId
+            return payload
+
+    else:
+
+        def resolve(_root, info, input):
+            payload = mutate_and_get_payload(info, **input)
+            try:
+                clientMutationId = input["clientMutationId"]
+            except KeyError:
+                raise GraphQLError(
+                    "Cannot set clientMutationId"
+                    f" in the payload object {inspect(payload)}."
+                )
+            if payload is None:
+                payload = NullResult(clientMutationId)
+            else:
+                payload.clientMutationId = clientMutationId
+            return payload
 
     return GraphQLField(
         output_type,

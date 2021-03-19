@@ -1,8 +1,6 @@
 from typing import List, NamedTuple
 
-from pytest import mark  # type: ignore
-
-from graphql import graphql
+from graphql import graphql_sync
 from graphql.type import (
     GraphQLField,
     GraphQLInt,
@@ -97,8 +95,7 @@ schema = GraphQLSchema(query=query_type)
 
 
 def describe_connection_definition():
-    @mark.asyncio
-    async def includes_connection_and_edge_fields():
+    def includes_connection_and_edge_fields():
         query = """
           query FriendsQuery {
             user {
@@ -114,7 +111,7 @@ def describe_connection_definition():
             }
           }
         """
-        assert await graphql(schema, query) == (
+        assert graphql_sync(schema, query) == (
             {
                 "user": {
                     "friends": {
@@ -129,8 +126,7 @@ def describe_connection_definition():
             None,
         )
 
-    @mark.asyncio
-    async def works_with_forward_connection_args():
+    def works_with_forward_connection_args():
         query = """
           query FriendsQuery {
             user {
@@ -144,7 +140,7 @@ def describe_connection_definition():
             }
           }
         """
-        assert await graphql(schema, query) == (
+        assert graphql_sync(schema, query) == (
             {
                 "user": {
                     "friendsForward": {
@@ -155,8 +151,7 @@ def describe_connection_definition():
             None,
         )
 
-    @mark.asyncio
-    async def works_with_backward_connection_args():
+    def works_with_backward_connection_args():
         query = """
           query FriendsQuery {
             user {
@@ -170,7 +165,7 @@ def describe_connection_definition():
             }
           }
         """
-        assert await graphql(schema, query) == (
+        assert graphql_sync(schema, query) == (
             {
                 "user": {
                     "friendsBackward": {

@@ -2,7 +2,7 @@ from typing import Any, Dict, NamedTuple, Optional, Union
 
 from pytest import fixture  # type: ignore
 
-from graphql import graphql_sync as graphql
+from graphql import graphql_sync
 from graphql.type import (
     GraphQLField,
     GraphQLList,
@@ -137,7 +137,7 @@ def describe_global_id_fields():
           }
         }
         """
-        assert graphql(schema, query) == (
+        assert graphql_sync(schema, query) == (
             {
                 "allObjects": [
                     {"id": "VXNlcjox"},
@@ -174,7 +174,7 @@ def describe_global_id_fields():
           }
         }
         """
-        assert graphql(schema, query) == (
+        assert graphql_sync(schema, query) == (
             {
                 "user": {"id": "VXNlcjox", "name": "John Doe"},
                 "photo": {"id": "UGhvdG86MQ==", "width": 300},
