@@ -31,6 +31,11 @@ def resolve_maybe_thunk(thing_or_thunk: Thunk) -> Any:
     return thing_or_thunk() if callable(thing_or_thunk) else thing_or_thunk
 
 
+class NullResult:
+    def __init__(self, clientMutationId=None):
+        self.clientMutationId = clientMutationId
+
+
 def mutation_with_client_mutation_id(
     name: str,
     input_fields: Thunk[GraphQLInputFieldMap],
@@ -76,12 +81,16 @@ def mutation_with_client_mutation_id(
         if isawaitable(payload):
             payload = await payload
         try:
-            payload.clientMutationId = input["clientMutationId"]
+            clientMutationId = input["clientMutationId"]
         except KeyError:
             raise GraphQLError(
                 "Cannot set clientMutationId"
                 f" in the payload object {inspect(payload)}."
             )
+        if payload is None:
+            payload = NullResult(clientMutationId)
+        else:
+            payload.clientMutationId = clientMutationId
         return payload
 
     return GraphQLField(

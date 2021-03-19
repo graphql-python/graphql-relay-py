@@ -178,6 +178,21 @@ def describe_mutation_with_client_mutation_id():
             None,
         )
 
+    @mark.asyncio
+    async def supports_mutations_returning_null():
+        query = """
+          mutation M {
+            simpleRootValueMutation(input: {clientMutationId: "abc"}) {
+              result
+              clientMutationId
+            }
+          }
+        """
+        assert await graphql(schema, query, root_value=None) == (
+            {"simpleRootValueMutation": {"result": None, "clientMutationId": "abc"}},
+            None,
+        )
+
     def describe_introspection():
         @mark.asyncio
         async def contains_correct_input():
