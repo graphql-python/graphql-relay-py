@@ -6,7 +6,7 @@ from .star_wars_schema import StarWarsSchema as schema
 def describe_star_wars_object_identification():
     def fetches_the_id_and_name_of_the_rebels():
         source = """
-            query RebelsQuery {
+            {
               rebels {
                 id
                 name
@@ -21,7 +21,7 @@ def describe_star_wars_object_identification():
 
     def refetches_the_rebels():
         source = """
-            query RebelsRefetchQuery {
+            {
               node(id: "RmFjdGlvbjox") {
                 id
                 ... on Faction {
@@ -38,7 +38,7 @@ def describe_star_wars_object_identification():
 
     def fetches_the_id_and_name_of_the_empire():
         source = """
-            query EmpireQuery {
+            {
               empire {
                 id
                 name
@@ -51,7 +51,7 @@ def describe_star_wars_object_identification():
 
     def refetches_the_empire():
         source = """
-            query EmpireRefetchQuery {
+            {
               node(id: "RmFjdGlvbjoy") {
                 id
                 ... on Faction {
@@ -66,7 +66,7 @@ def describe_star_wars_object_identification():
 
     def refetches_the_x_wing():
         source = """
-            query XWingRefetchQuery {
+            {
               node(id: "U2hpcDox") {
                 id
                 ... on Ship {

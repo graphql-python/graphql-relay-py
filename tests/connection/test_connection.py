@@ -97,20 +97,20 @@ schema = GraphQLSchema(query=query_type)
 def describe_connection_definition():
     def includes_connection_and_edge_fields():
         source = """
-          query FriendsQuery {
-            user {
-              friends(first: 2) {
-                totalCount
-                edges {
-                  friendshipTime
-                  node {
-                    name
+            {
+              user {
+                friends(first: 2) {
+                  totalCount
+                  edges {
+                    friendshipTime
+                    node {
+                      name
+                    }
                   }
                 }
               }
             }
-          }
-        """
+            """
         assert graphql_sync(schema, source) == (
             {
                 "user": {
@@ -128,18 +128,18 @@ def describe_connection_definition():
 
     def works_with_forward_connection_args():
         source = """
-          query FriendsQuery {
-            user {
-              friendsForward(first: 2) {
-                edges {
-                  node {
-                    name
+            {
+              user {
+                friendsForward(first: 2) {
+                  edges {
+                    node {
+                      name
+                    }
                   }
                 }
               }
             }
-          }
-        """
+            """
         assert graphql_sync(schema, source) == (
             {
                 "user": {
@@ -153,18 +153,18 @@ def describe_connection_definition():
 
     def works_with_backward_connection_args():
         source = """
-          query FriendsQuery {
-            user {
-              friendsBackward(last: 2) {
-                edges {
-                  node {
-                    name
+            {
+              user {
+                friendsBackward(last: 2) {
+                  edges {
+                    node {
+                      name
+                    }
                   }
                 }
               }
             }
-          }
-        """
+            """
         assert graphql_sync(schema, source) == (
             {
                 "user": {

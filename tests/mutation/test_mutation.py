@@ -97,12 +97,12 @@ schema = GraphQLSchema(query=query_type, mutation=mutation_type)
 def describe_mutation_with_client_mutation_id():
     def requires_an_argument():
         source = """
-          mutation M {
-            simpleMutation {
-              result
+            mutation {
+              simpleMutation {
+                result
+              }
             }
-          }
-        """
+            """
         assert graphql_sync(schema, source) == (
             None,
             [
@@ -110,20 +110,20 @@ def describe_mutation_with_client_mutation_id():
                     "message": "Field 'simpleMutation' argument 'input'"
                     " of type 'SimpleMutationInput!' is required,"
                     " but it was not provided.",
-                    "locations": [(3, 13)],
+                    "locations": [(3, 15)],
                 }
             ],
         )
 
     def returns_the_same_client_mutation_id():
         source = """
-          mutation M {
-            simpleMutation(input: {clientMutationId: "abc"}) {
-              result
-              clientMutationId
+            mutation {
+              simpleMutation(input: {clientMutationId: "abc"}) {
+                result
+                clientMutationId
+              }
             }
-          }
-        """
+            """
         assert graphql_sync(schema, source) == (
             {"simpleMutation": {"result": 1, "clientMutationId": "abc"}},
             None,
@@ -131,14 +131,14 @@ def describe_mutation_with_client_mutation_id():
 
     def supports_thunks_as_input_and_output_fields():
         source = """
-          mutation M {
-            simpleMutationWithThunkFields(
-                input: {inputData: 1234, clientMutationId: "abc"}) {
-              result
-              clientMutationId
+            mutation {
+              simpleMutationWithThunkFields(
+                  input: {inputData: 1234, clientMutationId: "abc"}) {
+                result
+                clientMutationId
+              }
             }
-          }
-        """
+            """
         assert graphql_sync(schema, source) == (
             {
                 "simpleMutationWithThunkFields": {
@@ -152,13 +152,13 @@ def describe_mutation_with_client_mutation_id():
     @mark.asyncio
     async def supports_async_mutations():
         source = """
-          mutation M {
-            simpleAsyncMutation(input: {clientMutationId: "abc"}) {
-              result
-              clientMutationId
+            mutation {
+              simpleAsyncMutation(input: {clientMutationId: "abc"}) {
+                result
+                clientMutationId
+              }
             }
-          }
-        """
+            """
         assert await graphql(schema, source) == (
             {"simpleAsyncMutation": {"result": 1, "clientMutationId": "abc"}},
             None,
@@ -166,13 +166,13 @@ def describe_mutation_with_client_mutation_id():
 
     def can_access_root_value():
         source = """
-          mutation M {
-            simpleRootValueMutation(input: {clientMutationId: "abc"}) {
-              result
-              clientMutationId
+            mutation {
+              simpleRootValueMutation(input: {clientMutationId: "abc"}) {
+                result
+                clientMutationId
+              }
             }
-          }
-        """
+            """
         assert graphql_sync(schema, source, root_value=Result(1)) == (
             {"simpleRootValueMutation": {"result": 1, "clientMutationId": "abc"}},
             None,
@@ -180,13 +180,13 @@ def describe_mutation_with_client_mutation_id():
 
     def supports_mutations_returning_null():
         source = """
-          mutation M {
-            simpleRootValueMutation(input: {clientMutationId: "abc"}) {
-              result
-              clientMutationId
+            mutation {
+              simpleRootValueMutation(input: {clientMutationId: "abc"}) {
+                result
+                clientMutationId
+              }
             }
-          }
-        """
+            """
         assert graphql_sync(schema, source, root_value=None) == (
             {"simpleRootValueMutation": {"result": None, "clientMutationId": "abc"}},
             None,

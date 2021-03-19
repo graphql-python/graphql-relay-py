@@ -6,7 +6,7 @@ from .star_wars_schema import StarWarsSchema as schema
 def describe_star_wars_connections():
     def fetches_the_first_ship_of_the_rebels():
         source = """
-            query RebelsShipsQuery {
+            {
               rebels {
                 name,
                 ships(first: 1) {
@@ -30,7 +30,7 @@ def describe_star_wars_connections():
 
     def fetches_the_first_two_ships_of_the_rebels_with_a_cursor():
         source = """
-            query MoreRebelShipsQuery {
+            {
               rebels {
                 name,
                 ships(first: 2) {
@@ -66,7 +66,7 @@ def describe_star_wars_connections():
 
     def fetches_the_next_three_ships_of_the_rebels_with_a_cursor():
         source = """
-            query EndOfRebelShipsQuery {
+            {
               rebels {
                 name,
                 ships(first: 3 after: "YXJyYXljb25uZWN0aW9uOjE=") {
@@ -106,7 +106,7 @@ def describe_star_wars_connections():
 
     def fetches_no_ships_of_the_rebels_at_the_end_of_connection():
         source = """
-            query RebelsQuery {
+            {
               rebels {
                 name,
                 ships(first: 3 after: "YXJyYXljb25uZWN0aW9uOjQ=") {
@@ -131,7 +131,7 @@ def describe_star_wars_connections():
 
     def identifies_the_end_of_the_list():
         source = """
-            query EndOfRebelShipsQuery {
+            {
               rebels {
                 name,
                 originalShips: ships(first: 2) {

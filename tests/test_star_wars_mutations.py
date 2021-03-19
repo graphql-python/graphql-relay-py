@@ -6,7 +6,7 @@ from .star_wars_schema import StarWarsSchema as schema
 def describe_star_wars_mutations():
     def correctly_mutates_dataset():
         source = """
-          mutation AddBWingQuery($input: IntroduceShipInput!) {
+          mutation ($input: IntroduceShipInput!) {
             introduceShip(input: $input) {
               ship {
                 id
