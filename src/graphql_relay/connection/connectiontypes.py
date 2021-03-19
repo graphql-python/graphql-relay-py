@@ -20,10 +20,10 @@ class PageInfoType(Protocol):
     def endCursor(self) -> Optional[ConnectionCursor]:
         ...
 
-    def hasPreviousPage(self) -> Optional[bool]:
+    def hasPreviousPage(self) -> bool:
         ...
 
-    def hasNextPage(self) -> Optional[bool]:
+    def hasNextPage(self) -> bool:
         ...
 
 
@@ -33,8 +33,8 @@ class PageInfoConstructor(Protocol):
         *,
         startCursor: Optional[ConnectionCursor],
         endCursor: Optional[ConnectionCursor],
-        hasPreviousPage: Optional[bool],
-        hasNextPage: Optional[bool],
+        hasPreviousPage: bool,
+        hasNextPage: bool,
     ) -> PageInfoType:
         ...
 
@@ -44,8 +44,8 @@ class PageInfo(NamedTuple):
 
     startCursor: Optional[ConnectionCursor]
     endCursor: Optional[ConnectionCursor]
-    hasPreviousPage: Optional[bool]
-    hasNextPage: Optional[bool]
+    hasPreviousPage: bool
+    hasNextPage: bool
 
 
 class EdgeType(Protocol):
