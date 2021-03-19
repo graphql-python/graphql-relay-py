@@ -1,4 +1,4 @@
-from typing import Any, Callable
+from typing import Any, Callable, cast
 
 from graphql.type import (
     GraphQLArgument,
@@ -20,12 +20,7 @@ def plural_identifying_root_field(
     description: str = None,
 ) -> GraphQLField:
     if is_non_null_type(input_type):
-        input_type = input_type.of_type
-    input_args = {
-        arg_name: GraphQLArgument(
-            GraphQLNonNull(GraphQLList(GraphQLNonNull(input_type)))
-        )
-    }
+        input_type = cast(GraphQLNonNull, input_type).of_type
 
     def resolve(_obj, info, **args):
         inputs = args[arg_name]
@@ -34,6 +29,10 @@ def plural_identifying_root_field(
     return GraphQLField(
         GraphQLList(output_type),
         description=description,
-        args=input_args,
+        args={
+            arg_name: GraphQLArgument(
+                GraphQLNonNull(GraphQLList(GraphQLNonNull(input_type)))
+            )
+        },
         resolve=resolve,
     )

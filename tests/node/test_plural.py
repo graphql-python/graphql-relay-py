@@ -1,8 +1,6 @@
 from typing import NamedTuple
 
-from pytest import mark  # type: ignore
-
-from graphql import graphql
+from graphql import graphql_sync
 from graphql.type import (
     GraphQLField,
     GraphQLObjectType,
@@ -55,8 +53,7 @@ class Context:
 
 
 def describe_plural_identifying_root_field():
-    @mark.asyncio
-    async def allows_fetching():
+    def allows_fetching():
         query = """
         {
           usernames(usernames:["dschafer", "leebyron", "schrockn"]) {
@@ -65,7 +62,7 @@ def describe_plural_identifying_root_field():
           }
         }
         """
-        assert await graphql(schema, query, context_value=Context()) == (
+        assert graphql_sync(schema, query, context_value=Context()) == (
             {
                 "usernames": [
                     {
@@ -85,8 +82,7 @@ def describe_plural_identifying_root_field():
             None,
         )
 
-    @mark.asyncio
-    async def correctly_introspects():
+    def correctly_introspects():
         query = """
         {
           __schema {
@@ -121,7 +117,7 @@ def describe_plural_identifying_root_field():
           }
         }
         """
-        assert await graphql(schema, query) == (
+        assert graphql_sync(schema, query) == (
             {
                 "__schema": {
                     "queryType": {
