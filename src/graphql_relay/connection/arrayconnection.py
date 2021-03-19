@@ -165,16 +165,14 @@ def connection_from_array_slice(
 
     first_edge_cursor = edges[0].cursor if edges else None
     last_edge_cursor = edges[-1].cursor if edges else None
-    lower_bound = after_offset + 1 if after else 0
-    upper_bound = before_offset if before else array_length
 
     return connection_type(
         edges=edges,
         pageInfo=page_info_type(
             startCursor=first_edge_cursor,
             endCursor=last_edge_cursor,
-            hasPreviousPage=isinstance(last, int) and start_offset > lower_bound,
-            hasNextPage=isinstance(first, int) and end_offset < upper_bound,
+            hasPreviousPage=start_offset > 0,
+            hasNextPage=end_offset < array_length,
         ),
     )
 
