@@ -96,14 +96,14 @@ schema = GraphQLSchema(query=query_type, mutation=mutation_type)
 
 def describe_mutation_with_client_mutation_id():
     def requires_an_argument():
-        query = """
+        source = """
           mutation M {
             simpleMutation {
               result
             }
           }
         """
-        assert graphql_sync(schema, query) == (
+        assert graphql_sync(schema, source) == (
             None,
             [
                 {
@@ -116,7 +116,7 @@ def describe_mutation_with_client_mutation_id():
         )
 
     def returns_the_same_client_mutation_id():
-        query = """
+        source = """
           mutation M {
             simpleMutation(input: {clientMutationId: "abc"}) {
               result
@@ -124,13 +124,13 @@ def describe_mutation_with_client_mutation_id():
             }
           }
         """
-        assert graphql_sync(schema, query) == (
+        assert graphql_sync(schema, source) == (
             {"simpleMutation": {"result": 1, "clientMutationId": "abc"}},
             None,
         )
 
     def supports_thunks_as_input_and_output_fields():
-        query = """
+        source = """
           mutation M {
             simpleMutationWithThunkFields(
                 input: {inputData: 1234, clientMutationId: "abc"}) {
@@ -139,7 +139,7 @@ def describe_mutation_with_client_mutation_id():
             }
           }
         """
-        assert graphql_sync(schema, query) == (
+        assert graphql_sync(schema, source) == (
             {
                 "simpleMutationWithThunkFields": {
                     "result": 1234,
@@ -151,7 +151,7 @@ def describe_mutation_with_client_mutation_id():
 
     @mark.asyncio
     async def supports_async_mutations():
-        query = """
+        source = """
           mutation M {
             simpleAsyncMutation(input: {clientMutationId: "abc"}) {
               result
@@ -159,13 +159,13 @@ def describe_mutation_with_client_mutation_id():
             }
           }
         """
-        assert await graphql(schema, query) == (
+        assert await graphql(schema, source) == (
             {"simpleAsyncMutation": {"result": 1, "clientMutationId": "abc"}},
             None,
         )
 
     def can_access_root_value():
-        query = """
+        source = """
           mutation M {
             simpleRootValueMutation(input: {clientMutationId: "abc"}) {
               result
@@ -173,13 +173,13 @@ def describe_mutation_with_client_mutation_id():
             }
           }
         """
-        assert graphql_sync(schema, query, root_value=Result(1)) == (
+        assert graphql_sync(schema, source, root_value=Result(1)) == (
             {"simpleRootValueMutation": {"result": 1, "clientMutationId": "abc"}},
             None,
         )
 
     def supports_mutations_returning_null():
-        query = """
+        source = """
           mutation M {
             simpleRootValueMutation(input: {clientMutationId: "abc"}) {
               result
@@ -187,14 +187,14 @@ def describe_mutation_with_client_mutation_id():
             }
           }
         """
-        assert graphql_sync(schema, query, root_value=None) == (
+        assert graphql_sync(schema, source, root_value=None) == (
             {"simpleRootValueMutation": {"result": None, "clientMutationId": "abc"}},
             None,
         )
 
     def describe_introspection():
         def contains_correct_input():
-            query = """
+            source = """
               {
                 __type(name: "SimpleMutationInput") {
                   name
@@ -209,7 +209,7 @@ def describe_mutation_with_client_mutation_id():
                 }
               }
             """
-            assert graphql_sync(schema, query) == (
+            assert graphql_sync(schema, source) == (
                 {
                     "__type": {
                         "name": "SimpleMutationInput",
@@ -226,7 +226,7 @@ def describe_mutation_with_client_mutation_id():
             )
 
         def contains_correct_payload():
-            query = """
+            source = """
               {
                 __type(name: "SimpleMutationPayload") {
                   name
@@ -241,7 +241,7 @@ def describe_mutation_with_client_mutation_id():
                 }
               }
             """
-            assert graphql_sync(schema, query) == (
+            assert graphql_sync(schema, source) == (
                 {
                     "__type": {
                         "name": "SimpleMutationPayload",
@@ -262,7 +262,7 @@ def describe_mutation_with_client_mutation_id():
             )
 
         def contains_correct_field():
-            query = """
+            source = """
               {
                 __schema {
                   mutationType {
@@ -288,7 +288,7 @@ def describe_mutation_with_client_mutation_id():
                 }
               }
             """
-            assert graphql_sync(schema, query) == (
+            assert graphql_sync(schema, source) == (
                 {
                     "__schema": {
                         "mutationType": {
@@ -403,7 +403,7 @@ def describe_mutation_with_client_mutation_id():
             )
 
         def contains_correct_descriptions():
-            query = """
+            source = """
               {
                 __schema {
                   mutationType {
@@ -415,7 +415,7 @@ def describe_mutation_with_client_mutation_id():
                 }
               }
             """
-            assert graphql_sync(schema, query) == (
+            assert graphql_sync(schema, source) == (
                 {
                     "__schema": {
                         "mutationType": {
@@ -442,7 +442,7 @@ def describe_mutation_with_client_mutation_id():
             )
 
         def contains_correct_deprecation_reason():
-            query = """
+            source = """
               {
                 __schema {
                   mutationType {
@@ -455,7 +455,7 @@ def describe_mutation_with_client_mutation_id():
                 }
               }
             """
-            assert graphql_sync(schema, query) == (
+            assert graphql_sync(schema, source) == (
                 {
                     "__schema": {
                         "mutationType": {

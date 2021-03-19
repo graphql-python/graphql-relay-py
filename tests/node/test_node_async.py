@@ -46,18 +46,18 @@ schema = GraphQLSchema(query=query_type, types=[user_type])
 def describe_node_interface_and_fields_with_async_object_fetcher():
     @mark.asyncio
     async def gets_the_correct_id_for_users():
-        query = """
+        source = """
           {
             node(id: "1") {
               id
             }
           }
         """
-        assert await graphql(schema, query) == ({"node": {"id": "1"}}, None)
+        assert await graphql(schema, source) == ({"node": {"id": "1"}}, None)
 
     @mark.asyncio
     async def gets_the_correct_name_for_users():
-        query = """
+        source = """
           {
             node(id: "1") {
               id
@@ -67,7 +67,7 @@ def describe_node_interface_and_fields_with_async_object_fetcher():
             }
           }
         """
-        assert await graphql(schema, query) == (
+        assert await graphql(schema, source) == (
             {"node": {"id": "1", "name": "John Doe"}},
             None,
         )

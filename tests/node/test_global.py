@@ -130,14 +130,14 @@ def schema(request):
 
 def describe_global_id_fields():
     def gives_different_ids(schema):
-        query = """
+        source = """
         {
           allObjects {
             id
           }
         }
         """
-        assert graphql_sync(schema, query) == (
+        assert graphql_sync(schema, source) == (
             {
                 "allObjects": [
                     {"id": "VXNlcjox"},
@@ -152,7 +152,7 @@ def describe_global_id_fields():
         )
 
     def refetches_the_ids(schema):
-        query = """
+        source = """
         {
           user: node(id: "VXNlcjox") {
             id
@@ -174,7 +174,7 @@ def describe_global_id_fields():
           }
         }
         """
-        assert graphql_sync(schema, query) == (
+        assert graphql_sync(schema, source) == (
             {
                 "user": {"id": "VXNlcjox", "name": "John Doe"},
                 "photo": {"id": "UGhvdG86MQ==", "width": 300},

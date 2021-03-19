@@ -96,7 +96,7 @@ schema = GraphQLSchema(query=query_type)
 
 def describe_connection_definition():
     def includes_connection_and_edge_fields():
-        query = """
+        source = """
           query FriendsQuery {
             user {
               friends(first: 2) {
@@ -111,7 +111,7 @@ def describe_connection_definition():
             }
           }
         """
-        assert graphql_sync(schema, query) == (
+        assert graphql_sync(schema, source) == (
             {
                 "user": {
                     "friends": {
@@ -127,7 +127,7 @@ def describe_connection_definition():
         )
 
     def works_with_forward_connection_args():
-        query = """
+        source = """
           query FriendsQuery {
             user {
               friendsForward(first: 2) {
@@ -140,7 +140,7 @@ def describe_connection_definition():
             }
           }
         """
-        assert graphql_sync(schema, query) == (
+        assert graphql_sync(schema, source) == (
             {
                 "user": {
                     "friendsForward": {
@@ -152,7 +152,7 @@ def describe_connection_definition():
         )
 
     def works_with_backward_connection_args():
-        query = """
+        source = """
           query FriendsQuery {
             user {
               friendsBackward(last: 2) {
@@ -165,7 +165,7 @@ def describe_connection_definition():
             }
           }
         """
-        assert graphql_sync(schema, query) == (
+        assert graphql_sync(schema, source) == (
             {
                 "user": {
                     "friendsBackward": {

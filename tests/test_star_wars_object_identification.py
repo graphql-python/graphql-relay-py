@@ -1,11 +1,11 @@
 from graphql import graphql_sync
 
-from .star_wars_schema import StarWarsSchema
+from .star_wars_schema import StarWarsSchema as schema
 
 
 def describe_star_wars_object_identification():
     def fetches_the_id_and_name_of_the_rebels():
-        query = """
+        source = """
             query RebelsQuery {
               rebels {
                 id
@@ -16,11 +16,11 @@ def describe_star_wars_object_identification():
         expected = {
             "rebels": {"id": "RmFjdGlvbjox", "name": "Alliance to Restore the Republic"}
         }
-        result = graphql_sync(StarWarsSchema, query)
+        result = graphql_sync(schema, source)
         assert result == (expected, None)
 
     def refetches_the_rebels():
-        query = """
+        source = """
             query RebelsRefetchQuery {
               node(id: "RmFjdGlvbjox") {
                 id
@@ -33,11 +33,11 @@ def describe_star_wars_object_identification():
         expected = {
             "node": {"id": "RmFjdGlvbjox", "name": "Alliance to Restore the Republic"}
         }
-        result = graphql_sync(StarWarsSchema, query)
+        result = graphql_sync(schema, source)
         assert result == (expected, None)
 
     def fetches_the_id_and_name_of_the_empire():
-        query = """
+        source = """
             query EmpireQuery {
               empire {
                 id
@@ -46,11 +46,11 @@ def describe_star_wars_object_identification():
             }
             """
         expected = {"empire": {"id": "RmFjdGlvbjoy", "name": "Galactic Empire"}}
-        result = graphql_sync(StarWarsSchema, query)
+        result = graphql_sync(schema, source)
         assert result == (expected, None)
 
     def refetches_the_empire():
-        query = """
+        source = """
             query EmpireRefetchQuery {
               node(id: "RmFjdGlvbjoy") {
                 id
@@ -61,11 +61,11 @@ def describe_star_wars_object_identification():
             }
             """
         expected = {"node": {"id": "RmFjdGlvbjoy", "name": "Galactic Empire"}}
-        result = graphql_sync(StarWarsSchema, query)
+        result = graphql_sync(schema, source)
         assert result == (expected, None)
 
     def refetches_the_x_wing():
-        query = """
+        source = """
             query XWingRefetchQuery {
               node(id: "U2hpcDox") {
                 id
@@ -76,5 +76,5 @@ def describe_star_wars_object_identification():
             }
             """
         expected = {"node": {"id": "U2hpcDox", "name": "X-Wing"}}
-        result = graphql_sync(StarWarsSchema, query)
+        result = graphql_sync(schema, source)
         assert result == (expected, None)

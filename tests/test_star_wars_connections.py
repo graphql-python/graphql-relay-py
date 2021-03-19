@@ -1,11 +1,11 @@
 from graphql import graphql_sync
 
-from .star_wars_schema import StarWarsSchema
+from .star_wars_schema import StarWarsSchema as schema
 
 
 def describe_star_wars_connections():
     def fetches_the_first_ship_of_the_rebels():
-        query = """
+        source = """
             query RebelsShipsQuery {
               rebels {
                 name,
@@ -25,11 +25,11 @@ def describe_star_wars_connections():
                 "ships": {"edges": [{"node": {"name": "X-Wing"}}]},
             }
         }
-        result = graphql_sync(StarWarsSchema, query)
+        result = graphql_sync(schema, source)
         assert result == (expected, None)
 
     def fetches_the_first_two_ships_of_the_rebels_with_a_cursor():
-        query = """
+        source = """
             query MoreRebelShipsQuery {
               rebels {
                 name,
@@ -61,11 +61,11 @@ def describe_star_wars_connections():
                 },
             }
         }
-        result = graphql_sync(StarWarsSchema, query)
+        result = graphql_sync(schema, source)
         assert result == (expected, None)
 
     def fetches_the_next_three_ships_of_the_rebels_with_a_cursor():
-        query = """
+        source = """
             query EndOfRebelShipsQuery {
               rebels {
                 name,
@@ -101,11 +101,11 @@ def describe_star_wars_connections():
                 },
             }
         }
-        result = graphql_sync(StarWarsSchema, query)
+        result = graphql_sync(schema, source)
         assert result == (expected, None)
 
     def fetches_no_ships_of_the_rebels_at_the_end_of_connection():
-        query = """
+        source = """
             query RebelsQuery {
               rebels {
                 name,
@@ -126,11 +126,11 @@ def describe_star_wars_connections():
                 "ships": {"edges": []},
             }
         }
-        result = graphql_sync(StarWarsSchema, query)
+        result = graphql_sync(schema, source)
         assert result == (expected, None)
 
     def identifies_the_end_of_the_list():
-        query = """
+        source = """
             query EndOfRebelShipsQuery {
               rebels {
                 name,
@@ -187,5 +187,5 @@ def describe_star_wars_connections():
                 },
             },
         }
-        result = graphql_sync(StarWarsSchema, query)
+        result = graphql_sync(schema, source)
         assert result == (expected, None)

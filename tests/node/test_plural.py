@@ -48,13 +48,13 @@ query_type = GraphQLObjectType(
 schema = GraphQLSchema(query=query_type)
 
 
-class Context:
-    lang = "en"
+class Context(NamedTuple):
+    lang: str
 
 
 def describe_plural_identifying_root_field():
     def allows_fetching():
-        query = """
+        source = """
         {
           usernames(usernames:["dschafer", "leebyron", "schrockn"]) {
             username
@@ -62,7 +62,8 @@ def describe_plural_identifying_root_field():
           }
         }
         """
-        assert graphql_sync(schema, query, context_value=Context()) == (
+        context_value = Context(lang="en")
+        assert graphql_sync(schema, source, context_value=context_value) == (
             {
                 "usernames": [
                     {
@@ -83,7 +84,7 @@ def describe_plural_identifying_root_field():
         )
 
     def correctly_introspects():
-        query = """
+        source = """
         {
           __schema {
             queryType {
@@ -117,7 +118,7 @@ def describe_plural_identifying_root_field():
           }
         }
         """
-        assert graphql_sync(schema, query) == (
+        assert graphql_sync(schema, source) == (
             {
                 "__schema": {
                     "queryType": {

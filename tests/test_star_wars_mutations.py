@@ -1,11 +1,11 @@
 from graphql import graphql_sync
 
-from .star_wars_schema import StarWarsSchema
+from .star_wars_schema import StarWarsSchema as schema
 
 
 def describe_star_wars_mutations():
     def correctly_mutates_dataset():
-        query = """
+        source = """
           mutation AddBWingQuery($input: IntroduceShipInput!) {
             introduceShip(input: $input) {
               ship {
@@ -19,7 +19,7 @@ def describe_star_wars_mutations():
             }
           }
         """
-        params = {
+        variable_values = {
             "input": {
                 "shipName": "B-Wing",
                 "factionId": "1",
@@ -33,5 +33,5 @@ def describe_star_wars_mutations():
                 "clientMutationId": "abcde",
             }
         }
-        result = graphql_sync(StarWarsSchema, query, variable_values=params)
+        result = graphql_sync(schema, source, variable_values=variable_values)
         assert result == (expected, None)
