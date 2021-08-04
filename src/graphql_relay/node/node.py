@@ -78,7 +78,7 @@ class ResolvedGlobalId(NamedTuple):
     id: str
 
 
-def to_global_id(type_: str, id_: str) -> str:
+def to_global_id(type_: any, id_: str) -> str:
     """
     Takes a type name and an ID specific to that type name, and returns a
     "global ID" that is unique among all types.
