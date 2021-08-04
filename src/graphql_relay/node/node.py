@@ -1,4 +1,4 @@
-from typing import Any, Callable, NamedTuple
+from typing import Any, Callable, NamedTuple, Union
 
 from graphql_relay.utils.base64 import base64, unbase64
 
@@ -78,7 +78,7 @@ class ResolvedGlobalId(NamedTuple):
     id: str
 
 
-def to_global_id(type_: any, id_: str) -> str:
+def to_global_id(type_: any, id_: Union[str, int]) -> str:
     """
     Takes a type name and an ID specific to that type name, and returns a
     "global ID" that is unique among all types.
