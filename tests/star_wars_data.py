@@ -19,7 +19,7 @@ all_ships = [
     Ship("3", "A-Wing"),
     # Yeah, technically it's Corellian. But it flew in the service of the rebels,
     # so for the purposes of this demo it's a rebel ship.
-    Ship("4", "Millenium Falcon"),
+    Ship("4", "Millennium Falcon"),
     Ship("5", "Home One"),
     Ship("6", "TIE Fighter"),
     Ship("7", "TIE Interceptor"),

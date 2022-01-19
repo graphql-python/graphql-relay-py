@@ -19,7 +19,7 @@ def describe_star_wars_object_identification():
         result = graphql_sync(schema, source)
         assert result == (expected, None)
 
-    def refetches_the_rebels():
+    def fetches_the_rebels_by_global_id():
         source = """
             {
               node(id: "RmFjdGlvbjox") {
@@ -49,7 +49,7 @@ def describe_star_wars_object_identification():
         result = graphql_sync(schema, source)
         assert result == (expected, None)
 
-    def refetches_the_empire():
+    def fetches_the_empire_by_global_id():
         source = """
             {
               node(id: "RmFjdGlvbjoy") {
@@ -64,7 +64,7 @@ def describe_star_wars_object_identification():
         result = graphql_sync(schema, source)
         assert result == (expected, None)
 
-    def refetches_the_x_wing():
+    def fetches_the_x_wing_by_global_id():
         source = """
             {
               node(id: "U2hpcDox") {

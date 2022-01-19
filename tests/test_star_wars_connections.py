@@ -91,7 +91,7 @@ def describe_star_wars_connections():
                         },
                         {
                             "cursor": "YXJyYXljb25uZWN0aW9uOjM=",
-                            "node": {"name": "Millenium Falcon"},
+                            "node": {"name": "Millennium Falcon"},
                         },
                         {
                             "cursor": "YXJyYXljb25uZWN0aW9uOjQ=",
@@ -177,7 +177,7 @@ def describe_star_wars_connections():
                             "node": {"name": "A-Wing"},
                         },
                         {
-                            "node": {"name": "Millenium Falcon"},
+                            "node": {"name": "Millennium Falcon"},
                         },
                         {
                             "node": {"name": "Home One"},

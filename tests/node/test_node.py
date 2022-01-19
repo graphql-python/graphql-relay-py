@@ -82,7 +82,7 @@ schema = GraphQLSchema(query=query_type, types=[user_type, photo_type])
 
 
 def describe_node_interface_and_fields():
-    def describe_refetchability():
+    def describe_ability_to_refetch():
         def gets_the_correct_id_for_users():
             source = """
               {

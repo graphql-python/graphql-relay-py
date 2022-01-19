@@ -221,7 +221,7 @@ def offset_to_cursor(offset: int) -> ConnectionCursor:
 
 
 def cursor_to_offset(cursor: ConnectionCursor) -> Optional[int]:
-    """Rederive the offset from the cursor string."""
+    """Extract the offset from the cursor string."""
     try:
         return int(unbase64(cursor)[len(PREFIX) :])
     except binascii.Error:

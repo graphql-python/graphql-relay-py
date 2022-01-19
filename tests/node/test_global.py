@@ -171,7 +171,7 @@ def describe_global_id_fields():
             None,
         )
 
-    def refetches_the_ids(schema):
+    def allows_to_refetch_the_ids(schema):
         source = """
         {
           user: node(id: "VXNlcjox") {
