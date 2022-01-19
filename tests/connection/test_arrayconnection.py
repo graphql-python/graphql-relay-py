@@ -1,6 +1,6 @@
 from typing import cast, Sequence
 
-from pytest import deprecated_call, raises  # type: ignore
+from pytest import deprecated_call, raises
 
 from graphql_relay import (
     connection_from_array,

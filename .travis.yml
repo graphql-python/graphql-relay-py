@@ -3,7 +3,12 @@ matrix:
   include:
     - name: Code quality tests
       env: TOXENV=flake8,mypy
-      python: 3.8
+      python: 3.9
+      dist: xenial
+      sudo: true
+    - name: Unit tests with Python 3.10
+      env: TOXENV=py310
+      python: 3.10
       dist: xenial
       sudo: true
     - name: Unit tests with Python 3.9
@@ -41,7 +46,7 @@ deploy:
   on:
     branch: master
     tags: true
-    python: 3.8
+    python: 3.9
   skip_existing: true
   username: mvanlonden
   password:

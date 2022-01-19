@@ -1,6 +1,6 @@
 from typing import Any, NamedTuple, Optional
 
-from pytest import fixture  # type: ignore
+from pytest import fixture
 
 from graphql import graphql_sync
 from graphql.type import (
