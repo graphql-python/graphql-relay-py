@@ -3,22 +3,18 @@
 # The graphql-relay and graphql-relay-js version info
 from .version import version, version_info, version_js, version_info_js
 
-# Types for creating connection types in the schema
-from .connection.connectiontypes import (
-    Connection,
-    ConnectionArguments,
-    ConnectionCursor,
-    Edge,
-    PageInfo,
-)
-
-# Helpers for creating connection types in the schema
+# Types and helpers for creating connection types in the schema
 from .connection.connection import (
     backward_connection_args,
     connection_args,
     connection_definitions,
     forward_connection_args,
+    Connection,
+    ConnectionArguments,
+    ConnectionCursor,
+    Edge,
     GraphQLConnectionDefinitions,
+    PageInfo,
 )
 
 # Helpers for creating connections from arrays

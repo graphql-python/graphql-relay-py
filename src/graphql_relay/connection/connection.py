@@ -1,4 +1,4 @@
-from typing import Any, NamedTuple
+from typing import Any, Dict, List, NamedTuple, Optional
 
 from graphql.type import (
     GraphQLArgument,
@@ -15,12 +15,22 @@ from graphql.type import (
     Thunk,
 )
 
+try:
+    from typing import Protocol
+except ImportError:  # Python < 3.8
+    from typing_extensions import Protocol  # type: ignore
+
 __all__ = [
     "connection_definitions",
     "forward_connection_args",
     "backward_connection_args",
     "connection_args",
+    "Connection",
+    "ConnectionArguments",
+    "ConnectionCursor",
+    "Edge",
     "GraphQLConnectionDefinitions",
+    "PageInfo",
 ]
 
 
@@ -50,6 +60,22 @@ class GraphQLConnectionDefinitions(NamedTuple):
 
 def resolve_maybe_thunk(thing_or_thunk: Thunk) -> Any:
     return thing_or_thunk() if callable(thing_or_thunk) else thing_or_thunk
+
+
+"""A type alias for cursors in this implementation."""
+ConnectionCursor = str
+
+
+"""A type describing the arguments a connection field receives in GraphQL.
+
+The following kinds of arguments are expected (all optional):
+
+    before: ConnectionCursor
+    after: ConnectionCursor
+    first: int
+    last: int
+"""
+ConnectionArguments = Dict[str, Any]
 
 
 def connection_definitions(
@@ -102,6 +128,91 @@ def connection_definitions(
     )
 
     return GraphQLConnectionDefinitions(edge_type, connection_type)
+
+
+class PageInfoType(Protocol):
+    @property
+    def startCursor(self) -> Optional[ConnectionCursor]:
+        ...
+
+    def endCursor(self) -> Optional[ConnectionCursor]:
+        ...
+
+    def hasPreviousPage(self) -> bool:
+        ...
+
+    def hasNextPage(self) -> bool:
+        ...
+
+
+class PageInfoConstructor(Protocol):
+    def __call__(
+        self,
+        *,
+        startCursor: Optional[ConnectionCursor],
+        endCursor: Optional[ConnectionCursor],
+        hasPreviousPage: bool,
+        hasNextPage: bool,
+    ) -> PageInfoType:
+        ...
+
+
+class PageInfo(NamedTuple):
+    """A type designed to be exposed as `PageInfo` over GraphQL."""
+
+    startCursor: Optional[ConnectionCursor]
+    endCursor: Optional[ConnectionCursor]
+    hasPreviousPage: bool
+    hasNextPage: bool
+
+
+class EdgeType(Protocol):
+    @property
+    def node(self) -> Any:
+        ...
+
+    @property
+    def cursor(self) -> ConnectionCursor:
+        ...
+
+
+class EdgeConstructor(Protocol):
+    def __call__(self, *, node: Any, cursor: ConnectionCursor) -> EdgeType:
+        ...
+
+
+class Edge(NamedTuple):
+    """A type designed to be exposed as a `Edge` over GraphQL."""
+
+    node: Any
+    cursor: ConnectionCursor
+
+
+class ConnectionType(Protocol):
+    @property
+    def edges(self):
+        List[EdgeType]: ...
+
+    @property
+    def pageInfo(self):
+        PageInfoType: ...
+
+
+class ConnectionConstructor(Protocol):
+    def __call__(
+        self,
+        *,
+        edges: List[EdgeType],
+        pageInfo: PageInfoType,
+    ) -> ConnectionType:
+        ...
+
+
+class Connection(NamedTuple):
+    """A type designed to be exposed as a `Connection` over GraphQL."""
+
+    edges: List[Edge]
+    pageInfo: PageInfo
 
 
 # The common page info type used by all connections.

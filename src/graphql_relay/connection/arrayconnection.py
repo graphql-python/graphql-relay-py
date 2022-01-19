@@ -8,7 +8,7 @@ except ImportError:  # Python < 3.8
     from typing_extensions import Protocol  # type: ignore
 
 from ..utils.base64 import base64, unbase64
-from .connectiontypes import (
+from .connection import (
     Connection,
     ConnectionArguments,
     ConnectionConstructor,
