@@ -9,7 +9,7 @@ from graphql.type import (
 )
 
 from graphql_relay.node.node import node_definitions, global_id_field, from_global_id
-from graphql_relay.connection.arrayconnection import connection_from_array
+from graphql_relay.connection.array_connection import connection_from_array
 from graphql_relay.connection.connection import connection_args, connection_definitions
 from graphql_relay.mutation.mutation import mutation_with_client_mutation_id
 

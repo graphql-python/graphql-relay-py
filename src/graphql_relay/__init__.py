@@ -18,7 +18,7 @@ from .connection.connection import (
 )
 
 # Helpers for creating connections from arrays
-from .connection.arrayconnection import (
+from .connection.array_connection import (
     connection_from_array,
     connection_from_array_slice,
     cursor_for_object_in_connection,
@@ -41,7 +41,7 @@ from .node.node import from_global_id, global_id_field, to_global_id
 
 # Deprecated functions from older graphql-relay-py versions
 # noinspection PyProtectedMember,PyUnresolvedReferences,PyDeprecation
-from .connection.arrayconnection import (  # noqa: F401
+from .connection.array_connection import (  # noqa: F401
     connection_from_list,
     connection_from_list_slice,
 )
