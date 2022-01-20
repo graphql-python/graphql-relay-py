@@ -1,8 +1,9 @@
 from itertools import chain
 from typing import Any, NamedTuple, Optional, Union
 
-from graphql import graphql_sync
-from graphql.type import (
+from graphql import (
+    graphql_sync,
+    print_schema,
     GraphQLField,
     GraphQLID,
     GraphQLInt,
@@ -13,7 +14,9 @@ from graphql.type import (
     GraphQLString,
 )
 
-from graphql_relay import node_definitions, to_global_id, from_global_id
+from graphql_relay import node_definitions
+
+from ..utils import dedent
 
 
 class User(NamedTuple):
@@ -78,7 +81,7 @@ query_type = GraphQLObjectType(
     "Query", lambda: {"node": node_field, "nodes": nodes_field}
 )
 
-schema = GraphQLSchema(query=query_type, types=[user_type, photo_type])
+schema = GraphQLSchema(query=query_type, types=[node_interface, user_type, photo_type])
 
 
 def describe_node_interface_and_fields():
@@ -189,133 +192,37 @@ def describe_node_interface_and_fields():
                 None,
             )
 
-    def describe_introspection():
-        def has_correct_node_interface():
-            source = """
-              {
-                __type(name: "Node") {
-                  name
-                  kind
-                  fields {
-                    name
-                    type {
-                      kind
-                      ofType {
-                        name
-                        kind
-                      }
-                    }
-                  }
-                }
-              }
-            """
-            assert graphql_sync(schema, source) == (
-                {
-                    "__type": {
-                        "name": "Node",
-                        "kind": "INTERFACE",
-                        "fields": [
-                            {
-                                "name": "id",
-                                "type": {
-                                    "kind": "NON_NULL",
-                                    "ofType": {"name": "ID", "kind": "SCALAR"},
-                                },
-                            }
-                        ],
-                    }
-                },
-                None,
-            )
+    def generates_correct_types():
+        assert print_schema(schema).rstrip() == dedent(
+            '''
+            """An object with an ID"""
+            interface Node {
+              """The id of the object."""
+              id: ID!
+            }
 
-        def has_correct_node_and_nodes_root_field():
-            source = """
-              {
-                __schema {
-                  queryType {
-                    fields {
-                      name
-                      type {
-                        name
-                        kind
-                      }
-                      args {
-                        name
-                        type {
-                          kind
-                          ofType {
-                            name
-                            kind
-                          }
-                        }
-                      }
-                    }
-                  }
-                }
-              }
-            """
-            assert graphql_sync(schema, source) == (
-                {
-                    "__schema": {
-                        "queryType": {
-                            "fields": [
-                                {
-                                    "name": "node",
-                                    "type": {"name": "Node", "kind": "INTERFACE"},
-                                    "args": [
-                                        {
-                                            "name": "id",
-                                            "type": {
-                                                "kind": "NON_NULL",
-                                                "ofType": {
-                                                    "name": "ID",
-                                                    "kind": "SCALAR",
-                                                },
-                                            },
-                                        }
-                                    ],
-                                },
-                                {
-                                    "name": "nodes",
-                                    "type": {"name": None, "kind": "NON_NULL"},
-                                    "args": [
-                                        {
-                                            "name": "ids",
-                                            "type": {
-                                                "kind": "NON_NULL",
-                                                "ofType": {
-                                                    "name": None,
-                                                    "kind": "LIST",
-                                                },
-                                            },
-                                        }
-                                    ],
-                                },
-                            ]
-                        }
-                    }
-                },
-                None,
-            )
+            type User implements Node {
+              id: ID!
+              name: String
+            }
 
+            type Photo implements Node {
+              id: ID!
+              width: Int
+            }
 
-def describe_convert_global_ids():
-    def to_global_id_converts_unicode_strings_correctly():
-        my_unicode_id = "ûñö"
-        g_id = to_global_id("MyType", my_unicode_id)
-        assert g_id == "TXlUeXBlOsO7w7HDtg=="
+            type Query {
+              """Fetches an object given its ID"""
+              node(
+                """The ID of an object"""
+                id: ID!
+              ): Node
 
-        my_unicode_id = "\u06ED"
-        g_id = to_global_id("MyType", my_unicode_id)
-        assert g_id == "TXlUeXBlOtut"
-
-    def from_global_id_converts_unicode_strings_correctly():
-        my_unicode_id = "ûñö"
-        my_type, my_id = from_global_id("TXlUeXBlOsO7w7HDtg==")
-        assert my_type == "MyType"
-        assert my_id == my_unicode_id
-
-        my_unicode_id = "\u06ED"
-        my_type, my_id = from_global_id("TXlUeXBlOtut")
-        assert my_type == "MyType"
-        assert my_id == my_unicode_id
+              """Fetches objects given their IDs"""
+              nodes(
+                """The IDs of objects"""
+                ids: [ID!]!
+              ): [Node]!
+            }
+            '''
+        )

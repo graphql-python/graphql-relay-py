@@ -1,7 +1,8 @@
 from typing import NamedTuple
 
-from graphql import graphql_sync
-from graphql.type import (
+from graphql import (
+    graphql_sync,
+    print_schema,
     GraphQLField,
     GraphQLObjectType,
     GraphQLResolveInfo,
@@ -10,6 +11,8 @@ from graphql.type import (
 )
 
 from graphql_relay import plural_identifying_root_field
+
+from ..utils import dedent
 
 user_type = GraphQLObjectType(
     "User",
@@ -83,74 +86,17 @@ def describe_plural_identifying_root_field():
             None,
         )
 
-    def correctly_introspects():
-        source = """
-        {
-          __schema {
-            queryType {
-              fields {
-                name
-                args {
-                  name
-                  type {
-                    kind
-                    ofType {
-                      kind
-                      ofType {
-                        kind
-                        ofType {
-                          name
-                          kind
-                        }
-                      }
-                    }
-                  }
-                }
-                type {
-                  kind
-                  ofType {
-                    name
-                    kind
-                  }
-                }
-              }
+    def generates_correct_types():
+        assert print_schema(schema).rstrip == dedent(
+            '''
+            type Query {
+              """Map from a username to the user"""
+              usernames(usernames: [String!]!): [User]
             }
-          }
-        }
-        """
-        assert graphql_sync(schema, source) == (
-            {
-                "__schema": {
-                    "queryType": {
-                        "fields": [
-                            {
-                                "name": "usernames",
-                                "args": [
-                                    {
-                                        "name": "usernames",
-                                        "type": {
-                                            "kind": "NON_NULL",
-                                            "ofType": {
-                                                "kind": "LIST",
-                                                "ofType": {
-                                                    "kind": "NON_NULL",
-                                                    "ofType": {
-                                                        "name": "String",
-                                                        "kind": "SCALAR",
-                                                    },
-                                                },
-                                            },
-                                        },
-                                    }
-                                ],
-                                "type": {
-                                    "kind": "LIST",
-                                    "ofType": {"name": "User", "kind": "OBJECT"},
-                                },
-                            }
-                        ]
-                    }
-                }
-            },
-            None,
+
+            type User {
+              username: String
+              url: String
+            }
+            '''
         )

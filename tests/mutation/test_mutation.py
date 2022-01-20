@@ -1,7 +1,9 @@
 from pytest import mark
 
-from graphql import graphql, graphql_sync
-from graphql.type import (
+from graphql import (
+    graphql,
+    graphql_sync,
+    print_schema,
     GraphQLField,
     GraphQLFieldMap,
     GraphQLInputField,
@@ -11,6 +13,8 @@ from graphql.type import (
 )
 
 from graphql_relay import mutation_with_client_mutation_id
+
+from ..utils import dedent
 
 
 class Result:
@@ -30,9 +34,7 @@ async def dummy_resolve_async(_info, inputData=None, clientMutationId=None):
 
 
 def wrap_in_schema(mutation_fields: GraphQLFieldMap) -> GraphQLSchema:
-    query_type = GraphQLObjectType(
-        "DummyQuery", fields={"dummy": GraphQLField(GraphQLInt)}
-    )
+    query_type = GraphQLObjectType("Query", fields={"dummy": GraphQLField(GraphQLInt)})
     mutation_type = GraphQLObjectType("Mutation", fields=mutation_fields)
     return GraphQLSchema(query_type, mutation_type)
 
@@ -172,253 +174,36 @@ def describe_mutation_with_client_mutation_id():
             None,
         )
 
-    def describe_introspection():
-        simple_mutation = mutation_with_client_mutation_id(
-            "SimpleMutation",
-            input_fields={},
-            output_fields={"result": GraphQLField(GraphQLInt)},
-            mutate_and_get_payload=dummy_resolve,
-        )
-
-        simple_mutation_with_description = mutation_with_client_mutation_id(
-            "SimpleMutationWithDescription",
-            description="Simple Mutation Description",
-            input_fields={},
-            output_fields={"result": GraphQLField(GraphQLInt)},
-            mutate_and_get_payload=dummy_resolve,
-        )
-
-        simple_mutation_with_deprecation_reason = mutation_with_client_mutation_id(
-            "SimpleMutationWithDeprecationReason",
+    def generates_correct_types():
+        some_mutation = mutation_with_client_mutation_id(
+            "SomeMutation",
+            description="Some Mutation Description",
             input_fields={},
             output_fields={"result": GraphQLField(GraphQLInt)},
             mutate_and_get_payload=dummy_resolve,
             deprecation_reason="Just because",
         )
 
-        schema = wrap_in_schema(
-            {
-                "simpleMutation": simple_mutation,
-                "simpleMutationWithDescription": simple_mutation_with_description,
-                "simpleMutationWithDeprecationReason": simple_mutation_with_deprecation_reason,  # noqa: E501
+        schema = wrap_in_schema({"someMutation": some_mutation})
+
+        assert print_schema(schema).rstrip() == dedent(
+            '''
+            type Query {
+              dummy: Int
             }
+
+            type Mutation {
+              """Some Mutation Description"""
+              someMutation(input: SomeMutationInput!): SomeMutationPayload @deprecated(reason: "Just because")
+            }
+
+            type SomeMutationPayload {
+              result: Int
+              clientMutationId: String
+            }
+
+            input SomeMutationInput {
+              clientMutationId: String
+            }
+            '''  # noqa: E501
         )
-
-        def contains_correct_input():
-            source = """
-              {
-                __type(name: "SimpleMutationInput") {
-                  name
-                  kind
-                  inputFields {
-                    name
-                    type {
-                      name
-                      kind
-                    }
-                  }
-                }
-              }
-            """
-            assert graphql_sync(schema, source) == (
-                {
-                    "__type": {
-                        "name": "SimpleMutationInput",
-                        "kind": "INPUT_OBJECT",
-                        "inputFields": [
-                            {
-                                "name": "clientMutationId",
-                                "type": {"name": None, "kind": "NON_NULL"},
-                            }
-                        ],
-                    }
-                },
-                None,
-            )
-
-        def contains_correct_payload():
-            source = """
-              {
-                __type(name: "SimpleMutationPayload") {
-                  name
-                  kind
-                  fields {
-                    name
-                    type {
-                      name
-                      kind
-                    }
-                  }
-                }
-              }
-            """
-            assert graphql_sync(schema, source) == (
-                {
-                    "__type": {
-                        "name": "SimpleMutationPayload",
-                        "kind": "OBJECT",
-                        "fields": [
-                            {
-                                "name": "result",
-                                "type": {"name": "Int", "kind": "SCALAR"},
-                            },
-                            {
-                                "name": "clientMutationId",
-                                "type": {"name": None, "kind": "NON_NULL"},
-                            },
-                        ],
-                    }
-                },
-                None,
-            )
-
-        def contains_correct_field():
-            source = """
-              {
-                __schema {
-                  mutationType {
-                    fields {
-                      name
-                      args {
-                        name
-                        type {
-                          name
-                          kind
-                          ofType {
-                            name
-                            kind
-                          }
-                        }
-                      }
-                      type {
-                        name
-                        kind
-                      }
-                    }
-                  }
-                }
-              }
-            """
-            assert graphql_sync(schema, source) == (
-                {
-                    "__schema": {
-                        "mutationType": {
-                            "fields": [
-                                {
-                                    "name": "simpleMutation",
-                                    "args": [
-                                        {
-                                            "name": "input",
-                                            "type": {
-                                                "name": None,
-                                                "kind": "NON_NULL",
-                                                "ofType": {
-                                                    "name": "SimpleMutationInput",
-                                                    "kind": "INPUT_OBJECT",
-                                                },
-                                            },
-                                        }
-                                    ],
-                                    "type": {
-                                        "name": "SimpleMutationPayload",
-                                        "kind": "OBJECT",
-                                    },
-                                },
-                                {
-                                    "name": "simpleMutationWithDescription",
-                                    "args": [
-                                        {
-                                            "name": "input",
-                                            "type": {
-                                                "name": None,
-                                                "kind": "NON_NULL",
-                                                "ofType": {
-                                                    "name": "SimpleMutation"
-                                                    "WithDescriptionInput",
-                                                    "kind": "INPUT_OBJECT",
-                                                },
-                                            },
-                                        }
-                                    ],
-                                    "type": {
-                                        "name": "SimpleMutationWithDescriptionPayload",
-                                        "kind": "OBJECT",
-                                    },
-                                },
-                            ]
-                        }
-                    }
-                },
-                None,
-            )
-
-        def contains_correct_descriptions():
-            source = """
-              {
-                __schema {
-                  mutationType {
-                    fields {
-                      name
-                      description
-                    }
-                  }
-                }
-              }
-            """
-            assert graphql_sync(schema, source) == (
-                {
-                    "__schema": {
-                        "mutationType": {
-                            "fields": [
-                                {"name": "simpleMutation", "description": None},
-                                {
-                                    "name": "simpleMutationWithDescription",
-                                    "description": "Simple Mutation Description",
-                                },
-                            ]
-                        }
-                    }
-                },
-                None,
-            )
-
-        def contains_correct_deprecation_reason():
-            source = """
-              {
-                __schema {
-                  mutationType {
-                    fields(includeDeprecated: true) {
-                      name
-                      isDeprecated
-                      deprecationReason
-                    }
-                  }
-                }
-              }
-            """
-            assert graphql_sync(schema, source) == (
-                {
-                    "__schema": {
-                        "mutationType": {
-                            "fields": [
-                                {
-                                    "name": "simpleMutation",
-                                    "isDeprecated": False,
-                                    "deprecationReason": None,
-                                },
-                                {
-                                    "name": "simpleMutationWithDescription",
-                                    "isDeprecated": False,
-                                    "deprecationReason": None,
-                                },
-                                {
-                                    "name": "simpleMutationWithDeprecationReason",
-                                    "isDeprecated": True,
-                                    "deprecationReason": "Just because",
-                                },
-                            ]
-                        }
-                    }
-                },
-                None,
-            )
