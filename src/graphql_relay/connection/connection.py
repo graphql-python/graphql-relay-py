@@ -1,6 +1,7 @@
-from typing import Any, Dict, List, NamedTuple, Optional
+from typing import Any, Dict, List, NamedTuple, Optional, Union
 
-from graphql.type import (
+from graphql import (
+    get_named_type,
     GraphQLArgument,
     GraphQLArgumentMap,
     GraphQLBoolean,
@@ -9,6 +10,7 @@ from graphql.type import (
     GraphQLFieldResolver,
     GraphQLInt,
     GraphQLList,
+    GraphQLNamedOutputType,
     GraphQLNonNull,
     GraphQLObjectType,
     GraphQLString,
@@ -92,18 +94,18 @@ ConnectionArguments = Dict[str, Any]
 
 
 def connection_definitions(
-    node_type: GraphQLObjectType,
-    name: str = None,
-    resolve_node: GraphQLFieldResolver = None,
-    resolve_cursor: GraphQLFieldResolver = None,
-    edge_fields: Thunk[GraphQLFieldMap] = None,
-    connection_fields: Thunk[GraphQLFieldMap] = None,
+    node_type: Union[GraphQLNamedOutputType, GraphQLNonNull[GraphQLNamedOutputType]],
+    name: Optional[str] = None,
+    resolve_node: Optional[GraphQLFieldResolver] = None,
+    resolve_cursor: Optional[GraphQLFieldResolver] = None,
+    edge_fields: Optional[Thunk[GraphQLFieldMap]] = None,
+    connection_fields: Optional[Thunk[GraphQLFieldMap]] = None,
 ) -> GraphQLConnectionDefinitions:
     """Return GraphQLObjectTypes for a connection with the given name.
 
     The nodes of the returned object types will be of the specified type.
     """
-    name = name or node_type.name
+    name = name or get_named_type(node_type).name
     edge_fields = edge_fields or {}
     connection_fields = connection_fields or {}
 
@@ -203,12 +205,12 @@ class Edge(NamedTuple):
 
 class ConnectionType(Protocol):
     @property
-    def edges(self):
-        List[EdgeType]: ...
+    def edges(self) -> List[EdgeType]:
+        ...
 
     @property
-    def pageInfo(self):
-        PageInfoType: ...
+    def pageInfo(self) -> PageInfoType:
+        ...
 
 
 class ConnectionConstructor(Protocol):

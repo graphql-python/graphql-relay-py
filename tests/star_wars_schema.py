@@ -1,4 +1,4 @@
-from graphql.type import (
+from graphql import (
     GraphQLID,
     GraphQLNonNull,
     GraphQLObjectType,

@@ -2,8 +2,8 @@ from typing import Any, NamedTuple, Optional
 
 from pytest import fixture
 
-from graphql import graphql_sync
-from graphql.type import (
+from graphql import (
+    graphql_sync,
     GraphQLField,
     GraphQLList,
     GraphQLInt,

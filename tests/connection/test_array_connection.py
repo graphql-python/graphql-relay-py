@@ -739,10 +739,10 @@ def describe_connection_from_array_slice():
             class LettersWithoutLen:
                 __getitem__ = letters.__getitem__
 
-            letters_without_len = LettersWithoutLen()
+            letters_without_len = cast(Sequence, LettersWithoutLen())
 
             with raises(TypeError):
-                len(cast(Sequence, letters_without_len))
+                len(letters_without_len)
 
             with raises(TypeError):
                 connection_from_array_slice(letters_without_len)

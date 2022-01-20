@@ -43,7 +43,7 @@ class SizedSliceable(Protocol):
 
 def connection_from_array(
     data: SizedSliceable,
-    args: ConnectionArguments = None,
+    args: Optional[ConnectionArguments] = None,
     connection_type: ConnectionConstructor = Connection,
     edge_type: EdgeConstructor = Edge,
     page_info_type: PageInfoConstructor = PageInfo,
@@ -73,7 +73,7 @@ def connection_from_array(
 
 def connection_from_list(
     data: Sequence,
-    args: ConnectionArguments = None,
+    args: Optional[ConnectionArguments] = None,
     connection_type: ConnectionConstructor = Connection,
     edge_type: EdgeConstructor = Edge,
     pageinfo_type: PageInfoConstructor = PageInfo,
@@ -100,10 +100,10 @@ def connection_from_list(
 
 def connection_from_array_slice(
     array_slice: SizedSliceable,
-    args: ConnectionArguments = None,
+    args: Optional[ConnectionArguments] = None,
     slice_start: int = 0,
-    array_length: int = None,
-    array_slice_length: int = None,
+    array_length: Optional[int] = None,
+    array_slice_length: Optional[int] = None,
     connection_type: ConnectionConstructor = Connection,
     edge_type: EdgeConstructor = Edge,
     page_info_type: PageInfoConstructor = PageInfo,
@@ -181,13 +181,13 @@ def connection_from_array_slice(
 
 def connection_from_list_slice(
     list_slice: Sequence,
-    args: ConnectionArguments = None,
+    args: Optional[ConnectionArguments] = None,
     connection_type: ConnectionConstructor = Connection,
     edge_type: EdgeConstructor = Edge,
     pageinfo_type: PageInfoConstructor = PageInfo,
-    slice_start=0,
-    list_length=0,
-    list_slice_length=None,
+    slice_start: int = 0,
+    list_length: int = 0,
+    list_slice_length: Optional[int] = None,
 ) -> ConnectionType:
     """Deprecated alias for connection_from_array_slice.
 
@@ -256,7 +256,9 @@ def cursor_for_object_in_connection(
         return offset_to_cursor(offset)
 
 
-def get_offset_with_default(cursor: ConnectionCursor = None, default_offset=0) -> int:
+def get_offset_with_default(
+    cursor: Optional[ConnectionCursor] = None, default_offset: int = 0
+) -> int:
     """Get offset from a given cursor and a default.
 
     Given an optional cursor and a default offset, return the offset to use;

@@ -2,8 +2,8 @@ from typing import NamedTuple
 
 from pytest import mark
 
-from graphql import graphql
-from graphql.type import (
+from graphql import (
+    graphql,
     GraphQLField,
     GraphQLID,
     GraphQLNonNull,

@@ -1,6 +1,6 @@
-from typing import Any, Callable
+from typing import Any, Callable, List, Optional
 
-from graphql.type import (
+from graphql import (
     GraphQLArgument,
     GraphQLField,
     GraphQLInputType,
@@ -17,9 +17,9 @@ def plural_identifying_root_field(
     input_type: GraphQLInputType,
     output_type: GraphQLOutputType,
     resolve_single_input: Callable[[GraphQLResolveInfo, str], Any],
-    description: str = None,
+    description: Optional[str] = None,
 ) -> GraphQLField:
-    def resolve(_obj, info, **args):
+    def resolve(_obj: Any, info: GraphQLResolveInfo, **args: Any) -> List:
         inputs = args[arg_name]
         return [resolve_single_input(info, input_) for input_ in inputs]
 

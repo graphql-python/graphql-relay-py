@@ -1,8 +1,8 @@
-from typing import Any, Callable, NamedTuple
+from typing import Any, Callable, NamedTuple, Optional
 
 from graphql_relay.utils.base64 import base64, unbase64
 
-from graphql.type import (
+from graphql import (
     GraphQLArgument,
     GraphQLNonNull,
     GraphQLID,
@@ -23,7 +23,7 @@ class GraphQLNodeDefinitions(NamedTuple):
 
 def node_definitions(
     id_fetcher: Callable[[str, GraphQLResolveInfo], Any],
-    type_resolver: GraphQLTypeResolver = None,
+    type_resolver: Optional[GraphQLTypeResolver] = None,
 ) -> GraphQLNodeDefinitions:
     """
     Given a function to map from an ID to an underlying object, and a function
@@ -96,7 +96,8 @@ def from_global_id(global_id: str) -> ResolvedGlobalId:
 
 
 def global_id_field(
-    type_name: str = None, id_fetcher: Callable[[Any, GraphQLResolveInfo], str] = None
+    type_name: Optional[str] = None,
+    id_fetcher: Optional[Callable[[Any, GraphQLResolveInfo], str]] = None,
 ) -> GraphQLField:
     """
     Creates the configuration for an id field on a node, using `to_global_id` to

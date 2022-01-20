@@ -1,9 +1,8 @@
 from inspect import iscoroutinefunction
-from typing import Any, Callable
+from typing import Any, Callable, Dict, Optional
 
-from graphql.error import GraphQLError
-from graphql.pyutils import AwaitableOrValue, inspect
-from graphql.type import (
+from graphql import (
+    GraphQLError,
     GraphQLArgument,
     GraphQLField,
     GraphQLFieldMap,
@@ -16,7 +15,7 @@ from graphql.type import (
     GraphQLString,
     Thunk,
 )
-
+from graphql.pyutils import AwaitableOrValue, inspect
 
 # Note: Contrary to the Javascript implementation of MutationFn,
 # the context is passed as part of the GraphQLResolveInfo and any arguments
@@ -32,7 +31,7 @@ def resolve_maybe_thunk(thing_or_thunk: Thunk) -> Any:
 
 
 class NullResult:
-    def __init__(self, clientMutationId=None):
+    def __init__(self, clientMutationId: Optional[str] = None) -> None:
         self.clientMutationId = clientMutationId
 
 
@@ -41,8 +40,9 @@ def mutation_with_client_mutation_id(
     input_fields: Thunk[GraphQLInputFieldMap],
     output_fields: Thunk[GraphQLFieldMap],
     mutate_and_get_payload: MutationFn,
-    description: str = None,
-    deprecation_reason: str = None,
+    description: Optional[str] = None,
+    deprecation_reason: Optional[str] = None,
+    extensions: Optional[Dict[str, Any]] = None,
 ) -> GraphQLField:
     """
     Returns a GraphQLFieldConfig for the specified mutation.
@@ -78,7 +78,7 @@ def mutation_with_client_mutation_id(
     if iscoroutinefunction(mutate_and_get_payload):
 
         # noinspection PyShadowingBuiltins
-        async def resolve(_root, info, input):
+        async def resolve(_root: Any, info: GraphQLResolveInfo, input: Dict) -> Any:
             payload = await mutate_and_get_payload(info, **input)
             try:
                 clientMutationId = input["clientMutationId"]
@@ -95,7 +95,10 @@ def mutation_with_client_mutation_id(
 
     else:
 
-        def resolve(_root, info, input):
+        # noinspection PyShadowingBuiltins
+        def resolve(  # type: ignore
+            _root: Any, info: GraphQLResolveInfo, input: Dict
+        ) -> Any:
             payload = mutate_and_get_payload(info, **input)
             try:
                 clientMutationId = input["clientMutationId"]
@@ -107,7 +110,7 @@ def mutation_with_client_mutation_id(
             if payload is None:
                 payload = NullResult(clientMutationId)
             else:
-                payload.clientMutationId = clientMutationId
+                payload.clientMutationId = clientMutationId  # type: ignore
             return payload
 
     return GraphQLField(
@@ -116,4 +119,5 @@ def mutation_with_client_mutation_id(
         deprecation_reason=deprecation_reason,
         args={"input": GraphQLArgument(GraphQLNonNull(input_type))},
         resolve=resolve,
+        extensions=extensions,
     )

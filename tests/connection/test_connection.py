@@ -5,6 +5,7 @@ from graphql import (
     print_schema,
     GraphQLField,
     GraphQLInt,
+    GraphQLNonNull,
     GraphQLObjectType,
     GraphQLSchema,
     GraphQLString,
@@ -66,7 +67,7 @@ user_type = GraphQLObjectType(
 )
 
 friend_connection = connection_definitions(
-    user_type,
+    GraphQLNonNull(user_type),
     name="Friend",
     resolve_node=lambda edge, _info: all_users[edge.node],
     edge_fields=lambda: {
@@ -83,7 +84,7 @@ friend_connection = connection_definitions(
 
 
 user_connection = connection_definitions(
-    user_type, resolve_node=lambda edge, _info: all_users[edge.node]
+    GraphQLNonNull(user_type), resolve_node=lambda edge, _info: all_users[edge.node]
 ).connection_type
 
 
@@ -245,7 +246,7 @@ def describe_connection_definition():
             """An edge in a connection."""
             type FriendEdge {
               """The item at the end of the edge"""
-              node: User
+              node: User!
 
               """A cursor for use in pagination"""
               cursor: String!
@@ -264,7 +265,7 @@ def describe_connection_definition():
             """An edge in a connection."""
             type UserEdge {
               """The item at the end of the edge"""
-              node: User
+              node: User!
 
               """A cursor for use in pagination"""
               cursor: String!
