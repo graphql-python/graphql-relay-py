@@ -37,15 +37,28 @@ __all__ = [
 # Returns a GraphQLArgumentMap appropriate to include on a field
 # whose return type is a connection type with forward pagination.
 forward_connection_args: GraphQLArgumentMap = {
-    "after": GraphQLArgument(GraphQLString),
-    "first": GraphQLArgument(GraphQLInt),
+    "after": GraphQLArgument(
+        GraphQLString,
+        description="Returns the items in the list"
+        " that come after the specified cursor.",
+    ),
+    "first": GraphQLArgument(
+        GraphQLInt,
+        description="Returns the first n items from the list.",
+    ),
 }
 
 # Returns a GraphQLArgumentMap appropriate to include on a field
 # whose return type is a connection type with backward pagination.
 backward_connection_args: GraphQLArgumentMap = {
-    "before": GraphQLArgument(GraphQLString),
-    "last": GraphQLArgument(GraphQLInt),
+    "before": GraphQLArgument(
+        GraphQLString,
+        description="Returns the items in the list"
+        " that come before the specified cursor.",
+    ),
+    "last": GraphQLArgument(
+        GraphQLInt, description="Returns the last n items from the list."
+    ),
 }
 
 # Returns a GraphQLArgumentMap appropriate to include on a field
