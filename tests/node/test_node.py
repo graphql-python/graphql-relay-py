@@ -309,6 +309,10 @@ def describe_convert_global_ids():
         g_id = to_global_id("MyType", my_unicode_id)
         assert g_id == "TXlUeXBlOtut"
 
+    def converts_to_global_id():
+        assert to_global_id("User", 1) == to_global_id("User", "1")
+        assert to_global_id("User", 1) == to_global_id(user_type, 1)
+
     def from_global_id_converts_unicode_strings_correctly():
         my_unicode_id = "ûñö"
         my_type, my_id = from_global_id("TXlUeXBlOsO7w7HDtg==")
