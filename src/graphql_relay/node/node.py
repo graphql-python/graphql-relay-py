@@ -60,6 +60,7 @@ def node_definitions(
 
     nodes_field = GraphQLField(
         GraphQLNonNull(GraphQLList(node_interface)),
+        description="Fetches objects given their IDs",
         args={
             "ids": GraphQLArgument(
                 GraphQLNonNull(GraphQLList(GraphQLNonNull(GraphQLID))),
