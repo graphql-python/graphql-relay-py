@@ -106,8 +106,6 @@ def connection_definitions(
     The nodes of the returned object types will be of the specified type.
     """
     name = name or get_named_type(node_type).name
-    edge_fields = edge_fields or {}
-    connection_fields = connection_fields or {}
 
     edge_type = GraphQLObjectType(
         name + "Edge",
@@ -123,7 +121,7 @@ def connection_definitions(
                 resolve=resolve_cursor,
                 description="A cursor for use in pagination",
             ),
-            **resolve_maybe_thunk(edge_fields),
+            **resolve_maybe_thunk(edge_fields or {}),
         },
     )
 
@@ -138,7 +136,7 @@ def connection_definitions(
             "edges": GraphQLField(
                 GraphQLList(edge_type), description="A list of edges."
             ),
-            **resolve_maybe_thunk(connection_fields),
+            **resolve_maybe_thunk(connection_fields or {}),
         },
     )
 
