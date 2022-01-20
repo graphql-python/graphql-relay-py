@@ -118,7 +118,7 @@ def connection_definitions(
         fields=lambda: {
             "pageInfo": GraphQLField(
                 GraphQLNonNull(page_info_type),
-                description="The Information to aid in pagination",
+                description="Information to aid in pagination.",
             ),
             "edges": GraphQLField(
                 GraphQLList(edge_type), description="A list of edges."
