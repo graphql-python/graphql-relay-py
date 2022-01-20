@@ -62,13 +62,13 @@ def mutation_with_client_mutation_id(
     def augmented_input_fields() -> GraphQLInputFieldMap:
         return dict(
             resolve_maybe_thunk(input_fields),
-            clientMutationId=GraphQLInputField(GraphQLNonNull(GraphQLString)),
+            clientMutationId=GraphQLInputField(GraphQLString),
         )
 
     def augmented_output_fields() -> GraphQLFieldMap:
         return dict(
             resolve_maybe_thunk(output_fields),
-            clientMutationId=GraphQLField(GraphQLNonNull(GraphQLString)),
+            clientMutationId=GraphQLField(GraphQLString),
         )
 
     output_type = GraphQLObjectType(name + "Payload", fields=augmented_output_fields)

@@ -78,13 +78,13 @@ from .star_wars_data import (
 # }
 #
 # input IntroduceShipInput {
-#   clientMutationId: string!
+#   clientMutationId: string
 #   shipName: string!
 #   factionId: ID!
 # }
 #
-# input IntroduceShipPayload {
-#   clientMutationId: string!
+# type IntroduceShipPayload {
+#   clientMutationId: string
 #   ship: Ship
 #   faction: Faction
 # }
@@ -201,13 +201,13 @@ queryType = GraphQLObjectType(
 #
 # It creates these two types implicitly:
 #   input IntroduceShipInput {
-#     clientMutationId: string!
+#     clientMutationId: string
 #     shipName: string!
 #     factionId: ID!
 #   }
 #
-#   input IntroduceShipPayload {
-#     clientMutationId: string!
+#   type IntroduceShipPayload {
+#     clientMutationId: string
 #     ship: Ship
 #     faction: Faction
 #   }
