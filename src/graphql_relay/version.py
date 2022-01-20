@@ -39,7 +39,10 @@ class VersionInfo(NamedTuple):
         v = f"{self.major}.{self.minor}.{self.micro}"
         level = self.releaselevel
         if level and level != "final":
-            v = f"{v}{level[:1]}{self.serial}"
+            level = level[:1]
+            if level == "c":
+                level = "rc"
+            v = f"{v}{level}{self.serial}"
         return v
 
 
