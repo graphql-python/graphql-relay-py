@@ -32,8 +32,7 @@ packages = [
     { include = '.coveragerc', format = "sdist" },
     { include = '.editorconfig', format = "sdist" },
     { include = '.flake8', format = "sdist" },
-    { include = 'mypy.ini', format = "sdist" },
-    { include = 'codecov.yml', format = "sdist" },
+    { include = '.mypy.ini', format = "sdist" },
     { include = 'poetry.lock', format = "sdist" },
     { include = 'tox.ini', format = "sdist" },
     { include = 'setup.cfg', format = "sdist" },
@@ -60,7 +59,6 @@ black = [
 ]
 flake8 = "^4.0"
 mypy = "0.931"
-codecov = "^2.1"
 check-manifest = ">=0.47,<1"
 bump2version = ">=1.0,<2"
 tox = "^3.24"

@@ -8,9 +8,8 @@ include .bumpversion.cfg
 include .coveragerc
 include .editorconfig
 include .flake8
+include .mypy.ini
 
-include codecov.yml
-include mypy.ini
 include tox.ini
 
 include poetry.lock

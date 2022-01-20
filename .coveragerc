@@ -5,8 +5,15 @@ source = src
 [report]
 exclude_lines =
     pragma: no cover
+    except ImportError:
+    \# Python <
     raise NotImplementedError
+    raise TypeError\(f?"Unexpected
+    assert False,
+    \s+next\($
+    if MYPY:
+    if TYPE_CHECKING:
+    ^\s+\.\.\.$
+    ^\s+pass$
 ignore_errors = True
-omit =
-    docs/*
-    tests/*
+
