@@ -1,7 +1,8 @@
 from typing import List, NamedTuple
 
-from graphql import graphql_sync
-from graphql.type import (
+from graphql import (
+    graphql_sync,
+    print_schema,
     GraphQLField,
     GraphQLInt,
     GraphQLObjectType,
@@ -16,6 +17,8 @@ from graphql_relay import (
     connection_from_array,
     forward_connection_args,
 )
+
+from ..utils import dedent
 
 
 class User(NamedTuple):
@@ -174,4 +177,73 @@ def describe_connection_definition():
                 }
             },
             None,
+        )
+
+    def generates_correct_types():
+        assert print_schema(schema).rstrip() == dedent(
+            '''
+            type Query {
+              user: User
+            }
+
+            type User {
+              name: String
+              friends(after: String, first: Int, before: String, last: Int): FriendConnection
+              friendsForward(after: String, first: Int): UserConnection
+              friendsBackward(before: String, last: Int): UserConnection
+            }
+
+            """A connection to a list of items."""
+            type FriendConnection {
+              """Information to aid in pagination."""
+              pageInfo: PageInfo!
+
+              """A list of edges."""
+              edges: [FriendEdge]
+              totalCount: Int
+            }
+
+            """Information about pagination in a connection."""
+            type PageInfo {
+              """When paginating forwards, are there more items?"""
+              hasNextPage: Boolean!
+
+              """When paginating backwards, are there more items?"""
+              hasPreviousPage: Boolean!
+
+              """When paginating backwards, the cursor to continue."""
+              startCursor: String
+
+              """When paginating forwards, the cursor to continue."""
+              endCursor: String
+            }
+
+            """An edge in a connection."""
+            type FriendEdge {
+              """The item at the end of the edge"""
+              node: User
+
+              """A cursor for use in pagination"""
+              cursor: String!
+              friendshipTime: String
+            }
+
+            """A connection to a list of items."""
+            type UserConnection {
+              """Information to aid in pagination."""
+              pageInfo: PageInfo!
+
+              """A list of edges."""
+              edges: [UserEdge]
+            }
+
+            """An edge in a connection."""
+            type UserEdge {
+              """The item at the end of the edge"""
+              node: User
+
+              """A cursor for use in pagination"""
+              cursor: String!
+            }
+            '''  # noqa: E501
         )
