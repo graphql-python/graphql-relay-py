@@ -135,11 +135,17 @@ def connection_from_array_slice(
     slice_end = slice_start + array_slice_length
     if array_length is None:
         array_length = slice_end
-    before_offset = get_offset_with_default(before, array_length)
-    after_offset = get_offset_with_default(after, -1)
 
-    start_offset = max(slice_start - 1, after_offset, -1) + 1
-    end_offset = min(slice_end, before_offset, array_length)
+    start_offset = max(slice_start, 0)
+    end_offset = min(slice_end, array_length)
+
+    after_offset = get_offset_with_default(after, -1)
+    if 0 <= after_offset < array_length:
+        start_offset = max(start_offset, after_offset + 1)
+
+    before_offset = get_offset_with_default(before, end_offset)
+    if 0 <= before_offset < array_length:
+        end_offset = min(end_offset, before_offset)
 
     if isinstance(first, int):
         if first < 0:
@@ -153,9 +159,7 @@ def connection_from_array_slice(
         start_offset = max(start_offset, end_offset - last)
 
     # If supplied slice is too large, trim it down before mapping over it.
-    trimmed_slice = array_slice[
-        start_offset - slice_start : array_slice_length - (slice_end - end_offset)
-    ]
+    trimmed_slice = array_slice[start_offset - slice_start : end_offset - slice_start]
 
     edges = [
         edge_type(node=value, cursor=offset_to_cursor(start_offset + index))
