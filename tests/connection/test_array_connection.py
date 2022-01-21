@@ -15,89 +15,102 @@ from graphql_relay import (
 from graphql_relay import connection_from_list, connection_from_list_slice
 
 
-def describe_connection_from_array():
-    letters = ["A", "B", "C", "D", "E"]
+array_abcde = ["A", "B", "C", "D", "E"]
 
+cursor_a = "YXJyYXljb25uZWN0aW9uOjA="
+cursor_b = "YXJyYXljb25uZWN0aW9uOjE="
+cursor_c = "YXJyYXljb25uZWN0aW9uOjI="
+cursor_d = "YXJyYXljb25uZWN0aW9uOjM="
+cursor_e = "YXJyYXljb25uZWN0aW9uOjQ="
+
+edge_a = Edge(node="A", cursor=cursor_a)
+edge_b = Edge(node="B", cursor=cursor_b)
+edge_c = Edge(node="C", cursor=cursor_c)
+edge_d = Edge(node="D", cursor=cursor_d)
+edge_e = Edge(node="E", cursor=cursor_e)
+
+
+def describe_connection_from_array():
     def describe_basic_slicing():
         def returns_all_elements_without_filters():
-            c = connection_from_array(letters, {})
+            c = connection_from_array(array_abcde, {})
             assert c == Connection(
                 edges=[
-                    Edge(node="A", cursor="YXJyYXljb25uZWN0aW9uOjA="),
-                    Edge(node="B", cursor="YXJyYXljb25uZWN0aW9uOjE="),
-                    Edge(node="C", cursor="YXJyYXljb25uZWN0aW9uOjI="),
-                    Edge(node="D", cursor="YXJyYXljb25uZWN0aW9uOjM="),
-                    Edge(node="E", cursor="YXJyYXljb25uZWN0aW9uOjQ="),
+                    edge_a,
+                    edge_b,
+                    edge_c,
+                    edge_d,
+                    edge_e,
                 ],
                 pageInfo=PageInfo(
-                    startCursor="YXJyYXljb25uZWN0aW9uOjA=",
-                    endCursor="YXJyYXljb25uZWN0aW9uOjQ=",
+                    startCursor=cursor_a,
+                    endCursor=cursor_e,
                     hasPreviousPage=False,
                     hasNextPage=False,
                 ),
             )
 
         def respects_a_smaller_first():
-            c = connection_from_array(letters, dict(first=2))
+            c = connection_from_array(array_abcde, dict(first=2))
             assert c == Connection(
                 edges=[
-                    Edge(node="A", cursor="YXJyYXljb25uZWN0aW9uOjA="),
-                    Edge(node="B", cursor="YXJyYXljb25uZWN0aW9uOjE="),
+                    edge_a,
+                    edge_b,
                 ],
                 pageInfo=PageInfo(
-                    startCursor="YXJyYXljb25uZWN0aW9uOjA=",
-                    endCursor="YXJyYXljb25uZWN0aW9uOjE=",
+                    startCursor=cursor_a,
+                    endCursor=cursor_b,
                     hasPreviousPage=False,
                     hasNextPage=True,
                 ),
             )
 
         def respects_an_overly_large_first():
-            c = connection_from_array(letters, dict(first=10))
+            c = connection_from_array(array_abcde, dict(first=10))
             assert c == Connection(
                 edges=[
-                    Edge(node="A", cursor="YXJyYXljb25uZWN0aW9uOjA="),
-                    Edge(node="B", cursor="YXJyYXljb25uZWN0aW9uOjE="),
-                    Edge(node="C", cursor="YXJyYXljb25uZWN0aW9uOjI="),
-                    Edge(node="D", cursor="YXJyYXljb25uZWN0aW9uOjM="),
-                    Edge(node="E", cursor="YXJyYXljb25uZWN0aW9uOjQ="),
+                    edge_a,
+                    edge_b,
+                    edge_c,
+                    edge_d,
+                    edge_e,
                 ],
                 pageInfo=PageInfo(
-                    startCursor="YXJyYXljb25uZWN0aW9uOjA=",
-                    endCursor="YXJyYXljb25uZWN0aW9uOjQ=",
+                    startCursor=cursor_a,
+                    endCursor=cursor_e,
                     hasPreviousPage=False,
                     hasNextPage=False,
                 ),
             )
 
         def respects_a_smaller_last():
-            c = connection_from_array(letters, dict(last=2))
+            c = connection_from_array(array_abcde, dict(last=2))
             assert c == Connection(
                 edges=[
-                    Edge(node="D", cursor="YXJyYXljb25uZWN0aW9uOjM="),
-                    Edge(node="E", cursor="YXJyYXljb25uZWN0aW9uOjQ="),
+                    edge_d,
+                    edge_e,
                 ],
                 pageInfo=PageInfo(
-                    startCursor="YXJyYXljb25uZWN0aW9uOjM=",
-                    endCursor="YXJyYXljb25uZWN0aW9uOjQ=",
+                    startCursor=cursor_d,
+                    endCursor=cursor_e,
                     hasPreviousPage=True,
                     hasNextPage=False,
                 ),
             )
 
         def respects_an_overly_large_last():
-            c = connection_from_array(letters, dict(last=10))
+            c = connection_from_array(array_abcde, dict(last=10))
             assert c == Connection(
                 edges=[
-                    Edge(node="A", cursor="YXJyYXljb25uZWN0aW9uOjA="),
-                    Edge(node="B", cursor="YXJyYXljb25uZWN0aW9uOjE="),
-                    Edge(node="C", cursor="YXJyYXljb25uZWN0aW9uOjI="),
-                    Edge(node="D", cursor="YXJyYXljb25uZWN0aW9uOjM="),
-                    Edge(node="E", cursor="YXJyYXljb25uZWN0aW9uOjQ="),
+                    edge_a,
+                    edge_b,
+                    edge_c,
+                    edge_d,
+                    edge_e,
                 ],
                 pageInfo=PageInfo(
-                    startCursor="YXJyYXljb25uZWN0aW9uOjA=",
-                    endCursor="YXJyYXljb25uZWN0aW9uOjQ=",
+                    startCursor=cursor_a,
+                    endCursor=cursor_e,
                     hasPreviousPage=False,
                     hasNextPage=False,
                 ),
@@ -105,70 +118,62 @@ def describe_connection_from_array():
 
     def describe_pagination():
         def respects_first_and_after():
-            c = connection_from_array(
-                letters, dict(first=2, after="YXJyYXljb25uZWN0aW9uOjE=")
-            )
+            c = connection_from_array(array_abcde, dict(first=2, after=cursor_b))
             assert c == Connection(
                 edges=[
-                    Edge(node="C", cursor="YXJyYXljb25uZWN0aW9uOjI="),
-                    Edge(node="D", cursor="YXJyYXljb25uZWN0aW9uOjM="),
+                    edge_c,
+                    edge_d,
                 ],
                 pageInfo=PageInfo(
-                    startCursor="YXJyYXljb25uZWN0aW9uOjI=",
-                    endCursor="YXJyYXljb25uZWN0aW9uOjM=",
+                    startCursor=cursor_c,
+                    endCursor=cursor_d,
                     hasPreviousPage=False,
                     hasNextPage=True,
                 ),
             )
 
         def respects_first_and_after_with_long_first():
-            c = connection_from_array(
-                letters, dict(first=10, after="YXJyYXljb25uZWN0aW9uOjE=")
-            )
+            c = connection_from_array(array_abcde, dict(first=10, after=cursor_b))
             assert c == Connection(
                 edges=[
-                    Edge(node="C", cursor="YXJyYXljb25uZWN0aW9uOjI="),
-                    Edge(node="D", cursor="YXJyYXljb25uZWN0aW9uOjM="),
-                    Edge(node="E", cursor="YXJyYXljb25uZWN0aW9uOjQ="),
+                    edge_c,
+                    edge_d,
+                    edge_e,
                 ],
                 pageInfo=PageInfo(
-                    startCursor="YXJyYXljb25uZWN0aW9uOjI=",
-                    endCursor="YXJyYXljb25uZWN0aW9uOjQ=",
+                    startCursor=cursor_c,
+                    endCursor=cursor_e,
                     hasPreviousPage=False,
                     hasNextPage=False,
                 ),
             )
 
         def respects_last_and_before():
-            c = connection_from_array(
-                letters, dict(last=2, before="YXJyYXljb25uZWN0aW9uOjM=")
-            )
+            c = connection_from_array(array_abcde, dict(last=2, before=cursor_d))
             assert c == Connection(
                 edges=[
-                    Edge(node="B", cursor="YXJyYXljb25uZWN0aW9uOjE="),
-                    Edge(node="C", cursor="YXJyYXljb25uZWN0aW9uOjI="),
+                    edge_b,
+                    edge_c,
                 ],
                 pageInfo=PageInfo(
-                    startCursor="YXJyYXljb25uZWN0aW9uOjE=",
-                    endCursor="YXJyYXljb25uZWN0aW9uOjI=",
+                    startCursor=cursor_b,
+                    endCursor=cursor_c,
                     hasPreviousPage=True,
                     hasNextPage=False,
                 ),
             )
 
         def respects_last_and_before_with_long_last():
-            c = connection_from_array(
-                letters, dict(last=10, before="YXJyYXljb25uZWN0aW9uOjM=")
-            )
+            c = connection_from_array(array_abcde, dict(last=10, before=cursor_d))
             assert c == Connection(
                 edges=[
-                    Edge(node="A", cursor="YXJyYXljb25uZWN0aW9uOjA="),
-                    Edge(node="B", cursor="YXJyYXljb25uZWN0aW9uOjE="),
-                    Edge(node="C", cursor="YXJyYXljb25uZWN0aW9uOjI="),
+                    edge_a,
+                    edge_b,
+                    edge_c,
                 ],
                 pageInfo=PageInfo(
-                    startCursor="YXJyYXljb25uZWN0aW9uOjA=",
-                    endCursor="YXJyYXljb25uZWN0aW9uOjI=",
+                    startCursor=cursor_a,
+                    endCursor=cursor_c,
                     hasPreviousPage=False,
                     hasNextPage=False,
                 ),
@@ -176,21 +181,21 @@ def describe_connection_from_array():
 
         def respects_first_and_after_and_before_too_few():
             c = connection_from_array(
-                letters,
+                array_abcde,
                 dict(
                     first=2,
-                    after="YXJyYXljb25uZWN0aW9uOjA=",
-                    before="YXJyYXljb25uZWN0aW9uOjQ=",
+                    after=cursor_a,
+                    before=cursor_e,
                 ),
             )
             assert c == Connection(
                 edges=[
-                    Edge(node="B", cursor="YXJyYXljb25uZWN0aW9uOjE="),
-                    Edge(node="C", cursor="YXJyYXljb25uZWN0aW9uOjI="),
+                    edge_b,
+                    edge_c,
                 ],
                 pageInfo=PageInfo(
-                    startCursor="YXJyYXljb25uZWN0aW9uOjE=",
-                    endCursor="YXJyYXljb25uZWN0aW9uOjI=",
+                    startCursor=cursor_b,
+                    endCursor=cursor_c,
                     hasPreviousPage=False,
                     hasNextPage=True,
                 ),
@@ -198,22 +203,22 @@ def describe_connection_from_array():
 
         def respects_first_and_after_and_before_too_many():
             c = connection_from_array(
-                letters,
+                array_abcde,
                 dict(
                     first=4,
-                    after="YXJyYXljb25uZWN0aW9uOjA=",
-                    before="YXJyYXljb25uZWN0aW9uOjQ=",
+                    after=cursor_a,
+                    before=cursor_e,
                 ),
             )
             assert c == Connection(
                 edges=[
-                    Edge(node="B", cursor="YXJyYXljb25uZWN0aW9uOjE="),
-                    Edge(node="C", cursor="YXJyYXljb25uZWN0aW9uOjI="),
-                    Edge(node="D", cursor="YXJyYXljb25uZWN0aW9uOjM="),
+                    edge_b,
+                    edge_c,
+                    edge_d,
                 ],
                 pageInfo=PageInfo(
-                    startCursor="YXJyYXljb25uZWN0aW9uOjE=",
-                    endCursor="YXJyYXljb25uZWN0aW9uOjM=",
+                    startCursor=cursor_b,
+                    endCursor=cursor_d,
                     hasPreviousPage=False,
                     hasNextPage=False,
                 ),
@@ -221,22 +226,22 @@ def describe_connection_from_array():
 
         def respects_first_and_after_and_before_exactly_right():
             c = connection_from_array(
-                letters,
+                array_abcde,
                 dict(
                     first=3,
-                    after="YXJyYXljb25uZWN0aW9uOjA=",
-                    before="YXJyYXljb25uZWN0aW9uOjQ=",
+                    after=cursor_a,
+                    before=cursor_e,
                 ),
             )
             assert c == Connection(
                 edges=[
-                    Edge(node="B", cursor="YXJyYXljb25uZWN0aW9uOjE="),
-                    Edge(node="C", cursor="YXJyYXljb25uZWN0aW9uOjI="),
-                    Edge(node="D", cursor="YXJyYXljb25uZWN0aW9uOjM="),
+                    edge_b,
+                    edge_c,
+                    edge_d,
                 ],
                 pageInfo=PageInfo(
-                    startCursor="YXJyYXljb25uZWN0aW9uOjE=",
-                    endCursor="YXJyYXljb25uZWN0aW9uOjM=",
+                    startCursor=cursor_b,
+                    endCursor=cursor_d,
                     hasPreviousPage=False,
                     hasNextPage=False,
                 ),
@@ -244,21 +249,21 @@ def describe_connection_from_array():
 
         def respects_last_and_after_and_before_too_few():
             c = connection_from_array(
-                letters,
+                array_abcde,
                 dict(
                     last=2,
-                    after="YXJyYXljb25uZWN0aW9uOjA=",
-                    before="YXJyYXljb25uZWN0aW9uOjQ=",
+                    after=cursor_a,
+                    before=cursor_e,
                 ),
             )
             assert c == Connection(
                 edges=[
-                    Edge(node="C", cursor="YXJyYXljb25uZWN0aW9uOjI="),
-                    Edge(node="D", cursor="YXJyYXljb25uZWN0aW9uOjM="),
+                    edge_c,
+                    edge_d,
                 ],
                 pageInfo=PageInfo(
-                    startCursor="YXJyYXljb25uZWN0aW9uOjI=",
-                    endCursor="YXJyYXljb25uZWN0aW9uOjM=",
+                    startCursor=cursor_c,
+                    endCursor=cursor_d,
                     hasPreviousPage=True,
                     hasNextPage=False,
                 ),
@@ -266,22 +271,22 @@ def describe_connection_from_array():
 
         def respects_last_and_after_and_before_too_many():
             c = connection_from_array(
-                letters,
+                array_abcde,
                 dict(
                     last=4,
-                    after="YXJyYXljb25uZWN0aW9uOjA=",
-                    before="YXJyYXljb25uZWN0aW9uOjQ=",
+                    after=cursor_a,
+                    before=cursor_e,
                 ),
             )
             assert c == Connection(
                 edges=[
-                    Edge(node="B", cursor="YXJyYXljb25uZWN0aW9uOjE="),
-                    Edge(node="C", cursor="YXJyYXljb25uZWN0aW9uOjI="),
-                    Edge(node="D", cursor="YXJyYXljb25uZWN0aW9uOjM="),
+                    edge_b,
+                    edge_c,
+                    edge_d,
                 ],
                 pageInfo=PageInfo(
-                    startCursor="YXJyYXljb25uZWN0aW9uOjE=",
-                    endCursor="YXJyYXljb25uZWN0aW9uOjM=",
+                    startCursor=cursor_b,
+                    endCursor=cursor_d,
                     hasPreviousPage=False,
                     hasNextPage=False,
                 ),
@@ -289,22 +294,22 @@ def describe_connection_from_array():
 
         def respects_last_and_after_and_before_exactly_right():
             c = connection_from_array(
-                letters,
+                array_abcde,
                 dict(
                     last=3,
-                    after="YXJyYXljb25uZWN0aW9uOjA=",
-                    before="YXJyYXljb25uZWN0aW9uOjQ=",
+                    after=cursor_a,
+                    before=cursor_e,
                 ),
             )
             assert c == Connection(
                 edges=[
-                    Edge(node="B", cursor="YXJyYXljb25uZWN0aW9uOjE="),
-                    Edge(node="C", cursor="YXJyYXljb25uZWN0aW9uOjI="),
-                    Edge(node="D", cursor="YXJyYXljb25uZWN0aW9uOjM="),
+                    edge_b,
+                    edge_c,
+                    edge_d,
                 ],
                 pageInfo=PageInfo(
-                    startCursor="YXJyYXljb25uZWN0aW9uOjE=",
-                    endCursor="YXJyYXljb25uZWN0aW9uOjM=",
+                    startCursor=cursor_b,
+                    endCursor=cursor_d,
                     hasPreviousPage=False,
                     hasNextPage=False,
                 ),
@@ -313,31 +318,33 @@ def describe_connection_from_array():
     def describe_cursor_edge_cases():
         def throws_an_error_if_first_smaller_than_zero():
             with raises(ValueError) as exc_info:
-                connection_from_array(letters, dict(first=-1))
+                connection_from_array(array_abcde, dict(first=-1))
             assert str(exc_info.value) == (
                 "Argument 'first' must be a non-negative integer."
             )
 
         def throws_an_error_if_last_smaller_than_zero():
             with raises(ValueError) as exc_info:
-                connection_from_array(letters, dict(last=-1))
+                connection_from_array(array_abcde, dict(last=-1))
             assert str(exc_info.value) == (
                 "Argument 'last' must be a non-negative integer."
             )
 
         def returns_all_elements_if_cursors_are_invalid():
-            c = connection_from_array(letters, dict(before="invalid", after="invalid"))
+            c = connection_from_array(
+                array_abcde, dict(before="invalid", after="invalid")
+            )
             assert c == Connection(
                 edges=[
-                    Edge(node="A", cursor="YXJyYXljb25uZWN0aW9uOjA="),
-                    Edge(node="B", cursor="YXJyYXljb25uZWN0aW9uOjE="),
-                    Edge(node="C", cursor="YXJyYXljb25uZWN0aW9uOjI="),
-                    Edge(node="D", cursor="YXJyYXljb25uZWN0aW9uOjM="),
-                    Edge(node="E", cursor="YXJyYXljb25uZWN0aW9uOjQ="),
+                    edge_a,
+                    edge_b,
+                    edge_c,
+                    edge_d,
+                    edge_e,
                 ],
                 pageInfo=PageInfo(
-                    startCursor="YXJyYXljb25uZWN0aW9uOjA=",
-                    endCursor="YXJyYXljb25uZWN0aW9uOjQ=",
+                    startCursor=cursor_a,
+                    endCursor=cursor_e,
                     hasPreviousPage=False,
                     hasNextPage=False,
                 ),
@@ -345,23 +352,23 @@ def describe_connection_from_array():
 
         def returns_all_elements_if_cursors_are_on_the_outside():
             c = connection_from_array(
-                letters,
+                array_abcde,
                 dict(
-                    before="YXJyYXljb25uZWN0aW9uOjYK",
-                    after="YXJyYXljb25uZWN0aW9uOi0xCg==",
+                    before="YXJyYXljb25uZWN0aW9uOjYK",  # offset_to_cursor(6)
+                    after="YXJyYXljb25uZWN0aW9uOi0xCg==",  # offset_to_cursor(-1)
                 ),
             )
             assert c == Connection(
                 edges=[
-                    Edge(node="A", cursor="YXJyYXljb25uZWN0aW9uOjA="),
-                    Edge(node="B", cursor="YXJyYXljb25uZWN0aW9uOjE="),
-                    Edge(node="C", cursor="YXJyYXljb25uZWN0aW9uOjI="),
-                    Edge(node="D", cursor="YXJyYXljb25uZWN0aW9uOjM="),
-                    Edge(node="E", cursor="YXJyYXljb25uZWN0aW9uOjQ="),
+                    edge_a,
+                    edge_b,
+                    edge_c,
+                    edge_d,
+                    edge_e,
                 ],
                 pageInfo=PageInfo(
-                    startCursor="YXJyYXljb25uZWN0aW9uOjA=",
-                    endCursor="YXJyYXljb25uZWN0aW9uOjQ=",
+                    startCursor=cursor_a,
+                    endCursor=cursor_e,
                     hasPreviousPage=False,
                     hasNextPage=False,
                 ),
@@ -369,10 +376,8 @@ def describe_connection_from_array():
 
         def returns_no_elements_if_cursors_cross():
             c = connection_from_array(
-                letters,
-                dict(
-                    before="YXJyYXljb25uZWN0aW9uOjI=", after="YXJyYXljb25uZWN0aW9uOjQ="
-                ),
+                array_abcde,
+                dict(before=cursor_c, after=cursor_e),
             )
             assert c == Connection(
                 edges=[],
@@ -386,11 +391,11 @@ def describe_connection_from_array():
 
     def describe_cursor_for_object_in_connection():
         def returns_an_edges_cursor_given_an_array_and_a_member_object():
-            letter_b_cursor = cursor_for_object_in_connection(letters, "B")
-            assert letter_b_cursor == "YXJyYXljb25uZWN0aW9uOjE="
+            letter_b_cursor = cursor_for_object_in_connection(array_abcde, "B")
+            assert letter_b_cursor == cursor_b
 
         def returns_null_given_an_array_and_a_non_member_object():
-            letter_f_cursor = cursor_for_object_in_connection(letters, "F")
+            letter_f_cursor = cursor_for_object_in_connection(array_abcde, "F")
             assert letter_f_cursor is None
 
         def describe_extended_functionality():
@@ -398,7 +403,7 @@ def describe_connection_from_array():
 
             def returns_an_edges_cursor_given_an_array_without_index_method():
                 class LettersWithoutIndex:
-                    __getitem__ = letters.__getitem__
+                    __getitem__ = array_abcde.__getitem__
 
                 letters_without_index = cast(Sequence, LettersWithoutIndex())
 
@@ -408,7 +413,7 @@ def describe_connection_from_array():
                 letter_b_cursor = cursor_for_object_in_connection(
                     letters_without_index, "B"
                 )
-                assert letter_b_cursor == "YXJyYXljb25uZWN0aW9uOjE="
+                assert letter_b_cursor == cursor_b
 
                 no_letter_cursor = cursor_for_object_in_connection(
                     letters_without_index, "="
@@ -419,35 +424,35 @@ def describe_connection_from_array():
         """Test functionality that is not part of graphql-relay-js."""
 
         def does_not_require_args():
-            c = connection_from_array(letters)
+            c = connection_from_array(array_abcde)
             assert c == Connection(
                 edges=[
-                    Edge(node="A", cursor="YXJyYXljb25uZWN0aW9uOjA="),
-                    Edge(node="B", cursor="YXJyYXljb25uZWN0aW9uOjE="),
-                    Edge(node="C", cursor="YXJyYXljb25uZWN0aW9uOjI="),
-                    Edge(node="D", cursor="YXJyYXljb25uZWN0aW9uOjM="),
-                    Edge(node="E", cursor="YXJyYXljb25uZWN0aW9uOjQ="),
+                    edge_a,
+                    edge_b,
+                    edge_c,
+                    edge_d,
+                    edge_e,
                 ],
                 pageInfo=PageInfo(
-                    startCursor="YXJyYXljb25uZWN0aW9uOjA=",
-                    endCursor="YXJyYXljb25uZWN0aW9uOjQ=",
+                    startCursor=cursor_a,
+                    endCursor=cursor_e,
                     hasPreviousPage=False,
                     hasNextPage=False,
                 ),
             )
 
         def uses_default_connection_types():
-            connection = connection_from_array(letters[:1])
+            connection = connection_from_array(array_abcde[:1])
             assert isinstance(connection, Connection)
             edge = connection.edges[0]
             assert isinstance(edge, Edge)
             assert len(connection.edges) == 1
-            assert edge == Edge(node="A", cursor="YXJyYXljb25uZWN0aW9uOjA=")
+            assert edge == edge_a
             page_info = connection.pageInfo
             assert isinstance(page_info, PageInfo)
             assert page_info == PageInfo(
-                startCursor="YXJyYXljb25uZWN0aW9uOjA=",
-                endCursor="YXJyYXljb25uZWN0aW9uOjA=",
+                startCursor=cursor_a,
+                endCursor=cursor_a,
                 hasPreviousPage=False,
                 hasNextPage=False,
             )
@@ -460,18 +465,18 @@ def describe_connection_from_array():
                     self.page_info = pageInfo
 
             connection = connection_from_array(
-                letters[:1], connection_type=CustomConnection
+                array_abcde[:1], connection_type=CustomConnection
             )
             assert isinstance(connection, CustomConnection)
             edge = connection.edges[0]
             assert isinstance(edge, Edge)
             assert len(connection.edges) == 1
-            assert edge == Edge(node="A", cursor="YXJyYXljb25uZWN0aW9uOjA=")
+            assert edge == edge_a
             page_info = connection.page_info
             assert isinstance(page_info, PageInfo)
             assert page_info == PageInfo(
-                startCursor="YXJyYXljb25uZWN0aW9uOjA=",
-                endCursor="YXJyYXljb25uZWN0aW9uOjA=",
+                startCursor=cursor_a,
+                endCursor=cursor_a,
                 hasPreviousPage=False,
                 hasNextPage=False,
             )
@@ -482,19 +487,19 @@ def describe_connection_from_array():
                     self.node = node
                     self.cursor = cursor
 
-            connection = connection_from_array(letters[:1], edge_type=CustomEdge)
+            connection = connection_from_array(array_abcde[:1], edge_type=CustomEdge)
             assert isinstance(connection, Connection)
             assert isinstance(connection.edges, list)
             assert len(connection.edges) == 1
             edge = connection.edges[0]
             assert isinstance(edge, CustomEdge)
             assert edge.node == "A"
-            assert edge.cursor == "YXJyYXljb25uZWN0aW9uOjA="
+            assert edge.cursor == cursor_a
             page_info = connection.pageInfo
             assert isinstance(page_info, PageInfo)
             assert page_info == PageInfo(
-                startCursor="YXJyYXljb25uZWN0aW9uOjA=",
-                endCursor="YXJyYXljb25uZWN0aW9uOjA=",
+                startCursor=cursor_a,
+                endCursor=cursor_a,
                 hasPreviousPage=False,
                 hasNextPage=False,
             )
@@ -511,18 +516,18 @@ def describe_connection_from_array():
                     self.hasNextPage = hasNextPage
 
             connection = connection_from_array(
-                letters[:1], page_info_type=CustomPageInfo
+                array_abcde[:1], page_info_type=CustomPageInfo
             )
             assert isinstance(connection, Connection)
             assert isinstance(connection.edges, list)
             assert len(connection.edges) == 1
             edge = connection.edges[0]
             assert isinstance(edge, Edge)
-            assert edge == Edge(node="A", cursor="YXJyYXljb25uZWN0aW9uOjA=")
+            assert edge == edge_a
             page_info = connection.pageInfo
             assert isinstance(page_info, CustomPageInfo)
-            assert page_info.startCursor == "YXJyYXljb25uZWN0aW9uOjA="
-            assert page_info.endCursor == "YXJyYXljb25uZWN0aW9uOjA="
+            assert page_info.startCursor == cursor_a
+            assert page_info.endCursor == cursor_a
             assert page_info.hasPreviousPage is False
             assert page_info.hasNextPage is False
 
@@ -530,17 +535,17 @@ def describe_connection_from_array():
             with deprecated_call():
                 # noinspection PyDeprecation
                 c = connection_from_list(
-                    letters[:1],
+                    array_abcde[:1],
                     args={},
                     connection_type=Connection,
                     edge_type=Edge,
                     pageinfo_type=PageInfo,
                 )
             assert c == Connection(
-                edges=[Edge(node="A", cursor="YXJyYXljb25uZWN0aW9uOjA=")],
+                edges=[edge_a],
                 pageInfo=PageInfo(
-                    startCursor="YXJyYXljb25uZWN0aW9uOjA=",
-                    endCursor="YXJyYXljb25uZWN0aW9uOjA=",
+                    startCursor=cursor_a,
+                    endCursor=cursor_a,
                     hasPreviousPage=False,
                     hasNextPage=False,
                 ),
@@ -548,23 +553,21 @@ def describe_connection_from_array():
 
 
 def describe_connection_from_array_slice():
-    letters = ["A", "B", "C", "D", "E"]
-
     def works_with_a_just_right_array_slice():
         c = connection_from_array_slice(
-            letters[1:3],
-            dict(first=2, after="YXJyYXljb25uZWN0aW9uOjA="),
+            array_abcde[1:3],
+            dict(first=2, after=cursor_a),
             slice_start=1,
             array_length=5,
         )
         assert c == Connection(
             edges=[
-                Edge(node="B", cursor="YXJyYXljb25uZWN0aW9uOjE="),
-                Edge(node="C", cursor="YXJyYXljb25uZWN0aW9uOjI="),
+                edge_b,
+                edge_c,
             ],
             pageInfo=PageInfo(
-                startCursor="YXJyYXljb25uZWN0aW9uOjE=",
-                endCursor="YXJyYXljb25uZWN0aW9uOjI=",
+                startCursor=cursor_b,
+                endCursor=cursor_c,
                 hasPreviousPage=False,
                 hasNextPage=True,
             ),
@@ -572,19 +575,19 @@ def describe_connection_from_array_slice():
 
     def works_with_an_oversized_array_slice_left_side():
         c = connection_from_array_slice(
-            letters[0:3],
-            dict(first=2, after="YXJyYXljb25uZWN0aW9uOjA="),
+            array_abcde[0:3],
+            dict(first=2, after=cursor_a),
             slice_start=0,
             array_length=5,
         )
         assert c == Connection(
             edges=[
-                Edge(node="B", cursor="YXJyYXljb25uZWN0aW9uOjE="),
-                Edge(node="C", cursor="YXJyYXljb25uZWN0aW9uOjI="),
+                edge_b,
+                edge_c,
             ],
             pageInfo=PageInfo(
-                startCursor="YXJyYXljb25uZWN0aW9uOjE=",
-                endCursor="YXJyYXljb25uZWN0aW9uOjI=",
+                startCursor=cursor_b,
+                endCursor=cursor_c,
                 hasPreviousPage=False,
                 hasNextPage=True,
             ),
@@ -592,16 +595,16 @@ def describe_connection_from_array_slice():
 
     def works_with_an_oversized_array_slice_right_side():
         c = connection_from_array_slice(
-            letters[2:4],
-            dict(first=1, after="YXJyYXljb25uZWN0aW9uOjE="),
+            array_abcde[2:4],
+            dict(first=1, after=cursor_b),
             slice_start=2,
             array_length=5,
         )
         assert c == Connection(
-            edges=[Edge(node="C", cursor="YXJyYXljb25uZWN0aW9uOjI=")],
+            edges=[edge_c],
             pageInfo=PageInfo(
-                startCursor="YXJyYXljb25uZWN0aW9uOjI=",
-                endCursor="YXJyYXljb25uZWN0aW9uOjI=",
+                startCursor=cursor_c,
+                endCursor=cursor_c,
                 hasPreviousPage=False,
                 hasNextPage=True,
             ),
@@ -609,16 +612,16 @@ def describe_connection_from_array_slice():
 
     def works_with_an_oversized_array_slice_both_sides():
         c = connection_from_array_slice(
-            letters[1:4],
-            dict(first=1, after="YXJyYXljb25uZWN0aW9uOjE="),
+            array_abcde[1:4],
+            dict(first=1, after=cursor_b),
             slice_start=1,
             array_length=5,
         )
         assert c == Connection(
-            edges=[Edge(node="C", cursor="YXJyYXljb25uZWN0aW9uOjI=")],
+            edges=[edge_c],
             pageInfo=PageInfo(
-                startCursor="YXJyYXljb25uZWN0aW9uOjI=",
-                endCursor="YXJyYXljb25uZWN0aW9uOjI=",
+                startCursor=cursor_c,
+                endCursor=cursor_c,
                 hasPreviousPage=False,
                 hasNextPage=True,
             ),
@@ -626,19 +629,19 @@ def describe_connection_from_array_slice():
 
     def works_with_an_undersized_array_slice_left_side():
         c = connection_from_array_slice(
-            letters[3:5],
-            dict(first=3, after="YXJyYXljb25uZWN0aW9uOjE="),
+            array_abcde[3:5],
+            dict(first=3, after=cursor_b),
             slice_start=3,
             array_length=5,
         )
         assert c == Connection(
             edges=[
-                Edge(node="D", cursor="YXJyYXljb25uZWN0aW9uOjM="),
-                Edge(node="E", cursor="YXJyYXljb25uZWN0aW9uOjQ="),
+                edge_d,
+                edge_e,
             ],
             pageInfo=PageInfo(
-                startCursor="YXJyYXljb25uZWN0aW9uOjM=",
-                endCursor="YXJyYXljb25uZWN0aW9uOjQ=",
+                startCursor=cursor_d,
+                endCursor=cursor_e,
                 hasPreviousPage=False,
                 hasNextPage=False,
             ),
@@ -646,19 +649,19 @@ def describe_connection_from_array_slice():
 
     def works_with_an_undersized_array_slice_right_side():
         c = connection_from_array_slice(
-            letters[2:4],
-            dict(first=3, after="YXJyYXljb25uZWN0aW9uOjE="),
+            array_abcde[2:4],
+            dict(first=3, after=cursor_b),
             slice_start=2,
             array_length=5,
         )
         assert c == Connection(
             edges=[
-                Edge(node="C", cursor="YXJyYXljb25uZWN0aW9uOjI="),
-                Edge(node="D", cursor="YXJyYXljb25uZWN0aW9uOjM="),
+                edge_c,
+                edge_d,
             ],
             pageInfo=PageInfo(
-                startCursor="YXJyYXljb25uZWN0aW9uOjI=",
-                endCursor="YXJyYXljb25uZWN0aW9uOjM=",
+                startCursor=cursor_c,
+                endCursor=cursor_d,
                 hasPreviousPage=False,
                 hasNextPage=True,
             ),
@@ -666,16 +669,16 @@ def describe_connection_from_array_slice():
 
     def works_with_an_undersized_array_slice_both_sides():
         c = connection_from_array_slice(
-            letters[3:4],
-            dict(first=3, after="YXJyYXljb25uZWN0aW9uOjE="),
+            array_abcde[3:4],
+            dict(first=3, after=cursor_b),
             slice_start=3,
             array_length=5,
         )
         assert c == Connection(
-            edges=[Edge(node="D", cursor="YXJyYXljb25uZWN0aW9uOjM=")],
+            edges=[edge_d],
             pageInfo=PageInfo(
-                startCursor="YXJyYXljb25uZWN0aW9uOjM=",
-                endCursor="YXJyYXljb25uZWN0aW9uOjM=",
+                startCursor=cursor_d,
+                endCursor=cursor_d,
                 hasPreviousPage=False,
                 hasNextPage=True,
             ),
@@ -685,42 +688,46 @@ def describe_connection_from_array_slice():
         """Test functionality that is not part of graphql-relay-js."""
 
         def does_not_require_args():
-            c = connection_from_array_slice(letters, slice_start=0, array_length=5)
+            c = connection_from_array_slice(array_abcde, slice_start=0, array_length=5)
             assert c == Connection(
                 edges=[
-                    Edge(node="A", cursor="YXJyYXljb25uZWN0aW9uOjA="),
-                    Edge(node="B", cursor="YXJyYXljb25uZWN0aW9uOjE="),
-                    Edge(node="C", cursor="YXJyYXljb25uZWN0aW9uOjI="),
-                    Edge(node="D", cursor="YXJyYXljb25uZWN0aW9uOjM="),
-                    Edge(node="E", cursor="YXJyYXljb25uZWN0aW9uOjQ="),
+                    edge_a,
+                    edge_b,
+                    edge_c,
+                    edge_d,
+                    edge_e,
                 ],
                 pageInfo=PageInfo(
-                    startCursor="YXJyYXljb25uZWN0aW9uOjA=",
-                    endCursor="YXJyYXljb25uZWN0aW9uOjQ=",
+                    startCursor=cursor_a,
+                    endCursor=cursor_e,
                     hasPreviousPage=False,
                     hasNextPage=False,
                 ),
             )
 
         def uses_zero_as_default_for_slice_start():
-            c = connection_from_array_slice(letters[:1], dict(first=1), array_length=5)
+            c = connection_from_array_slice(
+                array_abcde[:1], dict(first=1), array_length=5
+            )
             assert c == Connection(
-                edges=[Edge(node="A", cursor="YXJyYXljb25uZWN0aW9uOjA=")],
+                edges=[edge_a],
                 pageInfo=PageInfo(
-                    startCursor="YXJyYXljb25uZWN0aW9uOjA=",
-                    endCursor="YXJyYXljb25uZWN0aW9uOjA=",
+                    startCursor=cursor_a,
+                    endCursor=cursor_a,
                     hasPreviousPage=False,
                     hasNextPage=True,
                 ),
             )
 
         def uses_slice_end_as_default_for_array_length():
-            c = connection_from_array_slice(letters[:1], dict(first=1), slice_start=0)
+            c = connection_from_array_slice(
+                array_abcde[:1], dict(first=1), slice_start=0
+            )
             assert c == Connection(
-                edges=[Edge(node="A", cursor="YXJyYXljb25uZWN0aW9uOjA=")],
+                edges=[edge_a],
                 pageInfo=PageInfo(
-                    startCursor="YXJyYXljb25uZWN0aW9uOjA=",
-                    endCursor="YXJyYXljb25uZWN0aW9uOjA=",
+                    startCursor=cursor_a,
+                    endCursor=cursor_a,
                     hasPreviousPage=False,
                     hasNextPage=False,
                 ),
@@ -728,13 +735,13 @@ def describe_connection_from_array_slice():
 
         def ignores_len_of_slice_if_array_slice_length_provided():
             c = connection_from_array_slice(
-                letters[:2], dict(first=2), array_length=2, array_slice_length=1
+                array_abcde[:2], dict(first=2), array_length=2, array_slice_length=1
             )
             assert c == Connection(
-                edges=[Edge(node="A", cursor="YXJyYXljb25uZWN0aW9uOjA=")],
+                edges=[edge_a],
                 pageInfo=PageInfo(
-                    startCursor="YXJyYXljb25uZWN0aW9uOjA=",
-                    endCursor="YXJyYXljb25uZWN0aW9uOjA=",
+                    startCursor=cursor_a,
+                    endCursor=cursor_a,
                     hasPreviousPage=False,
                     hasNextPage=True,
                 ),
@@ -742,7 +749,7 @@ def describe_connection_from_array_slice():
 
         def uses_array_slice_length_instead_of_len_function():
             class LettersWithoutLen:
-                __getitem__ = letters.__getitem__
+                __getitem__ = array_abcde.__getitem__
 
             letters_without_len = cast(Sequence, LettersWithoutLen())
 
@@ -755,15 +762,15 @@ def describe_connection_from_array_slice():
             c = connection_from_array_slice(letters_without_len, array_slice_length=5)
             assert c == Connection(
                 edges=[
-                    Edge(node="A", cursor="YXJyYXljb25uZWN0aW9uOjA="),
-                    Edge(node="B", cursor="YXJyYXljb25uZWN0aW9uOjE="),
-                    Edge(node="C", cursor="YXJyYXljb25uZWN0aW9uOjI="),
-                    Edge(node="D", cursor="YXJyYXljb25uZWN0aW9uOjM="),
-                    Edge(node="E", cursor="YXJyYXljb25uZWN0aW9uOjQ="),
+                    edge_a,
+                    edge_b,
+                    edge_c,
+                    edge_d,
+                    edge_e,
                 ],
                 pageInfo=PageInfo(
-                    startCursor="YXJyYXljb25uZWN0aW9uOjA=",
-                    endCursor="YXJyYXljb25uZWN0aW9uOjQ=",
+                    startCursor=cursor_a,
+                    endCursor=cursor_e,
                     hasPreviousPage=False,
                     hasNextPage=False,
                 ),
@@ -771,18 +778,18 @@ def describe_connection_from_array_slice():
 
         def uses_default_connection_types():
             connection = connection_from_array_slice(
-                letters[:1], slice_start=0, array_length=1
+                array_abcde[:1], slice_start=0, array_length=1
             )
             assert isinstance(connection, Connection)
             edge = connection.edges[0]
             assert isinstance(edge, Edge)
             assert len(connection.edges) == 1
-            assert edge == Edge(node="A", cursor="YXJyYXljb25uZWN0aW9uOjA=")
+            assert edge == edge_a
             page_info = connection.pageInfo
             assert isinstance(page_info, PageInfo)
             assert page_info == PageInfo(
-                startCursor="YXJyYXljb25uZWN0aW9uOjA=",
-                endCursor="YXJyYXljb25uZWN0aW9uOjA=",
+                startCursor=cursor_a,
+                endCursor=cursor_a,
                 hasPreviousPage=False,
                 hasNextPage=False,
             )
@@ -795,7 +802,7 @@ def describe_connection_from_array_slice():
                     self.page_info = pageInfo
 
             connection = connection_from_array_slice(
-                letters[:1],
+                array_abcde[:1],
                 slice_start=0,
                 array_length=1,
                 connection_type=CustomConnection,
@@ -804,12 +811,12 @@ def describe_connection_from_array_slice():
             edge = connection.edges[0]
             assert isinstance(edge, Edge)
             assert len(connection.edges) == 1
-            assert edge == Edge(node="A", cursor="YXJyYXljb25uZWN0aW9uOjA=")
+            assert edge == edge_a
             page_info = connection.page_info
             assert isinstance(page_info, PageInfo)
             assert page_info == PageInfo(
-                startCursor="YXJyYXljb25uZWN0aW9uOjA=",
-                endCursor="YXJyYXljb25uZWN0aW9uOjA=",
+                startCursor=cursor_a,
+                endCursor=cursor_a,
                 hasPreviousPage=False,
                 hasNextPage=False,
             )
@@ -821,7 +828,7 @@ def describe_connection_from_array_slice():
                     self.cursor = cursor
 
             connection = connection_from_array_slice(
-                letters[:1], slice_start=0, array_length=1, edge_type=CustomEdge
+                array_abcde[:1], slice_start=0, array_length=1, edge_type=CustomEdge
             )
             assert isinstance(connection, Connection)
             assert isinstance(connection.edges, list)
@@ -829,12 +836,12 @@ def describe_connection_from_array_slice():
             edge = connection.edges[0]
             assert isinstance(edge, CustomEdge)
             assert edge.node == "A"
-            assert edge.cursor == "YXJyYXljb25uZWN0aW9uOjA="
+            assert edge.cursor == cursor_a
             page_info = connection.pageInfo
             assert isinstance(page_info, PageInfo)
             assert page_info == PageInfo(
-                startCursor="YXJyYXljb25uZWN0aW9uOjA=",
-                endCursor="YXJyYXljb25uZWN0aW9uOjA=",
+                startCursor=cursor_a,
+                endCursor=cursor_a,
                 hasPreviousPage=False,
                 hasNextPage=False,
             )
@@ -851,7 +858,7 @@ def describe_connection_from_array_slice():
                     self.hasNextPage = hasNextPage
 
             connection = connection_from_array_slice(
-                letters[:1],
+                array_abcde[:1],
                 slice_start=0,
                 array_length=1,
                 page_info_type=CustomPageInfo,
@@ -861,11 +868,11 @@ def describe_connection_from_array_slice():
             assert len(connection.edges) == 1
             edge = connection.edges[0]
             assert isinstance(edge, Edge)
-            assert edge == Edge(node="A", cursor="YXJyYXljb25uZWN0aW9uOjA=")
+            assert edge == edge_a
             page_info = connection.pageInfo
             assert isinstance(page_info, CustomPageInfo)
-            assert page_info.startCursor == "YXJyYXljb25uZWN0aW9uOjA="
-            assert page_info.endCursor == "YXJyYXljb25uZWN0aW9uOjA="
+            assert page_info.startCursor == cursor_a
+            assert page_info.endCursor == cursor_a
             assert page_info.hasPreviousPage is False
             assert page_info.hasNextPage is False
 
@@ -873,7 +880,7 @@ def describe_connection_from_array_slice():
             with deprecated_call():
                 # noinspection PyDeprecation
                 c = connection_from_list_slice(
-                    letters[:1],
+                    array_abcde[:1],
                     args={},
                     connection_type=Connection,
                     edge_type=Edge,
@@ -883,10 +890,10 @@ def describe_connection_from_array_slice():
                     list_slice_length=1,
                 )
             assert c == Connection(
-                edges=[Edge(node="A", cursor="YXJyYXljb25uZWN0aW9uOjA=")],
+                edges=[edge_a],
                 pageInfo=PageInfo(
-                    startCursor="YXJyYXljb25uZWN0aW9uOjA=",
-                    endCursor="YXJyYXljb25uZWN0aW9uOjA=",
+                    startCursor=cursor_a,
+                    endCursor=cursor_a,
                     hasPreviousPage=False,
                     hasNextPage=False,
                 ),
