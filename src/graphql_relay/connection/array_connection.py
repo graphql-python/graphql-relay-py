@@ -1,4 +1,3 @@
-import binascii
 import warnings
 from typing import Any, Iterator, Optional, Sequence
 
@@ -224,7 +223,7 @@ def cursor_to_offset(cursor: ConnectionCursor) -> Optional[int]:
     """Extract the offset from the cursor string."""
     try:
         return int(unbase64(cursor)[len(PREFIX) :])
-    except binascii.Error:
+    except ValueError:
         return None
 
 
