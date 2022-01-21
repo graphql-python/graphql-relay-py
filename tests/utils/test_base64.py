@@ -15,6 +15,9 @@ def describe_base64_conversion():
     def converts_invalid_base64_to_empty_string():
         assert unbase64("") == ""
         assert unbase64("invalid") == ""
+        assert unbase64(example_base64[-1:]) == ""
+        assert unbase64(example_base64[1:]) == ""
+        assert unbase64("!" + example_base64[1:]) == ""
         assert unbase64("Ü" + example_base64[1:]) == ""
 
     def converts_from_unicode_as_bytes_to_base64():
