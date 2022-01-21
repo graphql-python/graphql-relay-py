@@ -80,13 +80,7 @@ def mutation_with_client_mutation_id(
         # noinspection PyShadowingBuiltins
         async def resolve(_root: Any, info: GraphQLResolveInfo, input: Dict) -> Any:
             payload = await mutate_and_get_payload(info, **input)
-            try:
-                clientMutationId = input["clientMutationId"]
-            except KeyError:
-                raise GraphQLError(
-                    "Cannot set clientMutationId"
-                    f" in the payload object {inspect(payload)}."
-                )
+            clientMutationId = input.get("clientMutationId")
             if payload is None:
                 payload = NullResult(clientMutationId)
             else:
@@ -100,13 +94,7 @@ def mutation_with_client_mutation_id(
             _root: Any, info: GraphQLResolveInfo, input: Dict
         ) -> Any:
             payload = mutate_and_get_payload(info, **input)
-            try:
-                clientMutationId = input["clientMutationId"]
-            except KeyError:
-                raise GraphQLError(
-                    "Cannot set clientMutationId"
-                    f" in the payload object {inspect(payload)}."
-                )
+            clientMutationId = input.get("clientMutationId")
             if payload is None:
                 payload = NullResult(clientMutationId)
             else:
