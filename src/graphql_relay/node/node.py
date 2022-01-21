@@ -1,4 +1,4 @@
-from typing import Any, Callable, NamedTuple, Optional
+from typing import Any, Callable, NamedTuple, Optional, Union
 
 from graphql_relay.utils.base64 import base64, unbase64
 
@@ -22,7 +22,7 @@ class GraphQLNodeDefinitions(NamedTuple):
 
 
 def node_definitions(
-    id_fetcher: Callable[[str, GraphQLResolveInfo], Any],
+    fetch_by_id: Callable[[str, GraphQLResolveInfo], Any],
     type_resolver: Optional[GraphQLTypeResolver] = None,
 ) -> GraphQLNodeDefinitions:
     """
@@ -55,7 +55,7 @@ def node_definitions(
                 GraphQLNonNull(GraphQLID), description="The ID of an object"
             )
         },
-        resolve=lambda _obj, info, id: id_fetcher(id, info),
+        resolve=lambda _obj, info, id: fetch_by_id(id, info),
     )
 
     nodes_field = GraphQLField(
@@ -67,7 +67,7 @@ def node_definitions(
                 description="The IDs of objects",
             )
         },
-        resolve=lambda _obj, info, ids: [id_fetcher(id_, info) for id_ in ids],
+        resolve=lambda _obj, info, ids: [fetch_by_id(id_, info) for id_ in ids],
     )
 
     return GraphQLNodeDefinitions(node_interface, node_field, nodes_field)
@@ -79,12 +79,12 @@ class ResolvedGlobalId(NamedTuple):
     id: str
 
 
-def to_global_id(type_: str, id_: str) -> str:
+def to_global_id(type_: str, id_: Union[str, int]) -> str:
     """
     Takes a type name and an ID specific to that type name, and returns a
     "global ID" that is unique among all types.
     """
-    return base64(f"{type_}:{id_}")
+    return base64(f"{type_}:{GraphQLID.serialize(id_)}")
 
 
 def from_global_id(global_id: str) -> ResolvedGlobalId:
