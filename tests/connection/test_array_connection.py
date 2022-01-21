@@ -400,15 +400,20 @@ def describe_connection_from_array():
                 class LettersWithoutIndex:
                     __getitem__ = letters.__getitem__
 
-                letters_without_index = LettersWithoutIndex()
+                letters_without_index = cast(Sequence, LettersWithoutIndex())
 
                 with raises(AttributeError):
-                    cast(Sequence, letters_without_index).index("B")
+                    letters_without_index.index("B")
 
                 letter_b_cursor = cursor_for_object_in_connection(
-                    cast(Sequence, letters_without_index), "B"
+                    letters_without_index, "B"
                 )
                 assert letter_b_cursor == "YXJyYXljb25uZWN0aW9uOjE="
+
+                no_letter_cursor = cursor_for_object_in_connection(
+                    letters_without_index, "="
+                )
+                assert no_letter_cursor is None
 
     def describe_extended_functionality():
         """Test functionality that is not part of graphql-relay-js."""

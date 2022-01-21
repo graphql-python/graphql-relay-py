@@ -154,11 +154,11 @@ def describe_mutation_with_client_mutation_id():
         )
 
     def supports_mutations_returning_null():
+        def null_resolve(_info, **_input) -> None:
+            return None
+
         some_mutation = mutation_with_client_mutation_id(
-            "SomeMutation",
-            {},
-            {"result": GraphQLField(GraphQLInt)},
-            lambda _info, **_input: None,
+            "SomeMutation", {}, {"result": GraphQLField(GraphQLInt)}, null_resolve
         )
         schema = wrap_in_schema({"someMutation": some_mutation})
         source = """
@@ -170,6 +170,31 @@ def describe_mutation_with_client_mutation_id():
             }
             """
         assert graphql_sync(schema, source) == (
+            {"someMutation": {"result": None, "clientMutationId": "abc"}},
+            None,
+        )
+
+    @mark.asyncio
+    async def supports_async_mutations_returning_null():
+        async def null_resolve(_info, **_input) -> None:
+            return None
+
+        some_mutation = mutation_with_client_mutation_id(
+            "SomeMutation",
+            {},
+            {"result": GraphQLField(GraphQLInt)},
+            null_resolve,
+        )
+        schema = wrap_in_schema({"someMutation": some_mutation})
+        source = """
+            mutation {
+              someMutation(input: {clientMutationId: "abc"}) {
+                result
+                clientMutationId
+              }
+            }
+            """
+        assert await graphql(schema, source) == (
             {"someMutation": {"result": None, "clientMutationId": "abc"}},
             None,
         )

@@ -44,7 +44,7 @@ def create_ship(ship_name: str, faction_id: str) -> Ship:
     new_ship = Ship(str(len(all_ships) + 1), ship_name)
     all_ships.append(new_ship)
     faction = get_faction(faction_id)
-    if faction:
+    if faction:  # pragma: no cover else
         faction.ships.append(new_ship.id)
     return new_ship
 

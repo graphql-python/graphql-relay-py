@@ -53,7 +53,7 @@ def get_node_type(
         return user_type
     if obj in photo_data:
         return photo_type
-    return None
+    return None  # pragma: no cover
 
 
 node_interface, node_field, nodes_field = node_definitions(get_node, get_node_type)

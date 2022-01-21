@@ -103,17 +103,15 @@ def get_node(global_id, _info):
     type_, id_ = from_global_id(global_id)
     if type_ == "Faction":
         return get_faction(id_)
-    elif type_ == "Ship":
+    if type_ == "Ship":
         return get_ship(id_)
-    else:
-        return None
+    return None  # pragma: no cover
 
 
 def get_node_type(obj, _info, _type):
     if isinstance(obj, Faction):
         return factionType
-    else:
-        return shipType
+    return shipType
 
 
 node_interface, node_field = node_definitions(get_node, get_node_type)[:2]

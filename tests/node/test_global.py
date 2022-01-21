@@ -64,7 +64,7 @@ def schema(request):
                 )
             if type_ == "Post":
                 return next(filter(lambda obj: obj["id"] == id_, post_data), None)
-            return None
+            return None  # pragma: no cover
 
         def get_node_type(
             obj: Any, info: GraphQLResolveInfo, _type: Any
@@ -76,7 +76,7 @@ def schema(request):
                 return photo_type
             if "text" in obj:
                 return post_type
-            return None
+            return None  # pragma: no cover
 
     else:
 
@@ -89,7 +89,7 @@ def schema(request):
                 return next(filter(lambda obj: obj.photo_id == id_, photo_data), None)
             if type_ == "Post":
                 return next(filter(lambda obj: obj.id == id_, post_data), None)
-            return None
+            return None  # pragma: no cover
 
         def get_node_type(
             obj: Any, info: GraphQLResolveInfo, _type: Any
@@ -101,7 +101,7 @@ def schema(request):
                 return photo_type
             if isinstance(obj, Post):
                 return post_type
-            return None
+            return None  # pragma: no cover
 
     node_interface, node_field = node_definitions(get_node, get_node_type)[:2]
 

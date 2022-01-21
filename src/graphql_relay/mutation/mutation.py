@@ -2,7 +2,6 @@ from inspect import iscoroutinefunction
 from typing import Any, Callable, Dict, Optional
 
 from graphql import (
-    GraphQLError,
     GraphQLArgument,
     GraphQLField,
     GraphQLFieldMap,
@@ -15,7 +14,7 @@ from graphql import (
     GraphQLString,
     Thunk,
 )
-from graphql.pyutils import AwaitableOrValue, inspect
+from graphql.pyutils import AwaitableOrValue
 
 # Note: Contrary to the Javascript implementation of MutationFn,
 # the context is passed as part of the GraphQLResolveInfo and any arguments
