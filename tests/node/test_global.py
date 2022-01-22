@@ -202,3 +202,15 @@ def describe_global_id_fields():
             },
             None,
         )
+
+    def handles_valid_global_ids():
+        assert from_global_id("Zm9v") == ("", "foo")
+        assert from_global_id(b"Zm9v") == ("", "foo")  # type: ignore
+        assert from_global_id("Zm9vOmJhcg==") == ("foo", "bar")
+        assert from_global_id(b"Zm9vOmJhcg==") == ("foo", "bar")  # type: ignore
+
+    def handles_invalid_global_ids():
+        assert from_global_id("") == ("", "")
+        assert from_global_id("Og==") == ("", "")
+        assert from_global_id("bad!") == ("", "")
+        assert from_global_id("invalid") == ("", "")
