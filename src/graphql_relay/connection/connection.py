@@ -10,12 +10,29 @@ from graphql import (
     GraphQLFieldResolver,
     GraphQLInt,
     GraphQLList,
-    GraphQLNamedOutputType,
     GraphQLNonNull,
     GraphQLObjectType,
     GraphQLString,
     Thunk,
 )
+
+try:
+    from graphql import GraphQLNamedOutputType
+except ImportError:  # GraphQL < 3.1.7
+    from graphql import (
+        GraphQLEnumType,
+        GraphQLInterfaceType,
+        GraphQLScalarType,
+        GraphQLUnionType,
+    )
+
+    GraphQLNamedOutputType = Union[  # type: ignore
+        GraphQLScalarType,
+        GraphQLObjectType,
+        GraphQLInterfaceType,
+        GraphQLUnionType,
+        GraphQLEnumType,
+    ]
 
 try:
     from typing import Protocol
