@@ -1,3 +1,4 @@
+from collections.abc import Mapping
 from inspect import iscoroutinefunction
 from typing import Any, Callable, Dict, Optional
 
@@ -82,7 +83,10 @@ def mutation_with_client_mutation_id(
             clientMutationId = input.get("clientMutationId")
             if payload is None:
                 return NullResult(clientMutationId)
-            payload.clientMutationId = clientMutationId
+            if isinstance(payload, Mapping):
+                payload["clientMutationId"] = clientMutationId  # type: ignore
+            else:
+                payload.clientMutationId = clientMutationId
             return payload
 
     else:
@@ -95,7 +99,10 @@ def mutation_with_client_mutation_id(
             clientMutationId = input.get("clientMutationId")
             if payload is None:
                 return NullResult(clientMutationId)
-            payload.clientMutationId = clientMutationId  # type: ignore
+            if isinstance(payload, Mapping):
+                payload["clientMutationId"] = clientMutationId  # type: ignore
+            else:
+                payload.clientMutationId = clientMutationId  # type: ignore
             return payload
 
     return GraphQLField(

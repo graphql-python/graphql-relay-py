@@ -154,7 +154,7 @@ def describe_mutation_with_client_mutation_id():
         )
 
     def supports_mutations_returning_null():
-        def null_resolve(_info, **_input) -> None:
+        def null_resolve(_info, **_input):
             return None
 
         some_mutation = mutation_with_client_mutation_id(
@@ -176,7 +176,7 @@ def describe_mutation_with_client_mutation_id():
 
     @mark.asyncio
     async def supports_async_mutations_returning_null():
-        async def null_resolve(_info, **_input) -> None:
+        async def null_resolve(_info, **_input):
             return None
 
         some_mutation = mutation_with_client_mutation_id(
@@ -230,6 +230,61 @@ def describe_mutation_with_client_mutation_id():
             }
             """
         assert graphql_sync(schema, source) == (
+            {"someMutation": {"result": 1, "clientMutationId": "abc"}},
+            None,
+        )
+
+    def supports_mutations_returning_mappings():
+        def dict_mutate(_info, **_input):
+            return {"some_data": 1}
+
+        def dict_resolve(obj, _info):
+            return obj["some_data"]
+
+        some_mutation = mutation_with_client_mutation_id(
+            "SomeMutation",
+            {},
+            {"result": GraphQLField(GraphQLInt, resolve=dict_resolve)},
+            dict_mutate,
+        )
+        schema = wrap_in_schema({"someMutation": some_mutation})
+        source = """
+            mutation {
+              someMutation(input: {clientMutationId: "abc"}) {
+                result
+                clientMutationId
+              }
+            }
+            """
+        assert graphql_sync(schema, source) == (
+            {"someMutation": {"result": 1, "clientMutationId": "abc"}},
+            None,
+        )
+
+    @mark.asyncio
+    async def supports_async_mutations_returning_mappings():
+        async def dict_mutate(_info, **_input):
+            return {"some_data": 1}
+
+        async def dict_resolve(obj, _info):
+            return obj["some_data"]
+
+        some_mutation = mutation_with_client_mutation_id(
+            "SomeMutation",
+            {},
+            {"result": GraphQLField(GraphQLInt, resolve=dict_resolve)},
+            dict_mutate,
+        )
+        schema = wrap_in_schema({"someMutation": some_mutation})
+        source = """
+            mutation {
+              someMutation(input: {clientMutationId: "abc"}) {
+                result
+                clientMutationId
+              }
+            }
+            """
+        assert await graphql(schema, source) == (
             {"someMutation": {"result": 1, "clientMutationId": "abc"}},
             None,
         )
