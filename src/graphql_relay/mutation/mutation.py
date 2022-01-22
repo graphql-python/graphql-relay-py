@@ -81,9 +81,8 @@ def mutation_with_client_mutation_id(
             payload = await mutate_and_get_payload(info, **input)
             clientMutationId = input.get("clientMutationId")
             if payload is None:
-                payload = NullResult(clientMutationId)
-            else:
-                payload.clientMutationId = clientMutationId
+                return NullResult(clientMutationId)
+            payload.clientMutationId = clientMutationId
             return payload
 
     else:
@@ -95,9 +94,8 @@ def mutation_with_client_mutation_id(
             payload = mutate_and_get_payload(info, **input)
             clientMutationId = input.get("clientMutationId")
             if payload is None:
-                payload = NullResult(clientMutationId)
-            else:
-                payload.clientMutationId = clientMutationId  # type: ignore
+                return NullResult(clientMutationId)
+            payload.clientMutationId = clientMutationId  # type: ignore
             return payload
 
     return GraphQLField(

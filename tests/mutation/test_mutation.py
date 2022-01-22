@@ -199,6 +199,41 @@ def describe_mutation_with_client_mutation_id():
             None,
         )
 
+    def supports_mutations_returning_custom_classes():
+        class SomeClass:
+            @staticmethod
+            def get_some_generated_data():
+                return 1
+
+            @classmethod
+            def mutate(cls, _info, **_input):
+                return cls()
+
+            @classmethod
+            def resolve(cls, obj, _info):
+                assert isinstance(obj, cls)
+                return obj.get_some_generated_data()
+
+        some_mutation = mutation_with_client_mutation_id(
+            "SomeMutation",
+            {},
+            {"result": GraphQLField(GraphQLInt, resolve=SomeClass.resolve)},
+            SomeClass.mutate,
+        )
+        schema = wrap_in_schema({"someMutation": some_mutation})
+        source = """
+            mutation {
+              someMutation(input: {clientMutationId: "abc"}) {
+                result
+                clientMutationId
+              }
+            }
+            """
+        assert graphql_sync(schema, source) == (
+            {"someMutation": {"result": 1, "clientMutationId": "abc"}},
+            None,
+        )
+
     def generates_correct_types():
         some_mutation = mutation_with_client_mutation_id(
             "SomeMutation",
