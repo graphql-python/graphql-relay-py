@@ -52,8 +52,13 @@ pip install graphql-relay
 ```
 
 When building a schema for [GraphQL](https://github.com/graphql-python/graphql-core),
-the provided library functions can be used to simplify the creation of Relay
-patterns.
+the provided library functions can be used to simplify the creation of Relay patterns.
+
+All the functions that are explained in the following sections must be
+imported from the top level of the `graphql_relay` package, like this:
+```python
+from graphql_relay import connection_definitions
+```
 
 ### Connections
 
@@ -68,11 +73,10 @@ they return a connection type.
  - `connection_from_array` is a helper method that takes an array and the
 arguments from `connection_args`, does pagination and filtering, and returns
 an object in the shape expected by a `connection_type`'s `resolver` function.
-
  - `cursor_for_object_in_connection` is a helper method that takes an array and a
 member object, and returns a cursor for use in the mutation payload.
 
-An example usage of these methods from the [test schema](tests/starwars/schema.py):
+An example usage of these methods from the [test schema](tests/star_wars_schema.py):
 
 ```python
 ship_edge, ship_connection = connection_definitions('Ship', shipType)
@@ -122,7 +126,7 @@ for nodes and for implementing global IDs around local IDs.
     non-ID identifiers (like a username) and maps then to their corresponding
     objects.
 
-An example usage of these methods from the [test schema](tests/starwars/schema.py):
+An example usage of these methods from the [test schema](tests/star_wars_schema.py):
 
 ```python
 def get_node(global_id, _info):
@@ -176,7 +180,7 @@ and a mutation method to map from the input fields to the output fields,
 performing the mutation along the way. It then creates and returns a field
 configuration that can be used as a top-level field on the mutation type.
 
-An example usage of these methods from the [test schema](tests/starwars/schema.py):
+An example usage of these methods from the [test schema](tests/star_wars_schema.py):
 
 ```python
 class IntroduceShipMutation:
