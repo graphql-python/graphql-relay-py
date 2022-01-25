@@ -32,6 +32,17 @@ edge_e = Edge(node="E", cursor=cursor_e)
 
 
 def describe_connection_from_array():
+    def warns_for_deprecated_import():
+        from importlib import reload
+
+        with deprecated_call():
+            from graphql_relay.connection import arrayconnection as deprecated
+
+            # noinspection PyDeprecation
+            reload(deprecated)
+        # noinspection PyDeprecation
+        assert deprecated.connection_from_array is connection_from_array
+
     def describe_basic_slicing():
         def returns_all_elements_without_filters():
             c = connection_from_array(array_abcde, {})
@@ -465,6 +476,17 @@ def describe_connection_from_array():
 
 
 def describe_connection_from_array_slice():
+    def warns_for_deprecated_import():
+        from importlib import reload
+
+        with deprecated_call():
+            from graphql_relay.connection import arrayconnection as deprecated
+
+            # noinspection PyDeprecation
+            reload(deprecated)
+        # noinspection PyDeprecation
+        assert deprecated.connection_from_array_slice is connection_from_array_slice
+
     def works_with_a_just_right_array_slice():
         c = connection_from_array_slice(
             array_abcde[1:3],
