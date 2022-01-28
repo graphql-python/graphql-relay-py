@@ -11,6 +11,8 @@ from graphql import (
     get_nullable_type,
 )
 
+__all__ = ["plural_identifying_root_field"]
+
 
 def plural_identifying_root_field(
     arg_name: str,

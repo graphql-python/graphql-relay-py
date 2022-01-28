@@ -17,6 +17,14 @@ from graphql import (
 )
 from graphql.pyutils import AwaitableOrValue
 
+__all__ = [
+    "mutation_with_client_mutation_id",
+    "resolve_maybe_thunk",
+    "MutationFn",
+    "MutationFnWithoutArgs",
+    "NullResult",
+]
+
 # Note: Contrary to the Javascript implementation of MutationFn,
 # the context is passed as part of the GraphQLResolveInfo and any arguments
 # are passed individually as keyword arguments.

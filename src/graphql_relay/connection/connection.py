@@ -40,16 +40,23 @@ except ImportError:  # Python < 3.8
     from typing_extensions import Protocol  # type: ignore
 
 __all__ = [
-    "connection_definitions",
-    "forward_connection_args",
     "backward_connection_args",
     "connection_args",
+    "connection_definitions",
+    "forward_connection_args",
+    "page_info_type",
     "Connection",
     "ConnectionArguments",
+    "ConnectionConstructor",
     "ConnectionCursor",
+    "ConnectionType",
     "Edge",
+    "EdgeConstructor",
+    "EdgeType",
     "GraphQLConnectionDefinitions",
     "PageInfo",
+    "PageInfoConstructor",
+    "PageInfoType",
 ]
 
 

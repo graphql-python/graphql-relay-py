@@ -26,6 +26,7 @@ __all__ = [
     "cursor_to_offset",
     "get_offset_with_default",
     "offset_to_cursor",
+    "SizedSliceable",
 ]
 
 
