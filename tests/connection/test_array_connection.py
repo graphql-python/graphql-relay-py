@@ -12,10 +12,6 @@ from graphql_relay import (
     PageInfo,
 )
 
-# noinspection PyProtectedMember
-from graphql_relay import connection_from_list, connection_from_list_slice
-
-
 array_abcde = ["A", "B", "C", "D", "E"]
 
 cursor_a = "YXJyYXljb25uZWN0aW9uOjA="
@@ -454,26 +450,6 @@ def describe_connection_from_array():
             assert page_info.hasPreviousPage is False
             assert page_info.hasNextPage is False
 
-        def provides_deprecated_connection_from_list():
-            with deprecated_call():
-                # noinspection PyDeprecation
-                c = connection_from_list(
-                    array_abcde[:1],
-                    args={},
-                    connection_type=Connection,
-                    edge_type=Edge,
-                    pageinfo_type=PageInfo,
-                )
-            assert c == Connection(
-                edges=[edge_a],
-                pageInfo=PageInfo(
-                    startCursor=cursor_a,
-                    endCursor=cursor_a,
-                    hasPreviousPage=False,
-                    hasNextPage=False,
-                ),
-            )
-
 
 def describe_connection_from_array_slice():
     def warns_for_deprecated_import():
@@ -785,26 +761,3 @@ def describe_connection_from_array_slice():
             assert page_info.endCursor == cursor_a
             assert page_info.hasPreviousPage is False
             assert page_info.hasNextPage is False
-
-        def provides_deprecated_connection_from_list_slice():
-            with deprecated_call():
-                # noinspection PyDeprecation
-                c = connection_from_list_slice(
-                    array_abcde[:1],
-                    args={},
-                    connection_type=Connection,
-                    edge_type=Edge,
-                    pageinfo_type=PageInfo,
-                    slice_start=0,
-                    list_length=1,
-                    list_slice_length=1,
-                )
-            assert c == Connection(
-                edges=[edge_a],
-                pageInfo=PageInfo(
-                    startCursor=cursor_a,
-                    endCursor=cursor_a,
-                    hasPreviousPage=False,
-                    hasNextPage=False,
-                ),
-            )

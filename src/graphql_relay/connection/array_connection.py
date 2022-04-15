@@ -1,4 +1,3 @@
-import warnings
 from typing import Any, Iterator, Optional, Sequence
 
 try:
@@ -68,33 +67,6 @@ def connection_from_array(
         connection_type=connection_type,
         edge_type=edge_type,
         page_info_type=page_info_type,
-    )
-
-
-def connection_from_list(
-    data: Sequence,
-    args: Optional[ConnectionArguments] = None,
-    connection_type: ConnectionConstructor = Connection,
-    edge_type: EdgeConstructor = Edge,
-    pageinfo_type: PageInfoConstructor = PageInfo,
-) -> ConnectionType:
-    """Deprecated alias for connection_from_array.
-
-    We're now using the JavaScript terminology in Python as well, since list
-    is too narrow a type and there is no other really appropriate type name.
-    """
-    warnings.warn(
-        "connection_from_list() has been deprecated."
-        " Please use connection_from_array() instead.",
-        DeprecationWarning,
-        stacklevel=2,
-    )
-    return connection_from_array_slice(
-        data,
-        args,
-        connection_type=connection_type,
-        edge_type=edge_type,
-        page_info_type=pageinfo_type,
     )
 
 
@@ -180,39 +152,6 @@ def connection_from_array_slice(
             hasPreviousPage=isinstance(last, int) and start_offset > lower_bound,
             hasNextPage=isinstance(first, int) and end_offset < upper_bound,
         ),
-    )
-
-
-def connection_from_list_slice(
-    list_slice: Sequence,
-    args: Optional[ConnectionArguments] = None,
-    connection_type: ConnectionConstructor = Connection,
-    edge_type: EdgeConstructor = Edge,
-    pageinfo_type: PageInfoConstructor = PageInfo,
-    slice_start: int = 0,
-    list_length: int = 0,
-    list_slice_length: Optional[int] = None,
-) -> ConnectionType:
-    """Deprecated alias for connection_from_array_slice.
-
-    We're now using the JavaScript terminology in Python as well, since list
-    is too narrow a type and there is no other really appropriate type name.
-    """
-    warnings.warn(
-        "connection_from_list_slice() has been deprecated."
-        " Please use connection_from_array_slice() instead.",
-        DeprecationWarning,
-        stacklevel=2,
-    )
-    return connection_from_array_slice(
-        list_slice,
-        args,
-        slice_start=slice_start,
-        array_length=list_length,
-        array_slice_length=list_slice_length,
-        connection_type=connection_type,
-        edge_type=edge_type,
-        page_info_type=pageinfo_type,
     )
 
 

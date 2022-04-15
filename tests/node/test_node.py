@@ -47,12 +47,12 @@ def get_node(id_: str, info: GraphQLResolveInfo) -> Optional[Union[User, Photo]]
 
 def get_node_type(
     obj: Union[User, Photo], info: GraphQLResolveInfo, _type: Any
-) -> Optional[GraphQLObjectType]:
+) -> Optional[str]:
     assert info.schema is schema
     if obj in user_data:
-        return user_type
+        return user_type.name
     if obj in photo_data:
-        return photo_type
+        return photo_type.name
     return None  # pragma: no cover
 
 
@@ -193,7 +193,7 @@ def describe_node_interface_and_fields():
             )
 
     def generates_correct_types():
-        assert print_schema(schema).rstrip() == dedent(
+        assert print_schema(schema) == dedent(
             '''
             """An object with an ID"""
             interface Node {

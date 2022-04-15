@@ -26,7 +26,7 @@ user_type: GraphQLObjectType
 
 node_interface, node_field = node_definitions(
     lambda id_, _info: next(filter(lambda obj: obj.id == id_, user_data), None),
-    lambda _obj, _info, _type: user_type,
+    lambda _obj, _info, _type: user_type.name,
 )[:2]
 
 

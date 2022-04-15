@@ -2,37 +2,21 @@ from typing import Any, Dict, List, NamedTuple, Optional, Union
 
 from graphql import (
     get_named_type,
+    resolve_thunk,
     GraphQLArgument,
     GraphQLArgumentMap,
     GraphQLBoolean,
     GraphQLField,
-    GraphQLFieldMap,
     GraphQLFieldResolver,
     GraphQLInt,
     GraphQLList,
     GraphQLNonNull,
     GraphQLObjectType,
     GraphQLString,
-    Thunk,
+    ThunkMapping,
 )
 
-try:
-    from graphql import GraphQLNamedOutputType
-except ImportError:  # GraphQL < 3.1.7
-    from graphql import (
-        GraphQLEnumType,
-        GraphQLInterfaceType,
-        GraphQLScalarType,
-        GraphQLUnionType,
-    )
-
-    GraphQLNamedOutputType = Union[  # type: ignore
-        GraphQLScalarType,
-        GraphQLObjectType,
-        GraphQLInterfaceType,
-        GraphQLUnionType,
-        GraphQLEnumType,
-    ]
+from graphql import GraphQLNamedOutputType
 
 try:
     from typing import Protocol
@@ -97,10 +81,6 @@ class GraphQLConnectionDefinitions(NamedTuple):
     connection_type: GraphQLObjectType
 
 
-def resolve_maybe_thunk(thing_or_thunk: Thunk) -> Any:
-    return thing_or_thunk() if callable(thing_or_thunk) else thing_or_thunk
-
-
 """A type alias for cursors in this implementation."""
 ConnectionCursor = str
 
@@ -122,8 +102,8 @@ def connection_definitions(
     name: Optional[str] = None,
     resolve_node: Optional[GraphQLFieldResolver] = None,
     resolve_cursor: Optional[GraphQLFieldResolver] = None,
-    edge_fields: Optional[Thunk[GraphQLFieldMap]] = None,
-    connection_fields: Optional[Thunk[GraphQLFieldMap]] = None,
+    edge_fields: Optional[ThunkMapping[GraphQLField]] = None,
+    connection_fields: Optional[ThunkMapping[GraphQLField]] = None,
 ) -> GraphQLConnectionDefinitions:
     """Return GraphQLObjectTypes for a connection with the given name.
 
@@ -145,7 +125,7 @@ def connection_definitions(
                 resolve=resolve_cursor,
                 description="A cursor for use in pagination",
             ),
-            **resolve_maybe_thunk(edge_fields or {}),
+            **resolve_thunk(edge_fields or {}),
         },
     )
 
@@ -160,7 +140,7 @@ def connection_definitions(
             "edges": GraphQLField(
                 GraphQLList(edge_type), description="A list of edges."
             ),
-            **resolve_maybe_thunk(connection_fields or {}),
+            **resolve_thunk(connection_fields or {}),
         },
     )
 

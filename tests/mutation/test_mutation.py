@@ -4,6 +4,7 @@ from graphql import (
     graphql,
     graphql_sync,
     print_schema,
+    print_type,
     GraphQLField,
     GraphQLFieldMap,
     GraphQLInputField,
@@ -131,7 +132,7 @@ def describe_mutation_with_client_mutation_id():
         )
 
     def can_access_root_value():
-        some_mutation = mutation_with_client_mutation_id(
+        some_mutation = mutation_with_client_mutation_id(  # pragma: no cover
             "SomeMutation",
             {},
             {"result": GraphQLField(GraphQLInt)},
@@ -139,18 +140,14 @@ def describe_mutation_with_client_mutation_id():
                 info.root_value, clientMutationId
             ),
         )
-        schema = wrap_in_schema({"someMutation": some_mutation})
-        source = """
-            mutation {
-              someMutation(input: {clientMutationId: "abc"}) {
-                result
-                clientMutationId
-              }
+
+        wrapper_type = GraphQLObjectType("WrapperType", {"someMutation": some_mutation})
+        assert print_type(wrapper_type) == dedent(
+            """
+            type WrapperType {
+              someMutation(input: SomeMutationInput!): SomeMutationPayload
             }
             """
-        assert graphql_sync(schema, source, root_value=1) == (
-            {"someMutation": {"result": 1, "clientMutationId": "abc"}},
-            None,
         )
 
     def supports_mutations_returning_null():
@@ -301,7 +298,7 @@ def describe_mutation_with_client_mutation_id():
 
         schema = wrap_in_schema({"someMutation": some_mutation})
 
-        assert print_schema(schema).rstrip() == dedent(
+        assert print_schema(schema) == dedent(
             '''
             type Query {
               dummy: Int

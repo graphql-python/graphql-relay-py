@@ -38,7 +38,6 @@ from .connection.array_connection import (
 # Helper for creating mutations with client mutation IDs
 from .mutation.mutation import (
     mutation_with_client_mutation_id,
-    resolve_maybe_thunk,
     MutationFn,
     MutationFnWithoutArgs,
     NullResult,
@@ -52,13 +51,6 @@ from .node.plural import plural_identifying_root_field
 
 # Utilities for creating global IDs in systems that don't have them
 from .node.node import from_global_id, global_id_field, to_global_id, ResolvedGlobalId
-
-# Deprecated functions from older graphql-relay-py versions
-# noinspection PyProtectedMember,PyUnresolvedReferences,PyDeprecation
-from .connection.array_connection import (  # noqa: F401
-    connection_from_list,
-    connection_from_list_slice,
-)
 
 __version__ = version
 __version_info__ = version_info
@@ -99,7 +91,6 @@ __all__ = [
     "page_info_type",
     "plural_identifying_root_field",
     "ResolvedGlobalId",
-    "resolve_maybe_thunk",
     "SizedSliceable",
     "to_global_id",
     "version",

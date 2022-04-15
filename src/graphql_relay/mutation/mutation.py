@@ -3,6 +3,7 @@ from inspect import iscoroutinefunction
 from typing import Any, Callable, Dict, Optional
 
 from graphql import (
+    resolve_thunk,
     GraphQLArgument,
     GraphQLField,
     GraphQLFieldMap,
@@ -13,13 +14,12 @@ from graphql import (
     GraphQLObjectType,
     GraphQLResolveInfo,
     GraphQLString,
-    Thunk,
+    ThunkMapping,
 )
 from graphql.pyutils import AwaitableOrValue
 
 __all__ = [
     "mutation_with_client_mutation_id",
-    "resolve_maybe_thunk",
     "MutationFn",
     "MutationFnWithoutArgs",
     "NullResult",
@@ -34,10 +34,6 @@ MutationFnWithoutArgs = Callable[[GraphQLResolveInfo], AwaitableOrValue[Any]]
 MutationFn = Callable[..., AwaitableOrValue[Any]]
 
 
-def resolve_maybe_thunk(thing_or_thunk: Thunk) -> Any:
-    return thing_or_thunk() if callable(thing_or_thunk) else thing_or_thunk
-
-
 class NullResult:
     def __init__(self, clientMutationId: Optional[str] = None) -> None:
         self.clientMutationId = clientMutationId
@@ -45,8 +41,8 @@ class NullResult:
 
 def mutation_with_client_mutation_id(
     name: str,
-    input_fields: Thunk[GraphQLInputFieldMap],
-    output_fields: Thunk[GraphQLFieldMap],
+    input_fields: ThunkMapping[GraphQLInputField],
+    output_fields: ThunkMapping[GraphQLField],
     mutate_and_get_payload: MutationFn,
     description: Optional[str] = None,
     deprecation_reason: Optional[str] = None,
@@ -69,13 +65,13 @@ def mutation_with_client_mutation_id(
 
     def augmented_input_fields() -> GraphQLInputFieldMap:
         return dict(
-            resolve_maybe_thunk(input_fields),
+            resolve_thunk(input_fields),
             clientMutationId=GraphQLInputField(GraphQLString),
         )
 
     def augmented_output_fields() -> GraphQLFieldMap:
         return dict(
-            resolve_maybe_thunk(output_fields),
+            resolve_thunk(output_fields),
             clientMutationId=GraphQLField(GraphQLString),
         )
 

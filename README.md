@@ -63,47 +63,53 @@ from graphql_relay import connection_definitions
 ### Connections
 
 Helper functions are provided for both building the GraphQL types
-for connections and for implementing the `resolver` method for fields
+for connections and for implementing the `resolve` method for fields
 returning those types.
 
  - `connection_args` returns the arguments that fields should provide when
-they return a connection type.
+they return a connection type that supports bidirectional pagination.
+ - `forward_connection_args` returns the arguments that fields should provide when
+they return a connection type that only supports forward pagination.
+ - `backward_connection_args` returns the arguments that fields should provide when
+they return a connection type that only supports backward pagination.
  - `connection_definitions` returns a `connection_type` and its associated
 `edgeType`, given a name and a node type.
  - `connection_from_array` is a helper method that takes an array and the
 arguments from `connection_args`, does pagination and filtering, and returns
-an object in the shape expected by a `connection_type`'s `resolver` function.
+an object in the shape expected by a `connection_type`'s `resolve` function.
  - `cursor_for_object_in_connection` is a helper method that takes an array and a
 member object, and returns a cursor for use in the mutation payload.
+ - `offset_to_cursor` takes the index of a member object in an array
+ and returns an opaque cursor for use in the mutation payload.
+ - `cursor_to_offset` takes an opaque cursor (created with `offset_to_cursor`)
+and returns the corresponding array index.
 
 An example usage of these methods from the [test schema](tests/star_wars_schema.py):
 
 ```python
-ship_edge, ship_connection = connection_definitions('Ship', shipType)
+ship_edge, ship_connection = connection_definitions(ship_type, "Ship")
 
-factionType = GraphQLObjectType(
-    name='Faction',
-    description='A faction in the Star Wars saga',
+faction_type = GraphQLObjectType(
+    name="Faction",
+    description="A faction in the Star Wars saga",
     fields=lambda: {
-        'id': global_id_field('Faction'),
-        'name': GraphQLField(
-            GraphQLString,
-            description='The name of the faction.',
-        ),
-        'ships': GraphQLField(
+        "id": global_id_field("Faction"),
+        "name": GraphQLField(GraphQLString, description="The name of the faction."),
+        "ships": GraphQLField(
             ship_connection,
-            description='The ships used by the faction.',
+            description="The ships used by the faction.",
             args=connection_args,
             resolve=lambda faction, _info, **args: connection_from_array(
-                [getShip(ship) for ship in faction.ships], args),
-        )
+                [get_ship(ship) for ship in faction.ships], args
+            ),
+        ),
     },
-    interfaces=[node_interface]
+    interfaces=[node_interface],
 )
 ```
 
 This shows adding a `ships` field to the `Faction` object that is a connection.
-It uses `connection_definitions('Ship', shipType)` to create the connection
+It uses `connection_definitions(ship_type, "Ship")` to create the connection
 type, adds `connection_args` as arguments on this function, and then implements
 the resolver function by passing the array of ships and the arguments to
 `connection_from_array`.
@@ -131,40 +137,49 @@ An example usage of these methods from the [test schema](tests/star_wars_schema.
 ```python
 def get_node(global_id, _info):
     type_, id_ = from_global_id(global_id)
-    if type_ == 'Faction':
-        return getFaction(id_)
-    elif type_ == 'Ship':
-        return getShip(id_)
-    else:
-        return None
+    if type_ == "Faction":
+        return get_faction(id_)
+    if type_ == "Ship":
+        return get_ship(id_)
+    return None  # pragma: no cover
 
 def get_node_type(obj, _info, _type):
     if isinstance(obj, Faction):
-        return factionType
-    else:
-        return shipType
+        return faction_type.name
+    return ship_type.name
 
-node_interface, node_field = node_definitions(get_node, get_node_type)
+node_interface, node_field = node_definitions(get_node, get_node_type)[:2]
 
-factionType = GraphQLObjectType(
-    name= 'Faction',
-    description= 'A faction in the Star Wars saga',
-    fields= lambda: {
-        'id': global_id_field('Faction'),
+faction_type = GraphQLObjectType(
+    name="Faction",
+    description="A faction in the Star Wars saga",
+    fields=lambda: {
+        "id": global_id_field("Faction"),
+        "name": GraphQLField(GraphQLString, description="The name of the faction."),
+        "ships": GraphQLField(
+            ship_connection,
+            description="The ships used by the faction.",
+            args=connection_args,
+            resolve=lambda faction, _info, **args: connection_from_array(
+                [get_ship(ship) for ship in faction.ships], args
+            ),
+        ),
     },
-    interfaces= [node_interface]
+    interfaces=[node_interface],
 )
 
-queryType = GraphQLObjectType(
-    name= 'Query',
-    fields= lambda: {
-        'node': node_field
-    }
+query_type = GraphQLObjectType(
+    name="Query",
+    fields=lambda: {
+        "rebels": GraphQLField(faction_type, resolve=lambda _obj, _info: get_rebels()),
+        "empire": GraphQLField(faction_type, resolve=lambda _obj, _info: get_empire()),
+        "node": node_field,
+    },
 )
 ```
 
 This uses `node_definitions` to construct the `Node` interface and the `node`
-field; it uses `from_global_id` to resolve the IDs passed in in the implementation
+field; it uses `from_global_id` to resolve the IDs passed in the implementation
 of the function mapping ID to object. It then uses the `global_id_field` method to
 create the `id` field on `Faction`, which also ensures implements the
 `node_interface`. Finally, it adds the `node` field to the query type, using the
@@ -184,43 +199,35 @@ An example usage of these methods from the [test schema](tests/star_wars_schema.
 
 ```python
 class IntroduceShipMutation:
+
     def __init__(self, shipId, factionId, clientMutationId=None):
         self.shipId = shipId
         self.factionId = factionId
         self.clientMutationId = clientMutationId
 
-def mutate_and_get_payload(_info, shipName, factionId):
-    newShip = createShip(shipName, factionId)
-    return IntroduceShipMutation(shipId=newShip.id, factionId=factionId)
+def mutate_and_get_payload(_info, shipName, factionId, **_input):
+    new_ship = create_ship(shipName, factionId)
+    return IntroduceShipMutation(shipId=new_ship.id, factionId=factionId)
 
-shipMutation = mutation_with_client_mutation_id(
-    'IntroduceShip',
+ship_mutation = mutation_with_client_mutation_id(
+    "IntroduceShip",
     input_fields={
-        'shipName': GraphQLInputField(
-            GraphQLNonNull(GraphQLString)
-        ),
-        'factionId': GraphQLInputField(
-            GraphQLNonNull(GraphQLID)
-        )
+        "shipName": GraphQLInputField(GraphQLNonNull(GraphQLString)),
+        "factionId": GraphQLInputField(GraphQLNonNull(GraphQLID)),
     },
     output_fields={
-        'ship': GraphQLField(
-            shipType,
-            resolve=lambda payload, _info: getShip(payload.shipId)
+        "ship": GraphQLField(
+            ship_type, resolve=lambda payload, _info: get_ship(payload.shipId)
         ),
-        'faction': GraphQLField(
-            factionType,
-            resolve=lambda payload, _info: getFaction(payload.factionId)
-        )
+        "faction": GraphQLField(
+            faction_type, resolve=lambda payload, _info: get_faction(payload.factionId)
+        ),
     },
-    mutate_and_get_payload=mutate_and_get_payload
+    mutate_and_get_payload=mutate_and_get_payload,
 )
 
-mutationType = GraphQLObjectType(
-    'Mutation',
-    fields=lambda: {
-        'introduceShip': shipMutation
-    }
+mutation_type = GraphQLObjectType(
+    "Mutation", fields=lambda: {"introduceShip": ship_mutation}
 )
 ```
 
@@ -268,5 +275,5 @@ Python versions and perform all additional source code checks.
 You can also restrict tox to an individual environment, like this:
 
 ```sh
-poetry run tox -e py37
+poetry run tox -e py39
 ```

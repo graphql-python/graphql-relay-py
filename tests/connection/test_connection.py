@@ -181,7 +181,7 @@ def describe_connection_definition():
         )
 
     def generates_correct_types():
-        assert print_schema(schema).rstrip() == dedent(
+        assert print_schema(schema) == dedent(
             '''
             type Query {
               user: User

@@ -110,8 +110,8 @@ def get_node(global_id, _info):
 
 def get_node_type(obj, _info, _type):
     if isinstance(obj, Faction):
-        return faction_type
-    return ship_type
+        return faction_type.name
+    return ship_type.name
 
 
 node_interface, node_field = node_definitions(get_node, get_node_type)[:2]

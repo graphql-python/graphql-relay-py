@@ -87,7 +87,7 @@ def describe_plural_identifying_root_field():
         )
 
     def generates_correct_types():
-        assert print_schema(schema).rstrip() == dedent(
+        assert print_schema(schema) == dedent(
             '''
             type Query {
               """Map from a username to the user"""

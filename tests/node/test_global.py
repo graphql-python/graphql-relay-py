@@ -68,14 +68,14 @@ def schema(request):
 
         def get_node_type(
             obj: Any, info: GraphQLResolveInfo, _type: Any
-        ) -> Optional[GraphQLObjectType]:
+        ) -> Optional[str]:
             assert info.schema is schema
             if "name" in obj:
-                return user_type
+                return user_type.name
             if "photo_id" in obj:
-                return photo_type
+                return photo_type.name
             if "text" in obj:
-                return post_type
+                return post_type.name
             return None  # pragma: no cover
 
     else:
@@ -93,14 +93,14 @@ def schema(request):
 
         def get_node_type(
             obj: Any, info: GraphQLResolveInfo, _type: Any
-        ) -> Optional[GraphQLObjectType]:
+        ) -> Optional[str]:
             assert info.schema is schema
             if isinstance(obj, User):
-                return user_type
+                return user_type.name
             if isinstance(obj, Photo):
-                return photo_type
+                return photo_type.name
             if isinstance(obj, Post):
-                return post_type
+                return post_type.name
             return None  # pragma: no cover
 
     node_interface, node_field = node_definitions(get_node, get_node_type)[:2]
