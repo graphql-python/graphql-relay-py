@@ -1,6 +1,6 @@
 from graphql import graphql_sync
 
-from .star_wars_schema import StarWarsSchema as schema
+from .star_wars_schema import star_wars_schema as schema
 
 
 def describe_star_wars_object_identification():

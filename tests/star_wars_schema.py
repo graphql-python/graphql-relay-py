@@ -110,8 +110,8 @@ def get_node(global_id, _info):
 
 def get_node_type(obj, _info, _type):
     if isinstance(obj, Faction):
-        return factionType
-    return shipType
+        return faction_type
+    return ship_type
 
 
 node_interface, node_field = node_definitions(get_node, get_node_type)[:2]
@@ -124,7 +124,7 @@ node_interface, node_field = node_definitions(get_node, get_node_type)[:2]
 #     id: String!
 #     name: String
 #   }
-shipType = GraphQLObjectType(
+ship_type = GraphQLObjectType(
     name="Ship",
     description="A ship in the Star Wars saga",
     fields=lambda: {
@@ -148,7 +148,7 @@ shipType = GraphQLObjectType(
 #     cursor: String!
 #     node: Ship
 #   }
-ship_edge, ship_connection = connection_definitions(shipType, "Ship")
+ship_edge, ship_connection = connection_definitions(ship_type, "Ship")
 
 # We define our faction type, which implements the node interface.
 #
@@ -158,7 +158,7 @@ ship_edge, ship_connection = connection_definitions(shipType, "Ship")
 #     name: String
 #     ships: ShipConnection
 #   }
-factionType = GraphQLObjectType(
+faction_type = GraphQLObjectType(
     name="Faction",
     description="A faction in the Star Wars saga",
     fields=lambda: {
@@ -185,11 +185,11 @@ factionType = GraphQLObjectType(
 #     empire: Faction
 #     node(id: String!): Node
 #   }
-queryType = GraphQLObjectType(
+query_type = GraphQLObjectType(
     name="Query",
     fields=lambda: {
-        "rebels": GraphQLField(factionType, resolve=lambda _obj, _info: get_rebels()),
-        "empire": GraphQLField(factionType, resolve=lambda _obj, _info: get_empire()),
+        "rebels": GraphQLField(faction_type, resolve=lambda _obj, _info: get_rebels()),
+        "empire": GraphQLField(faction_type, resolve=lambda _obj, _info: get_empire()),
         "node": node_field,
     },
 )
@@ -226,7 +226,7 @@ def mutate_and_get_payload(_info, shipName, factionId, **_input):
     return IntroduceShipMutation(shipId=new_ship.id, factionId=factionId)
 
 
-shipMutation = mutation_with_client_mutation_id(
+ship_mutation = mutation_with_client_mutation_id(
     "IntroduceShip",
     input_fields={
         "shipName": GraphQLInputField(GraphQLNonNull(GraphQLString)),
@@ -234,10 +234,10 @@ shipMutation = mutation_with_client_mutation_id(
     },
     output_fields={
         "ship": GraphQLField(
-            shipType, resolve=lambda payload, _info: get_ship(payload.shipId)
+            ship_type, resolve=lambda payload, _info: get_ship(payload.shipId)
         ),
         "faction": GraphQLField(
-            factionType, resolve=lambda payload, _info: get_faction(payload.factionId)
+            faction_type, resolve=lambda payload, _info: get_faction(payload.factionId)
         ),
     },
     mutate_and_get_payload=mutate_and_get_payload,
@@ -250,10 +250,10 @@ shipMutation = mutation_with_client_mutation_id(
 #   type Mutation {
 #     introduceShip(input IntroduceShipInput!): IntroduceShipPayload
 #   }
-mutationType = GraphQLObjectType(
-    "Mutation", fields=lambda: {"introduceShip": shipMutation}
+mutation_type = GraphQLObjectType(
+    "Mutation", fields=lambda: {"introduceShip": ship_mutation}
 )
 
 # Finally, we construct our schema (whose starting query type is the query
 # type we defined above) and export it.
-StarWarsSchema = GraphQLSchema(query=queryType, mutation=mutationType)
+star_wars_schema = GraphQLSchema(query=query_type, mutation=mutation_type)
