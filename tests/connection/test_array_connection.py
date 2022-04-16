@@ -258,10 +258,18 @@ def describe_connection_from_array():
             )
 
         def returns_all_elements_if_cursors_are_invalid():
-            c = connection_from_array(
-                array_abcde, dict(before="invalid", after="invalid")
+            c1 = connection_from_array(
+                array_abcde, dict(before="InvalidBase64", after="InvalidBase64")
             )
-            assert c == Connection(
+
+            invalid_unicode_in_base64 = "9JCAgA=="  # U+110000
+            c2 = connection_from_array(
+                array_abcde,
+                dict(before=invalid_unicode_in_base64, after=invalid_unicode_in_base64),
+            )
+
+            assert c1 == c2
+            assert c1 == Connection(
                 edges=[edge_a, edge_b, edge_c, edge_d, edge_e],
                 pageInfo=PageInfo(
                     startCursor=cursor_a,
