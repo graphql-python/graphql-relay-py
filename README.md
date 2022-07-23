@@ -17,8 +17,6 @@ For older versions of Python, you can use version 2 of these libraries.
 [![PyPI version](https://badge.fury.io/py/graphql-relay.svg)](https://badge.fury.io/py/graphql-relay)
 ![Test Status](https://github.com/graphql-python/graphql-relay-py/actions/workflows/test.yml/badge.svg)
 ![Lint Status](https://github.com/graphql-python/graphql-relay-py/actions/workflows/lint.yml/badge.svg)
-[![Dependency Updates](https://pyup.io/repos/github/graphql-python/graphql-relay-py/shield.svg)](https://pyup.io/repos/github/graphql-python/graphql-relay-py/)
-[![Python 3 Status](https://pyup.io/repos/github/graphql-python/graphql-relay-py/python-3-shield.svg)](https://pyup.io/repos/github/graphql-python/graphql-relay-py/)
 [![Code Style](https://img.shields.io/badge/code%20style-black-000000.svg)](https://github.com/ambv/black)
 
 ## Getting Started
