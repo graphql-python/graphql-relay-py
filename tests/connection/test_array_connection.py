@@ -104,6 +104,178 @@ def describe_connection_from_array():
             )
 
     def describe_pagination():
+        def respects_first():
+            c = connection_from_array_slice(
+                array_abcde,
+                dict(first=2),
+            )
+            assert c == Connection(
+                edges=[edge_a, edge_b],
+                pageInfo=PageInfo(
+                    startCursor=cursor_a,
+                    endCursor=cursor_b,
+                    hasPreviousPage=False,
+                    hasNextPage=True,
+                ),
+            )
+
+            c = connection_from_array_slice(
+                array_abcde,
+                dict(first=0),
+            )
+            assert c == Connection(
+                edges=[],
+                pageInfo=PageInfo(
+                    startCursor=None,
+                    endCursor=None,
+                    hasPreviousPage=False,
+                    hasNextPage=True,
+                ),
+            )
+
+            c = connection_from_array_slice(
+                array_abcde,
+                dict(first=5),
+            )
+            assert c == Connection(
+                edges=[edge_a, edge_b, edge_c, edge_d, edge_e],
+                pageInfo=PageInfo(
+                    startCursor=cursor_a,
+                    endCursor=cursor_e,
+                    hasPreviousPage=False,
+                    hasNextPage=False,
+                ),
+            )
+
+            c = connection_from_array_slice(
+                array_abcde,
+                dict(first=100),
+            )
+            assert c == Connection(
+                edges=[edge_a, edge_b, edge_c, edge_d, edge_e],
+                pageInfo=PageInfo(
+                    startCursor=cursor_a,
+                    endCursor=cursor_e,
+                    hasPreviousPage=False,
+                    hasNextPage=False,
+                ),
+            )
+
+        def respects_last():
+            c = connection_from_array_slice(
+                array_abcde,
+                dict(last=2),
+            )
+            assert c == Connection(
+                edges=[edge_d, edge_e],
+                pageInfo=PageInfo(
+                    startCursor=cursor_d,
+                    endCursor=cursor_e,
+                    hasPreviousPage=True,
+                    hasNextPage=False,
+                ),
+            )
+
+            c = connection_from_array_slice(
+                array_abcde,
+                dict(last=0),
+            )
+            assert c == Connection(
+                edges=[],
+                pageInfo=PageInfo(
+                    startCursor=None,
+                    endCursor=None,
+                    hasPreviousPage=True,
+                    hasNextPage=False,
+                ),
+            )
+
+            c = connection_from_array_slice(
+                array_abcde,
+                dict(last=5),
+            )
+            assert c == Connection(
+                edges=[edge_a, edge_b, edge_c, edge_d, edge_e],
+                pageInfo=PageInfo(
+                    startCursor=cursor_a,
+                    endCursor=cursor_e,
+                    hasPreviousPage=False,
+                    hasNextPage=False,
+                ),
+            )
+
+            c = connection_from_array_slice(
+                array_abcde,
+                dict(last=100),
+            )
+            assert c == Connection(
+                edges=[edge_a, edge_b, edge_c, edge_d, edge_e],
+                pageInfo=PageInfo(
+                    startCursor=cursor_a,
+                    endCursor=cursor_e,
+                    hasPreviousPage=False,
+                    hasNextPage=False,
+                ),
+            )
+
+        def respects_after():
+            c = connection_from_array_slice(
+                array_abcde,
+                dict(after=cursor_b),
+            )
+            assert c == Connection(
+                edges=[edge_c, edge_d, edge_e],
+                pageInfo=PageInfo(
+                    startCursor=cursor_c,
+                    endCursor=cursor_e,
+                    hasPreviousPage=True,
+                    hasNextPage=False,
+                ),
+            )
+
+            c = connection_from_array_slice(
+                array_abcde,
+                dict(after=cursor_e),
+            )
+            assert c == Connection(
+                edges=[],
+                pageInfo=PageInfo(
+                    startCursor=None,
+                    endCursor=None,
+                    hasPreviousPage=True,
+                    hasNextPage=False,
+                ),
+            )
+
+        def respects_before():
+            c = connection_from_array_slice(
+                array_abcde,
+                dict(before=cursor_c),
+            )
+            assert c == Connection(
+                edges=[edge_a, edge_b],
+                pageInfo=PageInfo(
+                    startCursor=cursor_a,
+                    endCursor=cursor_b,
+                    hasPreviousPage=False,
+                    hasNextPage=True,
+                ),
+            )
+
+            c = connection_from_array_slice(
+                array_abcde,
+                dict(before=cursor_a),
+            )
+            assert c == Connection(
+                edges=[],
+                pageInfo=PageInfo(
+                    startCursor=None,
+                    endCursor=None,
+                    hasPreviousPage=False,
+                    hasNextPage=True,
+                ),
+            )
+
         def respects_first_and_after():
             c = connection_from_array(array_abcde, dict(first=2, after=cursor_b))
             assert c == Connection(
@@ -111,7 +283,7 @@ def describe_connection_from_array():
                 pageInfo=PageInfo(
                     startCursor=cursor_c,
                     endCursor=cursor_d,
-                    hasPreviousPage=False,
+                    hasPreviousPage=True,
                     hasNextPage=True,
                 ),
             )
@@ -123,7 +295,7 @@ def describe_connection_from_array():
                 pageInfo=PageInfo(
                     startCursor=cursor_c,
                     endCursor=cursor_e,
-                    hasPreviousPage=False,
+                    hasPreviousPage=True,
                     hasNextPage=False,
                 ),
             )
@@ -136,7 +308,7 @@ def describe_connection_from_array():
                     startCursor=cursor_b,
                     endCursor=cursor_c,
                     hasPreviousPage=True,
-                    hasNextPage=False,
+                    hasNextPage=True,
                 ),
             )
 
@@ -148,7 +320,7 @@ def describe_connection_from_array():
                     startCursor=cursor_a,
                     endCursor=cursor_c,
                     hasPreviousPage=False,
-                    hasNextPage=False,
+                    hasNextPage=True,
                 ),
             )
 
@@ -162,12 +334,15 @@ def describe_connection_from_array():
                 pageInfo=PageInfo(
                     startCursor=cursor_b,
                     endCursor=cursor_c,
-                    hasPreviousPage=False,
+                    hasPreviousPage=True,
                     hasNextPage=True,
                 ),
             )
 
         def respects_first_and_after_and_before_too_many():
+            # `hasNextPage=False` because the spec says:
+            # "If first is set: [...] If edges contains more than first elements return true, otherwise false."
+            # and after the cursors have been applied, the array contains 3 elements <= first (4)
             c = connection_from_array(
                 array_abcde,
                 dict(first=4, after=cursor_a, before=cursor_e),
@@ -177,12 +352,15 @@ def describe_connection_from_array():
                 pageInfo=PageInfo(
                     startCursor=cursor_b,
                     endCursor=cursor_d,
-                    hasPreviousPage=False,
+                    hasPreviousPage=True,
                     hasNextPage=False,
                 ),
             )
 
         def respects_first_and_after_and_before_exactly_right():
+            # `hasNextPage=False` because the spec says:
+            # "If first is set: [...] If edges contains more than first elements return true, otherwise false."
+            # and after the cursors have been applied, the array contains 3 elements <= first (3)
             c = connection_from_array(
                 array_abcde,
                 dict(first=3, after=cursor_a, before=cursor_e),
@@ -192,7 +370,7 @@ def describe_connection_from_array():
                 pageInfo=PageInfo(
                     startCursor=cursor_b,
                     endCursor=cursor_d,
-                    hasPreviousPage=False,
+                    hasPreviousPage=True,
                     hasNextPage=False,
                 ),
             )
@@ -208,11 +386,14 @@ def describe_connection_from_array():
                     startCursor=cursor_c,
                     endCursor=cursor_d,
                     hasPreviousPage=True,
-                    hasNextPage=False,
+                    hasNextPage=True,
                 ),
             )
 
         def respects_last_and_after_and_before_too_many():
+            # `hasPreviousPage=False` because the spec says:
+            # "If last is set: [...] If edges contains more than last elements return true, otherwise false."
+            # and after the cursors have been applied, the array contains 3 elements <= last (4)
             c = connection_from_array(
                 array_abcde,
                 dict(last=4, after=cursor_a, before=cursor_e),
@@ -223,11 +404,14 @@ def describe_connection_from_array():
                     startCursor=cursor_b,
                     endCursor=cursor_d,
                     hasPreviousPage=False,
-                    hasNextPage=False,
+                    hasNextPage=True,
                 ),
             )
 
         def respects_last_and_after_and_before_exactly_right():
+            # `hasPreviousPage=False` because the spec says:
+            # "If last is set: [...] If edges contains more than last elements return true, otherwise false."
+            # and after the cursors have been applied, the array contains 3 elements <= last (3)
             c = connection_from_array(
                 array_abcde,
                 dict(last=3, after=cursor_a, before=cursor_e),
@@ -237,6 +421,166 @@ def describe_connection_from_array():
                 pageInfo=PageInfo(
                     startCursor=cursor_b,
                     endCursor=cursor_d,
+                    hasPreviousPage=False,
+                    hasNextPage=True,
+                ),
+            )
+
+        def respects_first_and_last():
+            c = connection_from_array_slice(
+                array_abcde,
+                dict(first=2, last=1),
+            )
+            assert c == Connection(
+                edges=[edge_b],
+                pageInfo=PageInfo(
+                    startCursor=cursor_b,
+                    endCursor=cursor_b,
+                    hasPreviousPage=True,
+                    hasNextPage=True,
+                ),
+            )
+
+            # `hasPreviousPage=True` might seem weird but this is what the spec says:
+            # "If last is set: [...] If edges contains more than last elements return true, otherwise false."
+            # and the array contains 5 elements > last (2)
+            c = connection_from_array_slice(
+                array_abcde,
+                dict(first=2, last=2),
+            )
+            assert c == Connection(
+                edges=[edge_a, edge_b],
+                pageInfo=PageInfo(
+                    startCursor=cursor_a,
+                    endCursor=cursor_b,
+                    hasPreviousPage=True,
+                    hasNextPage=True,
+                ),
+            )
+
+            c = connection_from_array_slice(
+                array_abcde,
+                dict(first=2, last=10),
+            )
+            assert c == Connection(
+                edges=[edge_a, edge_b],
+                pageInfo=PageInfo(
+                    startCursor=cursor_a,
+                    endCursor=cursor_b,
+                    hasPreviousPage=False,
+                    hasNextPage=True,
+                ),
+            )
+
+            c = connection_from_array_slice(
+                array_abcde,
+                dict(first=100, last=2),
+            )
+            assert c == Connection(
+                edges=[edge_d, edge_e],
+                pageInfo=PageInfo(
+                    startCursor=cursor_d,
+                    endCursor=cursor_e,
+                    hasPreviousPage=True,
+                    hasNextPage=False,
+                ),
+            )
+
+            c = connection_from_array_slice(
+                array_abcde,
+                dict(first=100, last=10),
+            )
+            assert c == Connection(
+                edges=[edge_a, edge_b, edge_c, edge_d, edge_e],
+                pageInfo=PageInfo(
+                    startCursor=cursor_a,
+                    endCursor=cursor_e,
+                    hasPreviousPage=False,
+                    hasNextPage=False,
+                ),
+            )
+
+        def respects_first_and_before():
+            c = connection_from_array_slice(
+                array_abcde,
+                dict(first=2, before=cursor_c),
+            )
+            assert c == Connection(
+                edges=[edge_a, edge_b],
+                pageInfo=PageInfo(
+                    startCursor=cursor_a,
+                    endCursor=cursor_b,
+                    hasPreviousPage=False,
+                    hasNextPage=False,
+                ),
+            )
+
+            c = connection_from_array_slice(
+                array_abcde,
+                dict(first=2, before=cursor_e),
+            )
+            assert c == Connection(
+                edges=[edge_a, edge_b],
+                pageInfo=PageInfo(
+                    startCursor=cursor_a,
+                    endCursor=cursor_b,
+                    hasPreviousPage=False,
+                    hasNextPage=True,
+                ),
+            )
+
+            c = connection_from_array_slice(
+                array_abcde,
+                dict(first=10, before=cursor_c),
+            )
+            assert c == Connection(
+                edges=[edge_a, edge_b],
+                pageInfo=PageInfo(
+                    startCursor=cursor_a,
+                    endCursor=cursor_b,
+                    hasPreviousPage=False,
+                    hasNextPage=False,
+                ),
+            )
+
+        def respects_last_and_after():
+            c = connection_from_array_slice(
+                array_abcde,
+                dict(last=2, after=cursor_a),
+            )
+            assert c == Connection(
+                edges=[edge_d, edge_e],
+                pageInfo=PageInfo(
+                    startCursor=cursor_d,
+                    endCursor=cursor_e,
+                    hasPreviousPage=True,
+                    hasNextPage=False,
+                ),
+            )
+
+            c = connection_from_array_slice(
+                array_abcde,
+                dict(last=2, after=cursor_c),
+            )
+            assert c == Connection(
+                edges=[edge_d, edge_e],
+                pageInfo=PageInfo(
+                    startCursor=cursor_d,
+                    endCursor=cursor_e,
+                    hasPreviousPage=False,
+                    hasNextPage=False,
+                ),
+            )
+
+            c = connection_from_array_slice(
+                array_abcde,
+                dict(last=10, after=cursor_c),
+            )
+            assert c == Connection(
+                edges=[edge_d, edge_e],
+                pageInfo=PageInfo(
+                    startCursor=cursor_d,
+                    endCursor=cursor_e,
                     hasPreviousPage=False,
                     hasNextPage=False,
                 ),
@@ -280,7 +624,8 @@ def describe_connection_from_array():
             )
 
         def returns_all_elements_if_cursors_are_on_the_outside():
-            all_edges = Connection(
+            c = connection_from_array(array_abcde, dict(before=offset_to_cursor(6)))
+            assert c == Connection(
                 edges=[edge_a, edge_b, edge_c, edge_d, edge_e],
                 pageInfo=PageInfo(
                     startCursor=cursor_a,
@@ -290,21 +635,43 @@ def describe_connection_from_array():
                 ),
             )
 
-            assert (
-                connection_from_array(array_abcde, dict(before=offset_to_cursor(6)))
-                == all_edges
+            # `hasNextPage=False` because the spec says:
+            # "If before is set: If the server can efficiently determine that elements exist following `before`, return true."
+            # and `before` is before the beginning of the array so there are elements after.
+            c = connection_from_array(array_abcde, dict(before=offset_to_cursor(-1)))
+            assert c == Connection(
+                edges=[edge_a, edge_b, edge_c, edge_d, edge_e],
+                pageInfo=PageInfo(
+                    startCursor=cursor_a,
+                    endCursor=cursor_e,
+                    hasPreviousPage=False,
+                    hasNextPage=True,
+                ),
             )
-            assert (
-                connection_from_array(array_abcde, dict(before=offset_to_cursor(-1)))
-                == all_edges
+
+            # `hasPreviousPage=True` because the spec says:
+            # "If after is set: If the server can efficiently determine that elements exist prior to `after`, return true"
+            # and `after` is after the end of the array so there are elements before.
+            c = connection_from_array(array_abcde, dict(after=offset_to_cursor(6)))
+            assert c == Connection(
+                edges=[edge_a, edge_b, edge_c, edge_d, edge_e],
+                pageInfo=PageInfo(
+                    startCursor=cursor_a,
+                    endCursor=cursor_e,
+                    hasPreviousPage=True,
+                    hasNextPage=False,
+                ),
             )
-            assert (
-                connection_from_array(array_abcde, dict(after=offset_to_cursor(6)))
-                == all_edges
-            )
-            assert (
-                connection_from_array(array_abcde, dict(after=offset_to_cursor(-1)))
-                == all_edges
+
+            c = connection_from_array(array_abcde, dict(after=offset_to_cursor(-1)))
+            assert c == Connection(
+                edges=[edge_a, edge_b, edge_c, edge_d, edge_e],
+                pageInfo=PageInfo(
+                    startCursor=cursor_a,
+                    endCursor=cursor_e,
+                    hasPreviousPage=False,
+                    hasNextPage=False,
+                ),
             )
 
         def returns_no_elements_if_cursors_cross():
@@ -317,8 +684,8 @@ def describe_connection_from_array():
                 pageInfo=PageInfo(
                     startCursor=None,
                     endCursor=None,
-                    hasPreviousPage=False,
-                    hasNextPage=False,
+                    hasPreviousPage=True,
+                    hasNextPage=True,
                 ),
             )
 
@@ -483,7 +850,7 @@ def describe_connection_from_array_slice():
             pageInfo=PageInfo(
                 startCursor=cursor_b,
                 endCursor=cursor_c,
-                hasPreviousPage=False,
+                hasPreviousPage=True,
                 hasNextPage=True,
             ),
         )
@@ -500,7 +867,7 @@ def describe_connection_from_array_slice():
             pageInfo=PageInfo(
                 startCursor=cursor_b,
                 endCursor=cursor_c,
-                hasPreviousPage=False,
+                hasPreviousPage=True,
                 hasNextPage=True,
             ),
         )
@@ -517,7 +884,7 @@ def describe_connection_from_array_slice():
             pageInfo=PageInfo(
                 startCursor=cursor_c,
                 endCursor=cursor_c,
-                hasPreviousPage=False,
+                hasPreviousPage=True,
                 hasNextPage=True,
             ),
         )
@@ -534,7 +901,7 @@ def describe_connection_from_array_slice():
             pageInfo=PageInfo(
                 startCursor=cursor_c,
                 endCursor=cursor_c,
-                hasPreviousPage=False,
+                hasPreviousPage=True,
                 hasNextPage=True,
             ),
         )
@@ -551,7 +918,7 @@ def describe_connection_from_array_slice():
             pageInfo=PageInfo(
                 startCursor=cursor_d,
                 endCursor=cursor_e,
-                hasPreviousPage=False,
+                hasPreviousPage=True,
                 hasNextPage=False,
             ),
         )
@@ -568,8 +935,8 @@ def describe_connection_from_array_slice():
             pageInfo=PageInfo(
                 startCursor=cursor_c,
                 endCursor=cursor_d,
-                hasPreviousPage=False,
-                hasNextPage=True,
+                hasPreviousPage=True,
+                hasNextPage=False,
             ),
         )
 
@@ -585,8 +952,8 @@ def describe_connection_from_array_slice():
             pageInfo=PageInfo(
                 startCursor=cursor_d,
                 endCursor=cursor_d,
-                hasPreviousPage=False,
-                hasNextPage=True,
+                hasPreviousPage=True,
+                hasNextPage=False,
             ),
         )
 
@@ -643,7 +1010,7 @@ def describe_connection_from_array_slice():
                     startCursor=cursor_a,
                     endCursor=cursor_a,
                     hasPreviousPage=False,
-                    hasNextPage=True,
+                    hasNextPage=False,
                 ),
             )
 

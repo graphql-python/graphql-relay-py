@@ -103,32 +103,39 @@ def connection_from_array_slice(
     after = args.get("after")
     first = args.get("first")
     last = args.get("last")
+
     if array_slice_length is None:
         array_slice_length = len(array_slice)
     slice_end = slice_start + array_slice_length
     if array_length is None:
+        # Assume that the slice covers until the end of the result set
         array_length = slice_end
 
     start_offset = max(slice_start, 0)
     end_offset = min(slice_end, array_length)
 
+    first_edge_offset = 0
     after_offset = get_offset_with_default(after, -1)
     if 0 <= after_offset < array_length:
         start_offset = max(start_offset, after_offset + 1)
+        first_edge_offset = after_offset + 1
 
-    before_offset = get_offset_with_default(before, end_offset)
+    last_edge_offset = array_length - 1
+    before_offset = get_offset_with_default(before, array_length)
     if 0 <= before_offset < array_length:
         end_offset = min(end_offset, before_offset)
+        last_edge_offset = before_offset - 1
+
+    number_edges_after_cursors = last_edge_offset - first_edge_offset + 1
 
     if isinstance(first, int):
         if first < 0:
             raise ValueError("Argument 'first' must be a non-negative integer.")
-
         end_offset = min(end_offset, start_offset + first)
+
     if isinstance(last, int):
         if last < 0:
             raise ValueError("Argument 'last' must be a non-negative integer.")
-
         start_offset = max(start_offset, end_offset - last)
 
     # If supplied slice is too large, trim it down before mapping over it.
@@ -141,16 +148,28 @@ def connection_from_array_slice(
 
     first_edge_cursor = edges[0].cursor if edges else None
     last_edge_cursor = edges[-1].cursor if edges else None
-    lower_bound = after_offset + 1 if after else 0
-    upper_bound = before_offset if before else array_length
+
+    # Determine hasPreviousPage
+    has_previous_page = False
+    if isinstance(last, int):
+        has_previous_page = number_edges_after_cursors > last
+    elif after is not None:
+        has_previous_page = after_offset >= 0
+
+    # Determine hasNextPage
+    has_next_page = False
+    if isinstance(first, int):
+        has_next_page = number_edges_after_cursors > first
+    elif before is not None:
+        has_next_page = before_offset < array_length
 
     return connection_type(
         edges=edges,
         pageInfo=page_info_type(
             startCursor=first_edge_cursor,
             endCursor=last_edge_cursor,
-            hasPreviousPage=isinstance(last, int) and start_offset > lower_bound,
-            hasNextPage=isinstance(first, int) and end_offset < upper_bound,
+            hasPreviousPage=has_previous_page,
+            hasNextPage=has_next_page,
         ),
     )
 
