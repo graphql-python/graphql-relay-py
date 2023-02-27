@@ -1,3 +1,4 @@
+import sys
 from typing import Any, Dict, List, NamedTuple, Optional, Union
 
 from graphql import (
@@ -18,10 +19,10 @@ from graphql import (
 
 from graphql import GraphQLNamedOutputType
 
-try:
-    from typing import Protocol
-except ImportError:  # Python < 3.8
-    from typing_extensions import Protocol  # type: ignore
+if sys.version_info >= (3, 8):
+    from typing import Protocol  # pragma: no cover
+else:
+    from typing_extensions import Protocol  # pragma: no cover
 
 __all__ = [
     "backward_connection_args",
@@ -41,6 +42,7 @@ __all__ = [
     "PageInfo",
     "PageInfoConstructor",
     "PageInfoType",
+    "Traversable",
 ]
 
 
@@ -152,12 +154,15 @@ class PageInfoType(Protocol):
     def startCursor(self) -> Optional[ConnectionCursor]:
         ...
 
+    @property
     def endCursor(self) -> Optional[ConnectionCursor]:
         ...
 
+    @property
     def hasPreviousPage(self) -> bool:
         ...
 
+    @property
     def hasNextPage(self) -> bool:
         ...
 
@@ -170,7 +175,7 @@ class PageInfoConstructor(Protocol):
         endCursor: Optional[ConnectionCursor],
         hasPreviousPage: bool,
         hasNextPage: bool,
-    ) -> PageInfoType:
+    ) -> Any:
         ...
 
 
@@ -183,18 +188,20 @@ class PageInfo(NamedTuple):
     hasNextPage: bool
 
 
-class EdgeType(Protocol):
-    @property
-    def node(self) -> Any:
-        ...
-
+class Traversable(Protocol):
     @property
     def cursor(self) -> ConnectionCursor:
         ...
 
 
+class EdgeType(Traversable, Protocol):
+    @property
+    def node(self) -> Any:
+        ...
+
+
 class EdgeConstructor(Protocol):
-    def __call__(self, *, node: Any, cursor: ConnectionCursor) -> EdgeType:
+    def __call__(self, *, node: Any, cursor: ConnectionCursor) -> Traversable:
         ...
 
 
@@ -219,9 +226,9 @@ class ConnectionConstructor(Protocol):
     def __call__(
         self,
         *,
-        edges: List[EdgeType],
-        pageInfo: PageInfoType,
-    ) -> ConnectionType:
+        edges: List[Any],
+        pageInfo: Any,
+    ) -> Any:
         ...
 
 

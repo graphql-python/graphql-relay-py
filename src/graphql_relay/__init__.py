@@ -22,6 +22,7 @@ from .connection.connection import (
     PageInfo,
     PageInfoConstructor,
     PageInfoType,
+    Traversable,
 )
 
 # Helpers for creating connections from arrays
@@ -92,6 +93,7 @@ __all__ = [
     "plural_identifying_root_field",
     "ResolvedGlobalId",
     "SizedSliceable",
+    "Traversable",
     "to_global_id",
     "version",
     "version_info",
