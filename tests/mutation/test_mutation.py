@@ -19,7 +19,6 @@ from ..utils import dedent
 
 
 class Result:
-
     # noinspection PyPep8Naming
     def __init__(self, result, clientMutationId=None):
         self.clientMutationId = clientMutationId

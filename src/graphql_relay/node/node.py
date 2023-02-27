@@ -24,7 +24,6 @@ __all__ = [
 
 
 class GraphQLNodeDefinitions(NamedTuple):
-
     node_interface: GraphQLInterfaceType
     node_field: GraphQLField
     nodes_field: GraphQLField
@@ -83,7 +82,6 @@ def node_definitions(
 
 
 class ResolvedGlobalId(NamedTuple):
-
     type: str
     id: str
 

@@ -80,7 +80,6 @@ def mutation_with_client_mutation_id(
     input_type = GraphQLInputObjectType(name + "Input", fields=augmented_input_fields)
 
     if iscoroutinefunction(mutate_and_get_payload):
-
         # noinspection PyShadowingBuiltins
         async def resolve(_root: Any, info: GraphQLResolveInfo, input: Dict) -> Any:
             payload = await mutate_and_get_payload(info, **input)
@@ -94,7 +93,6 @@ def mutation_with_client_mutation_id(
             return payload
 
     else:
-
         # noinspection PyShadowingBuiltins
         def resolve(  # type: ignore
             _root: Any, info: GraphQLResolveInfo, input: Dict

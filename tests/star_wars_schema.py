@@ -212,7 +212,6 @@ query_type = GraphQLObjectType(
 
 
 class IntroduceShipMutation:
-
     # noinspection PyPep8Naming
     def __init__(self, shipId, factionId, clientMutationId=None):
         self.shipId = shipId
