@@ -1,9 +1,10 @@
-from typing import Any, Iterator, Optional, Sequence
+import sys
+from typing import Any, Iterator, Optional, overload, Sequence
 
-try:
-    from typing import Protocol
-except ImportError:  # Python < 3.8
-    from typing_extensions import Protocol  # type: ignore
+if sys.version_info >= (3, 8):
+    from typing import Protocol  # pragma: no cover
+else:
+    from typing_extensions import Protocol  # pragma: no cover
 
 from ..utils.base64 import base64, unbase64
 from .connection import (
@@ -11,7 +12,6 @@ from .connection import (
     ConnectionArguments,
     ConnectionConstructor,
     ConnectionCursor,
-    ConnectionType,
     Edge,
     EdgeConstructor,
     PageInfo,
@@ -33,11 +33,45 @@ class SizedSliceable(Protocol):
     def __getitem__(self, index: slice) -> Any:
         ...
 
-    def __iter__(self) -> Iterator:
+    def __iter__(self) -> Iterator[Any]:
         ...
 
     def __len__(self) -> int:
         ...
+
+
+@overload
+def connection_from_array(
+    data: SizedSliceable,
+    args: Optional[ConnectionArguments] = None,
+    *,
+    edge_type: EdgeConstructor = Edge,
+    page_info_type: PageInfoConstructor = PageInfo,
+) -> Connection:
+    ...
+
+
+@overload
+def connection_from_array(
+    data: SizedSliceable,
+    args: Optional[ConnectionArguments],
+    connection_type: ConnectionConstructor,
+    edge_type: EdgeConstructor = Edge,
+    page_info_type: PageInfoConstructor = PageInfo,
+) -> Any:
+    ...
+
+
+@overload
+def connection_from_array(
+    data: SizedSliceable,
+    args: Optional[ConnectionArguments] = None,
+    *,
+    connection_type: ConnectionConstructor,
+    edge_type: EdgeConstructor = Edge,
+    page_info_type: PageInfoConstructor = PageInfo,
+) -> Any:
+    ...
 
 
 def connection_from_array(
@@ -46,7 +80,7 @@ def connection_from_array(
     connection_type: ConnectionConstructor = Connection,
     edge_type: EdgeConstructor = Edge,
     page_info_type: PageInfoConstructor = PageInfo,
-) -> ConnectionType:
+) -> Any:
     """Create a connection object from a sequence of objects.
 
     Note that different from its JavaScript counterpart which expects an array,
@@ -70,6 +104,49 @@ def connection_from_array(
     )
 
 
+@overload
+def connection_from_array_slice(
+    array_slice: SizedSliceable,
+    args: Optional[ConnectionArguments] = None,
+    slice_start: int = 0,
+    array_length: Optional[int] = None,
+    array_slice_length: Optional[int] = None,
+    *,
+    edge_type: EdgeConstructor = Edge,
+    page_info_type: PageInfoConstructor = PageInfo,
+) -> Connection:
+    ...
+
+
+@overload
+def connection_from_array_slice(
+    array_slice: SizedSliceable,
+    args: Optional[ConnectionArguments],
+    slice_start: int,
+    array_length: Optional[int],
+    array_slice_length: Optional[int],
+    connection_type: ConnectionConstructor,
+    edge_type: EdgeConstructor = Edge,
+    page_info_type: PageInfoConstructor = PageInfo,
+) -> Any:
+    ...
+
+
+@overload
+def connection_from_array_slice(
+    array_slice: SizedSliceable,
+    args: Optional[ConnectionArguments] = None,
+    slice_start: int = 0,
+    array_length: Optional[int] = None,
+    array_slice_length: Optional[int] = None,
+    *,
+    connection_type: ConnectionConstructor,
+    edge_type: EdgeConstructor = Edge,
+    page_info_type: PageInfoConstructor = PageInfo,
+) -> Any:
+    ...
+
+
 def connection_from_array_slice(
     array_slice: SizedSliceable,
     args: Optional[ConnectionArguments] = None,
@@ -79,7 +156,7 @@ def connection_from_array_slice(
     connection_type: ConnectionConstructor = Connection,
     edge_type: EdgeConstructor = Edge,
     page_info_type: PageInfoConstructor = PageInfo,
-) -> ConnectionType:
+) -> Any:
     """Create a connection object from a slice of the result set.
 
     Note that different from its JavaScript counterpart which expects an array,
